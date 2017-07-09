@@ -15,32 +15,24 @@ using System.Windows.Shapes;
 namespace Hatate
 {
 	/// <summary>
-	/// Interaction logic for Compare.xaml
+	/// Interaction logic for Option.xaml
 	/// </summary>
-	public partial class Compare : Window
+	public partial class Option : Window
 	{
-		private bool isGood = false;
-
-		public Compare(string thumb, string match)
+		public Option()
 		{
 			InitializeComponent();
 
 			this.Owner = App.Current.MainWindow;
 
-			this.Image_Original.Source = new BitmapImage(new Uri(thumb));
-			this.Image_Match.Source = new BitmapImage(new Uri(match));
+			this.CheckBox_Compare.IsChecked = Properties.Settings.Default.Compare;
 
 			this.ShowDialog();
 		}
 
-		public bool IsGood()
+		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
-			return this.isGood;
-		}
-
-		private void Button_Good_Click(object sender, RoutedEventArgs e)
-		{
-			this.isGood = true;
+			Properties.Settings.Default.Compare = (bool)this.CheckBox_Compare.IsChecked;
 
 			this.Close();
 		}

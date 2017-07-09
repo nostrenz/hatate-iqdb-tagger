@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Compare" Height="204.475" Width="236.488">
+        Title="Compare" Height="204.475" Width="236.488" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid>
 		<Image x:Name="Image_Original" HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100"/>
 		<Image x:Name="Image_Match" HorizontalAlignment="Left" Height="100" Margin="115,10,0,0" VerticalAlignment="Top" Width="100"/>

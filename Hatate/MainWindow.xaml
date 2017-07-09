@@ -5,11 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="MainWindow" Height="374.096" Width="525">
+        Title="Hatate" Height="374.096" Width="525">
 	<Grid>
-		<ListBox x:Name="ListBox_Files" Margin="0,0,0,57"/>
+		<ListBox x:Name="ListBox_Files" Margin="0,18,0,57"/>
 		<Label x:Name="Label_Action" Content="Label" Margin="0,0,75,26" Height="26" VerticalAlignment="Bottom"/>
 		<Label x:Name="Label_Remaining" Content="Label" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,0"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
+		<Menu HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Width="517">
+			<MenuItem x:Name="MenuItem_Refresh" Header="Refresh" Click="MenuItem_Refresh_Click"/>
+			<MenuItem Header="Options" Click="MenuItem_Options_Click"/>
+		</Menu>
 	</Grid>
 </Window>

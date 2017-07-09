@@ -74,6 +74,8 @@ namespace Hatate
 			this.files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(path, filter, SearchOption.TopDirectoryOnly)).ToArray();
 			this.searched = this.files.Length;
 
+			this.ListBox_Files.Items.Clear();
+
 			foreach (string file in this.files) {
 				this.ListBox_Files.Items.Add(file);
 			}
@@ -135,8 +137,6 @@ namespace Hatate
 			IqdbApi.IqdbApi api = new IqdbApi.IqdbApi();
 
 			foreach (string filepath in this.files) {
-				Console.WriteLine("START ---------------------------");
-
 				string filename = filepath.Substring(filepath.LastIndexOf(@"\") + 1, filepath.Length - filepath.LastIndexOf(@"\") - 1);
 
 				// Skip file if a txt with the same name already exists
@@ -152,13 +152,21 @@ namespace Hatate
 				await this.Run(api, thumb, filename);
 
 				this.searched--;
-				this.Label_Action.Content = "Next search in " + (INTERVAL/1000) + " seconds";
+
+				if (this.searched > 0) {
+					this.Label_Action.Content = "Next search in " + (INTERVAL/1000) + " seconds";
+				} else {
+					this.Label_Action.Content = "Finished.";
+
+					// Ready for next batch
+					this.GetFileList();
+					this.Button_Start.IsEnabled = true;
+				}
+				
 				this.UpdateLabels();
 
 				// Wait some time until the next search
 				await PutTaskDelay();
-
-				Console.WriteLine("END ---------------------------");
 			}
 		}
 
@@ -199,10 +207,12 @@ namespace Hatate
 					Console.WriteLine("| Url: "        + match.Url);
 					Console.WriteLine("| -------------------------------");
 
-					Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
+					if (Properties.Settings.Default.Compare) {
+						Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
 
-					if (!compare.IsGood()) {
-						continue;
+						if (!compare.IsGood()) {
+							continue;
+						}
 					}
 
 					this.WriteTagsToTxt(filename, match.Tags);
@@ -212,6 +222,8 @@ namespace Hatate
 
 				if (found) {
 					Console.WriteLine("Tags found for " + filename);
+
+					File.Move(this.GetImgsDirPath() + filename, this.GetImgsDirPath() + @"tagged\" + filename);
 				} else {
 					Console.WriteLine("Nothing found for " + filename);
 
@@ -222,7 +234,7 @@ namespace Hatate
 
 		private void WriteTagsToTxt(string filename, System.Collections.Immutable.ImmutableList<string> tags)
 		{
-			string txtPath = this.GetImgsDirPath() + filename + ".txt";
+			string txtPath = this.GetImgsDirPath() + @"tagged\" + filename + ".txt";
 
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(txtPath)) {
 				foreach (string tag in tags) {
@@ -259,6 +271,16 @@ namespace Hatate
 			this.Button_Start.IsEnabled = false;
 
 			this.StartSearch();
+		}
+
+		private void MenuItem_Refresh_Click(object sender, RoutedEventArgs e)
+		{
+			this.GetFileList();
+		}
+
+		private void MenuItem_Options_Click(object sender, RoutedEventArgs e)
+		{
+			Option potion = new Option();
 		}
 	}
 }
