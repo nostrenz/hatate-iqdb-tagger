@@ -64,8 +64,7 @@ namespace Hatate
 					return;
 				}
 
-				this.workingFolder = fbd.SelectedPath + @"\";
-				Options.Default.LastFolder = fbd.SelectedPath;
+				Options.Default.LastFolder = this.workingFolder = fbd.SelectedPath + @"\";
 
 				Options.Default.Save();
 			}
