@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hatate" Height="374.096" Width="525" MinWidth="500" MinHeight="186">
+        Title="Hatate - iqdb images tagger" Height="374.096" Width="525" MinWidth="500" MinHeight="186">
 	<Grid>
 		<ListBox x:Name="ListBox_Files" Margin="0,18,0,57"/>
 		<Label x:Name="Label_Action" Content="Label" Margin="0,0,75,26" Height="26" VerticalAlignment="Bottom"/>
