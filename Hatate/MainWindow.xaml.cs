@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Options = Hatate.Properties.Settings;
 
@@ -270,15 +271,17 @@ namespace Hatate
 					continue;
 				}
 
+				List<string> tagList = this.FilterTags(match.Tags, match.Rating);
+
 				if (Options.Default.Compare) {
-					Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
+					Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl, tagList);
 
 					if (!compare.IsGood) {
 						continue;
 					}
 				}
 
-				this.WriteTagsToTxt(filename, match.Tags, match.Rating);
+				this.WriteTagsToTxt(filename, tagList);
 
 				return true;
 			}
@@ -318,27 +321,45 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
+		/// </summary>
+		/// <returns></returns>
+		private List<string> FilterTags(System.Collections.Immutable.ImmutableList<string> tags, IqdbApi.Enums.Rating rating)
+		{
+			List<string> tagList = new List<string>();
+
+			// Write each tags
+			foreach (string tag in tags) {
+				string tmp = this.FormatTag(tag);
+
+				if (tmp != null) {
+					tagList.Add(tmp);
+				}
+			}
+
+			// Add rating
+			if (Options.Default.AddRating) {
+				string strRating = rating.ToString().ToLower();
+
+				if (String.IsNullOrWhiteSpace(strRating)) {
+					tagList.Add("rating:" + strRating);
+				}
+			}
+
+			return tagList;
+		}
+
+		/// <summary>
 		/// Take the tag list and write it into a text file with the same name as the image.
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="tags"></param>
-		private void WriteTagsToTxt(string filename, System.Collections.Immutable.ImmutableList<string> tags, IqdbApi.Enums.Rating rating)
+		private void WriteTagsToTxt(string filename, List<string> tags)
 		{
-			string txtPath = this.TaggedDirPath + filename + ".txt";
-
-			using (StreamWriter file = new StreamWriter(txtPath)) {
+			using (StreamWriter file = new StreamWriter(this.TaggedDirPath + filename + ".txt")) {
 				// Write each tags
 				foreach (string tag in tags) {
-					string tmp = this.FormatTag(tag);
-
-					if (tmp != null) {
-						file.WriteLine(tmp);
-					}
-				}
-
-				// Add rating
-				if (Options.Default.AddRating) {
-					file.WriteLine("rating:" + rating.ToString().ToLower());
+					file.WriteLine(tag);
 				}
 			}
 		}

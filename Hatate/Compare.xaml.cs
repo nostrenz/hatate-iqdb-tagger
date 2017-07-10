@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Collections.Generic;
 
 namespace Hatate
 {
@@ -11,7 +12,7 @@ namespace Hatate
 	{
 		private bool isGood = false;
 
-		public Compare(string thumb, string match)
+		public Compare(string thumb, string match, List<string> tagList)
 		{
 			InitializeComponent();
 
@@ -19,6 +20,12 @@ namespace Hatate
 
 			this.Image_Original.Source = new BitmapImage(new Uri(thumb));
 			this.Image_Match.Source = new BitmapImage(new Uri(match));
+
+			this.Label_Counters.Content = tagList.Count + " tags found";
+
+			foreach (string tag in tagList) {
+				this.ListBox_Tags.Items.Add(tag);
+			}
 
 			this.ShowDialog();
 		}

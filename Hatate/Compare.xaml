@@ -5,12 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Compare" Height="204.475" Width="236.488" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Compare" Height="236.817" Width="374.181" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid>
-		<Image x:Name="Image_Original" HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100"/>
-		<Image x:Name="Image_Match" HorizontalAlignment="Left" Height="100" Margin="115,10,0,0" VerticalAlignment="Top" Width="100"/>
+		<Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100">
+			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		</Border>
+		<Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="100" Margin="115,10,0,0" VerticalAlignment="Top" Width="100">
+			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		</Border>
+
 		<Label Content="Original" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="100" HorizontalContentAlignment="Center"/>
 		<Label Content="Match" HorizontalAlignment="Left" Margin="115,110,0,0" VerticalAlignment="Top" Width="100" HorizontalContentAlignment="Center"/>
-		<Button Content="Good?" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top" Width="205" Click="Button_Good_Click"/>
+		<Button Content="Good?" Click="Button_Good_Click" Height="36" VerticalAlignment="Bottom"/>
+		<Label x:Name="Label_Counters" Content="99 tags found" HorizontalAlignment="Left" Margin="0,0,0,36" Width="220" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="31" VerticalAlignment="Bottom"/>
+		<ListBox x:Name="ListBox_Tags" Margin="220,0,0,36" Height="162" VerticalAlignment="Bottom"/>
 	</Grid>
 </Window>
