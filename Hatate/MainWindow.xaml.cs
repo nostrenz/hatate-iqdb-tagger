@@ -34,7 +34,7 @@ namespace Hatate
 		public MainWindow()
 		{
 			InitializeComponent();
-			
+
 			if (Options.Default.KnownTags) {
 				this.LoadKnownTags();
 			}
@@ -235,7 +235,7 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task RunIqdbApi(IqdbApi.IqdbApi api, string thumbPath, string filename)
 		{
-			using (var fs = new System.IO.FileStream(thumbPath, System.IO.FileMode.Open)) {
+			using (var fs = new FileStream(thumbPath, FileMode.Open)) {
 				IqdbApi.Models.SearchResult result = await api.SearchFile(fs);
 
 				this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
@@ -304,17 +304,21 @@ namespace Hatate
 			tag = tag.Replace(",", "");
 			tag = tag.Trim();
 
+			if (String.IsNullOrWhiteSpace(tag)) {
+				return null;
+			}
+
 			if (!Options.Default.KnownTags) {
 				return tag;
 			}
 
-			if (this.tags.Contains(tag)) {
+			if (this.tags != null && this.tags.Contains(tag)) {
 				return tag;
-			} else if (this.series.Contains(tag)) {
+			} else if (this.series != null && this.series.Contains(tag)) {
 				return "series:" + tag;
-			} else if (this.characters.Contains(tag)) {
+			} else if (this.characters != null && this.characters.Contains(tag)) {
 				return "characters:" + tag;
-			} else if (this.creators.Contains(tag)) {
+			} else if (this.creators != null && this.creators.Contains(tag)) {
 				return "creators:" + tag;
 			}
 
