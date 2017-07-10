@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hatate" Height="374.096" Width="525">
+        Title="Hatate" Height="374.096" Width="525" MinWidth="500" MinHeight="186">
 	<Grid>
 		<ListBox x:Name="ListBox_Files" Margin="0,18,0,57"/>
 		<Label x:Name="Label_Action" Content="Label" Margin="0,0,75,26" Height="26" VerticalAlignment="Bottom"/>
 		<Label x:Name="Label_Remaining" Content="Label" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,0"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False"/>
-		<Menu HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Width="517">
+		<Menu Height="18" VerticalAlignment="Top">
 			<MenuItem x:Name="MenuItem_OpenFolder" Header="Open folder" Click="MenuItem_OpenFolder_Click"/>
 			<MenuItem x:Name="MenuItem_Refresh" Header="Refresh list" Click="MenuItem_Refresh_Click" Height="18"/>
 			<MenuItem Header="Reload known tags" Click="MenuItem_ReloadKnownTags_Click"/>
