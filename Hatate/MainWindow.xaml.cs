@@ -51,7 +51,7 @@ namespace Hatate
 		*/
 
 		#region Private
-		
+
 		/// <summary>
 		/// Select a folder to open.
 		/// </summary>
@@ -80,19 +80,19 @@ namespace Hatate
 			string chara = @"\tags\characters.txt";
 			string creator = @"\tags\creators.txt";
 
-			if (File.Exists(tag)) {
+			if (File.Exists(appFolder + tag)) {
 				this.tags = File.ReadAllLines(appFolder + tag);
 			}
 
-			if (File.Exists(serie)) {
+			if (File.Exists(appFolder + serie)) {
 				this.series = File.ReadAllLines(appFolder + serie);
 			}
 
-			if (File.Exists(chara)) {
+			if (File.Exists(appFolder + chara)) {
 				this.characters = File.ReadAllLines(appFolder + chara);
 			}
 
-			if (File.Exists(creator)) {
+			if (File.Exists(appFolder + creator)) {
 				this.creators = File.ReadAllLines(appFolder + creator);
 			}
 
@@ -239,31 +239,7 @@ namespace Hatate
 				IqdbApi.Models.SearchResult result = await api.SearchFile(fs);
 
 				this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
-				bool found = false;
-
-				foreach (IqdbApi.Models.Match match in result.Matches) {
-					// Check minimum similarity and number of tags
-					if (match.Similarity < Options.Default.Similarity || match.Tags.Count < Options.Default.TagsCount) {
-						continue;
-					}
-
-					// Check match type if enabled
-					if (Options.Default.CheckMatchType && match.MatchType != Options.Default.MatchType) {
-						continue;
-					}
-
-					if (Options.Default.Compare) {
-						Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
-
-						if (!compare.IsGood) {
-							continue;
-						}
-					}
-
-					this.WriteTagsToTxt(filename, match.Tags);
-
-					found = true;
-				}
+				bool found = this.CheckMatches(result.Matches, filename, thumbPath);
 
 				if (found) {
 					File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
@@ -274,21 +250,95 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Check the various matches to find the best one.
+		/// </summary>
+		private bool CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, string filename, string thumbPath)
+		{
+			foreach (IqdbApi.Models.Match match in matches) {
+				// Check minimum similarity and number of tags
+				if (match.Similarity < Options.Default.Similarity || match.Tags.Count < Options.Default.TagsCount) {
+					continue;
+				}
+
+				// Check match type if enabled
+				if (Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
+					continue;
+				}
+
+				// Check source
+				if (!this.CheckSource(match.Source)) {
+					continue;
+				}
+
+				if (Options.Default.Compare) {
+					Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
+
+					if (!compare.IsGood) {
+						continue;
+					}
+				}
+
+				this.WriteTagsToTxt(filename, match.Tags, match.Rating);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Check if the given source checked in the options.
+		/// </summary>
+		/// <param name=""></param>
+		/// <returns></returns>
+		private bool CheckSource(IqdbApi.Enums.Source source)
+		{
+			switch (source) {
+				case IqdbApi.Enums.Source.Danbooru:
+					return Options.Default.Source_Danbooru;
+				case IqdbApi.Enums.Source.Konachan:
+					return Options.Default.Source_Konachan;
+				case IqdbApi.Enums.Source.Yandere:
+					return Options.Default.Source_Yandere;
+				case IqdbApi.Enums.Source.Gelbooru:
+					return Options.Default.Source_Gelbooru;
+				case IqdbApi.Enums.Source.SankakuChannel:
+					return Options.Default.Source_SankakuChannel;
+				case IqdbApi.Enums.Source.Eshuushuu:
+					return Options.Default.Source_Eshuushuu;
+				case IqdbApi.Enums.Source.TheAnimeGallery:
+					return Options.Default.Source_TheAnimeGallery;
+				case IqdbApi.Enums.Source.Zerochan:
+					return Options.Default.Source_Zerochan;
+				case IqdbApi.Enums.Source.AnimePictures:
+					return Options.Default.Source_AnimePictures;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Take the tag list and write it into a text file with the same name as the image.
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="tags"></param>
-		private void WriteTagsToTxt(string filename, System.Collections.Immutable.ImmutableList<string> tags)
+		private void WriteTagsToTxt(string filename, System.Collections.Immutable.ImmutableList<string> tags, IqdbApi.Enums.Rating rating)
 		{
 			string txtPath = this.TaggedDirPath + filename + ".txt";
 
 			using (StreamWriter file = new StreamWriter(txtPath)) {
+				// Write each tags
 				foreach (string tag in tags) {
 					string tmp = this.FormatTag(tag);
 
 					if (tmp != null) {
 						file.WriteLine(tmp);
 					}
+				}
+
+				// Add rating
+				if (Options.Default.AddRating) {
+					file.WriteLine("rating:" + rating.ToString().ToLower());
 				}
 			}
 		}
@@ -302,7 +352,7 @@ namespace Hatate
 		{
 			tag = tag.Replace("_", " ");
 			tag = tag.Replace(",", "");
-			tag = tag.Trim();
+			tag = tag.ToLower().Trim();
 
 			if (String.IsNullOrWhiteSpace(tag)) {
 				return null;

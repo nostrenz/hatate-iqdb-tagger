@@ -6,7 +6,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Similarity" Type="System.Byte" Scope="User">
-      <Value Profile="(Default)">90</Value>
+      <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="KnownTags" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -15,7 +15,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="MatchType" Type="IqdbApi.Enums.MatchType" Scope="User">
-      <Value Profile="(Default)">Best</Value>
+      <Value Profile="(Default)">Additional</Value>
     </Setting>
     <Setting Name="CheckMatchType" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -25,6 +25,39 @@
     </Setting>
     <Setting Name="Delay" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
+    </Setting>
+    <Setting Name="Setting" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Source_Danbooru" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Source_Konachan" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Source_Yandere" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Source_Gelbooru" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Source_SankakuChannel" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Source_Eshuushuu" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Source_TheAnimeGallery" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Source_Zerochan" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Source_AnimePictures" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AddRating" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

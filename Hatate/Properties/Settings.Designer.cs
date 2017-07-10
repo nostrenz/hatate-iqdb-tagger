@@ -37,7 +37,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
         public byte Similarity {
             get {
                 return ((byte)(this["Similarity"]));
@@ -73,7 +73,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Best")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Additional")]
         public global::IqdbApi.Enums.MatchType MatchType {
             get {
                 return ((global::IqdbApi.Enums.MatchType)(this["MatchType"]));
@@ -116,6 +116,138 @@ namespace Hatate.Properties {
             }
             set {
                 this["Delay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Setting {
+            get {
+                return ((string)(this["Setting"]));
+            }
+            set {
+                this["Setting"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Danbooru {
+            get {
+                return ((bool)(this["Source_Danbooru"]));
+            }
+            set {
+                this["Source_Danbooru"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Konachan {
+            get {
+                return ((bool)(this["Source_Konachan"]));
+            }
+            set {
+                this["Source_Konachan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Yandere {
+            get {
+                return ((bool)(this["Source_Yandere"]));
+            }
+            set {
+                this["Source_Yandere"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Gelbooru {
+            get {
+                return ((bool)(this["Source_Gelbooru"]));
+            }
+            set {
+                this["Source_Gelbooru"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_SankakuChannel {
+            get {
+                return ((bool)(this["Source_SankakuChannel"]));
+            }
+            set {
+                this["Source_SankakuChannel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_Eshuushuu {
+            get {
+                return ((bool)(this["Source_Eshuushuu"]));
+            }
+            set {
+                this["Source_Eshuushuu"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_TheAnimeGallery {
+            get {
+                return ((bool)(this["Source_TheAnimeGallery"]));
+            }
+            set {
+                this["Source_TheAnimeGallery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Zerochan {
+            get {
+                return ((bool)(this["Source_Zerochan"]));
+            }
+            set {
+                this["Source_Zerochan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_AnimePictures {
+            get {
+                return ((bool)(this["Source_AnimePictures"]));
+            }
+            set {
+                this["Source_AnimePictures"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AddRating {
+            get {
+                return ((bool)(this["AddRating"]));
+            }
+            set {
+                this["AddRating"] = value;
             }
         }
     }

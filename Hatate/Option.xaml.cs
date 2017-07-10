@@ -22,11 +22,23 @@ namespace Hatate
 
 			this.CheckBox_Compare.IsChecked = Options.Default.Compare;
 			this.CheckBox_KnownTags.IsChecked = Options.Default.KnownTags;
+			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
 			this.CheckBox_MatchType.IsChecked = Options.Default.CheckMatchType;
 			this.Combo_MatchType.SelectedItem = Options.Default.MatchType;
 			this.TextBox_MinimumTagsCount.Text = Options.Default.TagsCount.ToString();
 			this.Slider_Similarity.Value = Options.Default.Similarity;
 			this.Slider_Delay.Value = Options.Default.Delay;
+
+			// Sources
+			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
+			this.CheckBox_Source_Konachan.IsChecked = Options.Default.Source_Konachan;
+			this.CheckBox_Source_Yandere.IsChecked = Options.Default.Source_Yandere;
+			this.CheckBox_Source_Gelbooru.IsChecked = Options.Default.Source_Gelbooru;
+			this.CheckBox_Source_SankakuChannel.IsChecked = Options.Default.Source_SankakuChannel;
+			this.CheckBox_Source_Eshuushuu.IsChecked = Options.Default.Source_Eshuushuu;
+			this.CheckBox_Source_TheAnimeGallery.IsChecked = Options.Default.Source_TheAnimeGallery;
+			this.CheckBox_Source_Zerochan.IsChecked = Options.Default.Source_Zerochan;
+			this.CheckBox_Source_AnimePictures.IsChecked = Options.Default.Source_AnimePictures;
 
 			this.UpdateLabels();
 			this.ShowDialog();
@@ -54,11 +66,23 @@ namespace Hatate
 		{
 			Options.Default.Compare = (bool)this.CheckBox_Compare.IsChecked;
 			Options.Default.KnownTags = (bool)this.CheckBox_KnownTags.IsChecked;
+			Options.Default.AddRating = (bool)this.CheckBox_AddRating.IsChecked;
 			Options.Default.CheckMatchType = (bool)this.CheckBox_MatchType.IsChecked;
 			Options.Default.MatchType = (IqdbApi.Enums.MatchType)this.Combo_MatchType.SelectedItem;
 			Options.Default.TagsCount = Int32.Parse(this.TextBox_MinimumTagsCount.Text);
 			Options.Default.Similarity = (byte)this.Slider_Similarity.Value;
 			Options.Default.Delay = (int)this.Slider_Delay.Value;
+
+			// Sources
+			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
+			Options.Default.Source_Konachan = (bool)this.CheckBox_Source_Konachan.IsChecked;
+			Options.Default.Source_Yandere = (bool)this.CheckBox_Source_Yandere.IsChecked;
+			Options.Default.Source_Gelbooru = (bool)this.CheckBox_Source_Gelbooru.IsChecked;
+			Options.Default.Source_SankakuChannel =(bool)this.CheckBox_Source_SankakuChannel.IsChecked;
+			Options.Default.Source_Eshuushuu = (bool)this.CheckBox_Source_Eshuushuu.IsChecked;
+			Options.Default.Source_TheAnimeGallery = (bool)this.CheckBox_Source_TheAnimeGallery.IsChecked;
+			Options.Default.Source_Zerochan = (bool)this.CheckBox_Source_Zerochan.IsChecked;
+			Options.Default.Source_AnimePictures = (bool)this.CheckBox_Source_AnimePictures.IsChecked;
 
 			Options.Default.Save();
 
