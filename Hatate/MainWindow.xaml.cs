@@ -64,7 +64,7 @@ namespace Hatate
 					return;
 				}
 
-				this.workingFolder = fbd.SelectedPath;
+				this.workingFolder = fbd.SelectedPath + @"\";
 				Options.Default.LastFolder = fbd.SelectedPath;
 
 				Options.Default.Save();
@@ -178,7 +178,7 @@ namespace Hatate
 			for (int i = 0; i < count; i++) {
 				string filepath = this.files[i];
 				string filename = filepath.Substring(filepath.LastIndexOf(@"\") + 1, filepath.Length - filepath.LastIndexOf(@"\") - 1);
-				
+
 				// Skip file if a txt with the same name already exists
 				if (File.Exists(filepath + ".txt")) {
 					continue;
