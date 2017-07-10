@@ -37,18 +37,6 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
-        public int Interval {
-            get {
-                return ((int)(this["Interval"]));
-            }
-            set {
-                this["Interval"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public byte Similarity {
             get {
@@ -104,6 +92,30 @@ namespace Hatate.Properties {
             }
             set {
                 this["CheckMatchType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastFolder {
+            get {
+                return ((string)(this["LastFolder"]));
+            }
+            set {
+                this["LastFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public int Delay {
+            get {
+                return ((int)(this["Delay"]));
+            }
+            set {
+                this["Delay"] = value;
             }
         }
     }

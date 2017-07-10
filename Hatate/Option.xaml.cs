@@ -26,8 +26,9 @@ namespace Hatate
 			this.Combo_MatchType.SelectedItem = Options.Default.MatchType;
 			this.TextBox_MinimumTagsCount.Text = Options.Default.TagsCount.ToString();
 			this.Slider_Similarity.Value = Options.Default.Similarity;
+			this.Slider_Delay.Value = Options.Default.Delay;
 
-			this.UpdateLabel();
+			this.UpdateLabels();
 			this.ShowDialog();
 		}
 
@@ -37,9 +38,10 @@ namespace Hatate
 		============================================
 		*/
 
-		private void UpdateLabel()
+		private void UpdateLabels()
 		{
 			this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
+			this.Label_Delay.Content = "Delay (" + (int)this.Slider_Delay.Value + "secs / " + (int)(this.Slider_Delay.Value / 60) + "mins)";
 		}
 
 		/*
@@ -55,24 +57,25 @@ namespace Hatate
 			Options.Default.CheckMatchType = (bool)this.CheckBox_MatchType.IsChecked;
 			Options.Default.MatchType = (IqdbApi.Enums.MatchType)this.Combo_MatchType.SelectedItem;
 			Options.Default.TagsCount = Int32.Parse(this.TextBox_MinimumTagsCount.Text);
-			Options.Default.Similarity = (byte)Slider_Similarity.Value;
+			Options.Default.Similarity = (byte)this.Slider_Similarity.Value;
+			Options.Default.Delay = (int)this.Slider_Delay.Value;
 
 			Options.Default.Save();
 
 			this.Close();
 		}
 
-		private void Slider_Similarity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-		{
-			if (this.IsLoaded) {
-				this.UpdateLabel();
-			}
-		}
-
 		private void CheckBox_MatchType_Click(object sender, RoutedEventArgs e)
 		{
 			this.Label_MatchType.IsEnabled = (bool)this.CheckBox_MatchType.IsChecked;
 			this.Combo_MatchType.IsEnabled = (bool)this.CheckBox_MatchType.IsChecked;
+		}
+
+		private void Sliders_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			if (this.IsLoaded) {
+				this.UpdateLabels();
+			}
 		}
 	}
 }

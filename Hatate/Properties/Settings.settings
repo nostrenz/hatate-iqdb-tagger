@@ -5,9 +5,6 @@
     <Setting Name="Compare" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Interval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">60000</Value>
-    </Setting>
     <Setting Name="Similarity" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">90</Value>
     </Setting>
@@ -22,6 +19,12 @@
     </Setting>
     <Setting Name="CheckMatchType" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LastFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Delay" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60</Value>
     </Setting>
   </Settings>
 </SettingsFile>

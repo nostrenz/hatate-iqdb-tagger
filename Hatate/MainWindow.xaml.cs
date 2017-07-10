@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows.Forms;
 using Options = Hatate.Properties.Settings;
 
 namespace Hatate
@@ -17,8 +18,6 @@ namespace Hatate
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		const int INTERVAL = 60000; // 60 seconds
-		const string DIR_IMGS = @"imgs\";
 		const string DIR_THUMBS = @"thumbs\";
 
 		private string[] tags;
@@ -29,16 +28,19 @@ namespace Hatate
 		private static string appFolder = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 		private int lastSearchedInSeconds = 0;
 		private string[] files;
-		private int searched = 0;
+		private int remaining = 0;
+		private string workingFolder = Options.Default.LastFolder;
 
 		public MainWindow()
 		{
 			InitializeComponent();
-
-			this.GetFileList();
 			
 			if (Options.Default.KnownTags) {
-				this.GetKnownTags();
+				this.LoadKnownTags();
+			}
+
+			if (!String.IsNullOrWhiteSpace(this.workingFolder)) {
+				this.GetImagesFromFolder();
 			}
 		}
 
@@ -49,11 +51,30 @@ namespace Hatate
 		*/
 
 		#region Private
+		
+		/// <summary>
+		/// Select a folder to open.
+		/// </summary>
+		private void OpenFolder()
+		{
+			using (FolderBrowserDialog fbd = new FolderBrowserDialog()) {
+				DialogResult result = fbd.ShowDialog();
+
+				if (result != System.Windows.Forms.DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath)) {
+					return;
+				}
+
+				this.workingFolder = fbd.SelectedPath;
+				Options.Default.LastFolder = fbd.SelectedPath;
+
+				Options.Default.Save();
+			}
+		}
 
 		/// <summary>
 		/// Load known tags from text files.
 		/// </summary>
-		private void GetKnownTags()
+		private void LoadKnownTags()
 		{
 			string tag = @"\tags\tags.txt";
 			string serie = @"\tags\series.txt";
@@ -80,26 +101,21 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Get the files, store them in the list and display them in the view.
+		/// Get all the images in the working directory and add them to the list.
 		/// </summary>
-		private void GetFileList()
+		private void GetImagesFromFolder()
 		{
-			string path = appFolder + @"\imgs";
-
-			if (!Directory.Exists(path)) {
-				Directory.CreateDirectory(path);
-			}
-
-			this.files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(path, filter, SearchOption.TopDirectoryOnly)).ToArray();
-			this.searched = this.files.Length;
-
+			this.files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(this.workingFolder, filter, SearchOption.TopDirectoryOnly)).ToArray();
+			this.remaining = this.files.Length;
 			this.ListBox_Files.Items.Clear();
 
 			foreach (string file in this.files) {
 				this.ListBox_Files.Items.Add(file);
 			}
 
-			this.Label_Action.Content = "Ready.";
+			this.Label_Action.Content = (this.remaining > 0 ? "Ready." : "No images found.");
+			this.Button_Start.IsEnabled = (this.remaining > 0);
+
 			this.UpdateLabels();
 		}
 
@@ -149,18 +165,22 @@ namespace Hatate
 		/// </summary>
 		private async void StartSearch()
 		{
-			if (this.files.Length < 1) {
+			if (this.ListBox_Files.Items.Count < 1) {
 				return;
 			}
 
+			this.MenuItem_OpenFolder.IsEnabled = false;
+			this.Button_Start.IsEnabled = false;
+
 			IqdbApi.IqdbApi api = new IqdbApi.IqdbApi();
+			int count = this.files.Length;
 
-			foreach (string filepath in this.files) {
+			for (int i = 0; i < count; i++) {
+				string filepath = this.files[i];
 				string filename = filepath.Substring(filepath.LastIndexOf(@"\") + 1, filepath.Length - filepath.LastIndexOf(@"\") - 1);
-
+				
 				// Skip file if a txt with the same name already exists
 				if (File.Exists(filepath + ".txt")) {
-					Console.WriteLine("Already searched: " + filepath + ".txt");
 					continue;
 				}
 
@@ -172,23 +192,19 @@ namespace Hatate
 				this.Label_Action.Content = "Searching file on IQDB...";
 				await this.RunIqdbApi(api, thumb, filename);
 
-				this.searched--;
-
-				if (this.searched > 0) {
-					this.Label_Action.Content = "Next search in " + (INTERVAL / 1000) + " seconds";
-				} else {
-					this.Label_Action.Content = "Finished.";
-
-					// Ready for next batch
-					this.GetFileList();
-					this.Button_Start.IsEnabled = true;
-				}
-
+				this.remaining--;
+				this.Label_Action.Content = (this.remaining > 0) ? "Next search in " + (Options.Default.Delay) + " seconds" : "Finished.";
+				this.ListBox_Files.Items.Remove(filepath);
 				this.UpdateLabels();
 
 				// Wait some time until the next search
-				await PutTaskDelay();
+				if (i < count - 1) {
+					await PutTaskDelay();
+				}
 			}
+
+			this.MenuItem_OpenFolder.IsEnabled = true;
+			this.Button_Start.IsEnabled = true;
 		}
 
 		/// <summary>
@@ -197,7 +213,7 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task PutTaskDelay()
 		{
-			await Task.Delay(INTERVAL);
+			await Task.Delay(Options.Default.Delay * 1000);
 		}
 
 		/// <summary>
@@ -205,10 +221,10 @@ namespace Hatate
 		/// </summary>
 		private void UpdateLabels()
 		{
-			int remainSeconds = (INTERVAL / 1000 + lastSearchedInSeconds) * this.searched;
+			int remainSeconds = (Options.Default.Delay + lastSearchedInSeconds) * this.remaining;
 			int remainMinutes = remainSeconds / 60;
 
-			this.Label_Remaining.Content = this.searched + " files remaining, approximatly " + remainSeconds + " seconds (" + remainMinutes + " minutes) until completion";
+			this.Label_Remaining.Content = this.remaining + " files remaining, approximatly " + remainSeconds + " seconds (" + remainMinutes + " minutes) until completion";
 		}
 
 		/// <summary>
@@ -233,20 +249,9 @@ namespace Hatate
 					}
 
 					// Check match type if enabled
-					if (Options.Default.CheckMatchType && match.MatchType != (IqdbApi.Enums.MatchType)Options.Default.MatchType) {
+					if (Options.Default.CheckMatchType && match.MatchType != Options.Default.MatchType) {
 						continue;
 					}
-
-					Console.WriteLine("| -------------------------------");
-					Console.WriteLine("| Similarity: " + match.Similarity);
-					Console.WriteLine("| Source: " + match.Source);
-					Console.WriteLine("| Score: " + match.Score);
-					Console.WriteLine("| MatchType: " + match.MatchType);
-					Console.WriteLine("| PreviewUrl: " + match.PreviewUrl);
-					Console.WriteLine("| Rating: " + match.Rating);
-					Console.WriteLine("| Resolution: " + match.Resolution);
-					Console.WriteLine("| Url: " + match.Url);
-					Console.WriteLine("| -------------------------------");
 
 					if (Options.Default.Compare) {
 						Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
@@ -262,13 +267,9 @@ namespace Hatate
 				}
 
 				if (found) {
-					Console.WriteLine("Tags found for " + filename);
-
-					File.Move(this.ImgsDirPath + filename, this.ImgsDirPath + @"tagged\" + filename);
+					File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
 				} else {
-					Console.WriteLine("Nothing found for " + filename);
-
-					File.Move(this.ImgsDirPath + filename, this.ImgsDirPath + @"notfound\" + filename);
+					File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
 				}
 			}
 		}
@@ -280,9 +281,9 @@ namespace Hatate
 		/// <param name="tags"></param>
 		private void WriteTagsToTxt(string filename, System.Collections.Immutable.ImmutableList<string> tags)
 		{
-			string txtPath = this.ImgsDirPath + @"tagged\" + filename + ".txt";
+			string txtPath = this.TaggedDirPath + filename + ".txt";
 
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(txtPath)) {
+			using (StreamWriter file = new StreamWriter(txtPath)) {
 				foreach (string tag in tags) {
 					string tmp = this.FormatTag(tag);
 
@@ -332,19 +333,53 @@ namespace Hatate
 		#region Accessor
 
 		/// <summary>
-		/// Get the full path to the imgs folder.
-		/// </summary>
-		private string ImgsDirPath
-		{
-			get { return appFolder + @"\" + DIR_IMGS; }
-		}
-
-		/// <summary>
-		/// Get the full path to the thumbs folder.
+		/// Get the full path to the thumbs folder under the application directory.
 		/// </summary>
 		private string ThumbsDirPath
 		{
-			get { return appFolder + @"\" + DIR_THUMBS; }
+			get {
+				string path = appFolder + @"\" + DIR_THUMBS;
+
+				if (!Directory.Exists(path)) {
+					Directory.CreateDirectory(path);
+				}
+
+				return path;
+			}
+		}
+
+		/// <summary>
+		/// Get the full path to the tagged subfolder under the working directory.
+		/// </summary>
+		private string TaggedDirPath
+		{
+			get
+			{
+				string path = this.workingFolder + @"tagged\";
+
+				if (!Directory.Exists(path)) {
+					Directory.CreateDirectory(path);
+				}
+
+				return path;
+			}
+		}
+
+		/// <summary>
+		/// Get the full path to the notfound subfolder under the working directory.
+		/// </summary>
+		private string NotfoundDirPath
+		{
+			get
+			{
+				string path = this.workingFolder + @"notfound\";
+
+				if (!Directory.Exists(path)) {
+					Directory.CreateDirectory(path);
+				}
+
+				return path;
+			}
 		}
 
 		#endregion Accessor
@@ -356,7 +391,7 @@ namespace Hatate
 		*/
 
 		#region Event
-		
+
 		/// <summary>
 		/// Called when clicking on the Start button, start the search operations.
 		/// </summary>
@@ -364,8 +399,6 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void Button_Start_Click(object sender, RoutedEventArgs e)
 		{
-			this.Button_Start.IsEnabled = false;
-
 			this.StartSearch();
 		}
 
@@ -376,7 +409,7 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_Refresh_Click(object sender, RoutedEventArgs e)
 		{
-			this.GetFileList();
+			this.GetImagesFromFolder();
 		}
 
 		/// <summary>
@@ -387,6 +420,30 @@ namespace Hatate
 		private void MenuItem_Options_Click(object sender, RoutedEventArgs e)
 		{
 			Option potion = new Option();
+		}
+
+		/// <summary>
+		/// Called when clicking on the menubar's Reload known tags button, reload the tags from the text files.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_ReloadKnownTags_Click(object sender, RoutedEventArgs e)
+		{
+			this.LoadKnownTags();
+		}
+
+		/// <summary>
+		/// Called when clicking on the menubar's Open folder button, open a new folder to load images from.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_OpenFolder_Click(object sender, RoutedEventArgs e)
+		{
+			this.OpenFolder();
+
+			if (this.workingFolder != null) {
+				this.GetImagesFromFolder();
+			}
 		}
 
 		#endregion Event
