@@ -58,5 +58,53 @@ namespace Hatate.Properties {
                 this["Similarity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool KnownTags {
+            get {
+                return ((bool)(this["KnownTags"]));
+            }
+            set {
+                this["KnownTags"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int TagsCount {
+            get {
+                return ((int)(this["TagsCount"]));
+            }
+            set {
+                this["TagsCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Best")]
+        public global::IqdbApi.Enums.MatchType MatchType {
+            get {
+                return ((global::IqdbApi.Enums.MatchType)(this["MatchType"]));
+            }
+            set {
+                this["MatchType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckMatchType {
+            get {
+                return ((bool)(this["CheckMatchType"]));
+            }
+            set {
+                this["CheckMatchType"] = value;
+            }
+        }
     }
 }

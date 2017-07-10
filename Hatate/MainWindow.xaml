@@ -12,7 +12,7 @@
 		<Label x:Name="Label_Remaining" Content="Label" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,0"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
 		<Menu HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Width="517">
-			<MenuItem x:Name="MenuItem_Refresh" Header="Refresh" Click="MenuItem_Refresh_Click"/>
+			<MenuItem x:Name="MenuItem_Refresh" Header="Refresh" Click="MenuItem_Refresh_Click" Height="18"/>
 			<MenuItem Header="Options" Click="MenuItem_Options_Click"/>
 		</Menu>
 	</Grid>

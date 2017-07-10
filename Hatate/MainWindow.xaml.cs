@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using IqdbApi;
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;
-using System.Threading;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using Options = Hatate.Properties.Settings;
 
 namespace Hatate
 {
@@ -47,15 +36,45 @@ namespace Hatate
 			InitializeComponent();
 
 			this.GetFileList();
-			this.GetKnownTags();
+			
+			if (Options.Default.KnownTags) {
+				this.GetKnownTags();
+			}
 		}
 
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		#region Private
+
+		/// <summary>
+		/// Load known tags from text files.
+		/// </summary>
 		private void GetKnownTags()
 		{
-			this.tags = File.ReadAllLines(appFolder + @"\tags\tags.txt");
-			this.series = File.ReadAllLines(appFolder + @"\tags\series.txt");
-			this.characters = File.ReadAllLines(appFolder + @"\tags\characters.txt");
-			this.creators = File.ReadAllLines(appFolder + @"\tags\creators.txt");
+			string tag = @"\tags\tags.txt";
+			string serie = @"\tags\series.txt";
+			string chara = @"\tags\characters.txt";
+			string creator = @"\tags\creators.txt";
+
+			if (File.Exists(tag)) {
+				this.tags = File.ReadAllLines(appFolder + tag);
+			}
+
+			if (File.Exists(serie)) {
+				this.series = File.ReadAllLines(appFolder + serie);
+			}
+
+			if (File.Exists(chara)) {
+				this.characters = File.ReadAllLines(appFolder + chara);
+			}
+
+			if (File.Exists(creator)) {
+				this.creators = File.ReadAllLines(appFolder + creator);
+			}
 
 			this.Label_Action.Content = "Tags loaded.";
 		}
@@ -84,9 +103,16 @@ namespace Hatate
 			this.UpdateLabels();
 		}
 
+		/// <summary>
+		/// Generate a smaller image.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <param name="filename"></param>
+		/// <param name="width"></param>
+		/// <returns></returns>
 		private string GenerateThumbnail(string filepath, string filename, int width = 150)
 		{
-			string thumbsDir = this.GetThumbsDirPath();
+			string thumbsDir = this.ThumbsDirPath;
 			string output = thumbsDir + filename;
 
 			Directory.CreateDirectory(thumbsDir);
@@ -118,16 +144,9 @@ namespace Hatate
 			return output;
 		}
 
-		private string GetImgsDirPath()
-		{
-			return appFolder + @"\" + DIR_IMGS;
-		}
-
-		private string GetThumbsDirPath()
-		{
-			return appFolder + @"\" + DIR_THUMBS;
-		}
-
+		/// <summary>
+		/// Start the search operations.
+		/// </summary>
 		private async void StartSearch()
 		{
 			if (this.files.Length < 1) {
@@ -145,16 +164,18 @@ namespace Hatate
 					continue;
 				}
 
+				// Generate a smaller image for uploading
 				this.Label_Action.Content = "Generating thumbnail...";
 				string thumb = this.GenerateThumbnail(filepath, filename);
 
+				// Search the image on IQDB
 				this.Label_Action.Content = "Searching file on IQDB...";
-				await this.Run(api, thumb, filename);
+				await this.RunIqdbApi(api, thumb, filename);
 
 				this.searched--;
 
 				if (this.searched > 0) {
-					this.Label_Action.Content = "Next search in " + (INTERVAL/1000) + " seconds";
+					this.Label_Action.Content = "Next search in " + (INTERVAL / 1000) + " seconds";
 				} else {
 					this.Label_Action.Content = "Finished.";
 
@@ -162,7 +183,7 @@ namespace Hatate
 					this.GetFileList();
 					this.Button_Start.IsEnabled = true;
 				}
-				
+
 				this.UpdateLabels();
 
 				// Wait some time until the next search
@@ -170,20 +191,34 @@ namespace Hatate
 			}
 		}
 
-		async Task PutTaskDelay()
+		/// <summary>
+		/// Make an async task wait.
+		/// </summary>
+		/// <returns></returns>
+		private async Task PutTaskDelay()
 		{
 			await Task.Delay(INTERVAL);
 		}
 
+		/// <summary>
+		/// Update the labels with some useful informations.
+		/// </summary>
 		private void UpdateLabels()
 		{
-			int remainSeconds = (INTERVAL/1000 + lastSearchedInSeconds) * this.searched;
+			int remainSeconds = (INTERVAL / 1000 + lastSearchedInSeconds) * this.searched;
 			int remainMinutes = remainSeconds / 60;
 
 			this.Label_Remaining.Content = this.searched + " files remaining, approximatly " + remainSeconds + " seconds (" + remainMinutes + " minutes) until completion";
 		}
 
-		private async Task Run(IqdbApi.IqdbApi api, string thumbPath, string filename)
+		/// <summary>
+		/// Run the IQDB search.
+		/// </summary>
+		/// <param name="api"></param>
+		/// <param name="thumbPath"></param>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		private async Task RunIqdbApi(IqdbApi.IqdbApi api, string thumbPath, string filename)
 		{
 			using (var fs = new System.IO.FileStream(thumbPath, System.IO.FileMode.Open)) {
 				IqdbApi.Models.SearchResult result = await api.SearchFile(fs);
@@ -192,25 +227,31 @@ namespace Hatate
 				bool found = false;
 
 				foreach (IqdbApi.Models.Match match in result.Matches) {
-					if (match.Similarity < 90 || match.MatchType != IqdbApi.Enums.MatchType.Best || match.Tags.Count == 0) {
+					// Check minimum similarity and number of tags
+					if (match.Similarity < Options.Default.Similarity || match.Tags.Count < Options.Default.TagsCount) {
+						continue;
+					}
+
+					// Check match type if enabled
+					if (Options.Default.CheckMatchType && match.MatchType != (IqdbApi.Enums.MatchType)Options.Default.MatchType) {
 						continue;
 					}
 
 					Console.WriteLine("| -------------------------------");
 					Console.WriteLine("| Similarity: " + match.Similarity);
-					Console.WriteLine("| Source: "     + match.Source);
-					Console.WriteLine("| Score: "      + match.Score);
-					Console.WriteLine("| MatchType: "  + match.MatchType);
+					Console.WriteLine("| Source: " + match.Source);
+					Console.WriteLine("| Score: " + match.Score);
+					Console.WriteLine("| MatchType: " + match.MatchType);
 					Console.WriteLine("| PreviewUrl: " + match.PreviewUrl);
-					Console.WriteLine("| Rating: "     + match.Rating);
+					Console.WriteLine("| Rating: " + match.Rating);
 					Console.WriteLine("| Resolution: " + match.Resolution);
-					Console.WriteLine("| Url: "        + match.Url);
+					Console.WriteLine("| Url: " + match.Url);
 					Console.WriteLine("| -------------------------------");
 
-					if (Properties.Settings.Default.Compare) {
+					if (Options.Default.Compare) {
 						Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl);
 
-						if (!compare.IsGood()) {
+						if (!compare.IsGood) {
 							continue;
 						}
 					}
@@ -223,22 +264,27 @@ namespace Hatate
 				if (found) {
 					Console.WriteLine("Tags found for " + filename);
 
-					File.Move(this.GetImgsDirPath() + filename, this.GetImgsDirPath() + @"tagged\" + filename);
+					File.Move(this.ImgsDirPath + filename, this.ImgsDirPath + @"tagged\" + filename);
 				} else {
 					Console.WriteLine("Nothing found for " + filename);
 
-					File.Move(this.GetImgsDirPath() + filename, this.GetImgsDirPath() + @"notfound\" + filename);
+					File.Move(this.ImgsDirPath + filename, this.ImgsDirPath + @"notfound\" + filename);
 				}
 			}
 		}
 
+		/// <summary>
+		/// Take the tag list and write it into a text file with the same name as the image.
+		/// </summary>
+		/// <param name="filename"></param>
+		/// <param name="tags"></param>
 		private void WriteTagsToTxt(string filename, System.Collections.Immutable.ImmutableList<string> tags)
 		{
-			string txtPath = this.GetImgsDirPath() + @"tagged\" + filename + ".txt";
+			string txtPath = this.ImgsDirPath + @"tagged\" + filename + ".txt";
 
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(txtPath)) {
 				foreach (string tag in tags) {
-					string tmp = this.formatTag(tag);
+					string tmp = this.FormatTag(tag);
 
 					if (tmp != null) {
 						file.WriteLine(tmp);
@@ -247,11 +293,20 @@ namespace Hatate
 			}
 		}
 
-		private string formatTag(string tag)
+		/// <summary>
+		/// Remove unwanted characters and compare the tag with the known ones if enabled.
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
+		private string FormatTag(string tag)
 		{
 			tag = tag.Replace("_", " ");
 			tag = tag.Replace(",", "");
 			tag = tag.Trim();
+
+			if (!Options.Default.KnownTags) {
+				return tag;
+			}
 
 			if (this.tags.Contains(tag)) {
 				return tag;
@@ -266,6 +321,47 @@ namespace Hatate
 			return null;
 		}
 
+		#endregion Private
+
+		/*
+		============================================
+		Accessor
+		============================================
+		*/
+
+		#region Accessor
+
+		/// <summary>
+		/// Get the full path to the imgs folder.
+		/// </summary>
+		private string ImgsDirPath
+		{
+			get { return appFolder + @"\" + DIR_IMGS; }
+		}
+
+		/// <summary>
+		/// Get the full path to the thumbs folder.
+		/// </summary>
+		private string ThumbsDirPath
+		{
+			get { return appFolder + @"\" + DIR_THUMBS; }
+		}
+
+		#endregion Accessor
+
+		/*
+		============================================
+		Event
+		============================================
+		*/
+
+		#region Event
+		
+		/// <summary>
+		/// Called when clicking on the Start button, start the search operations.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Button_Start_Click(object sender, RoutedEventArgs e)
 		{
 			this.Button_Start.IsEnabled = false;
@@ -273,14 +369,26 @@ namespace Hatate
 			this.StartSearch();
 		}
 
+		/// <summary>
+		/// Called when clicking on the menubar's refresh button, refresh the files list.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void MenuItem_Refresh_Click(object sender, RoutedEventArgs e)
 		{
 			this.GetFileList();
 		}
 
+		/// <summary>
+		/// Called when clicking on the menubar's Options button, open the options window.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void MenuItem_Options_Click(object sender, RoutedEventArgs e)
 		{
 			Option potion = new Option();
 		}
+
+		#endregion Event
 	}
 }

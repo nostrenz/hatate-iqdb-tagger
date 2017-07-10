@@ -11,5 +11,17 @@
     <Setting Name="Similarity" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">90</Value>
     </Setting>
+    <Setting Name="KnownTags" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TagsCount" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="MatchType" Type="IqdbApi.Enums.MatchType" Scope="User">
+      <Value Profile="(Default)">Best</Value>
+    </Setting>
+    <Setting Name="CheckMatchType" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
