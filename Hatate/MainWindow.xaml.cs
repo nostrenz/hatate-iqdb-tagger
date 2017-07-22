@@ -256,19 +256,20 @@ namespace Hatate
 					// FormatException may happen in cas of an invalid HTML response where no tags could be parsed
 				}
 
-				// No result found
-				if (result == null) {
-					return;
+				// Result found
+				if (result != null) {
+					this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
+
+					// If found, move the image to the tagged folder 
+					if (this.CheckMatches(result.Matches, filename, thumbPath)) {
+						File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
+
+						return;
+					}
 				}
 
-				this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
-				bool found = this.CheckMatches(result.Matches, filename, thumbPath);
-
-				if (found) {
-					File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
-				} else {
-					File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
-				}
+				// The search produced not result, move the image to the notfound folder
+				File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
 			}
 		}
 
