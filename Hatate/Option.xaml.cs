@@ -28,6 +28,7 @@ namespace Hatate
 			this.TextBox_MinimumTagsCount.Text = Options.Default.TagsCount.ToString();
 			this.Slider_Similarity.Value = Options.Default.Similarity;
 			this.Slider_Delay.Value = Options.Default.Delay;
+			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -52,8 +53,14 @@ namespace Hatate
 
 		private void UpdateLabels()
 		{
+			int delay = (int)this.Slider_Delay.Value;
+			int half = delay / 2;
+			int min = delay - half;
+			int max = delay + half;
+
 			this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
-			this.Label_Delay.Content = "Delay (" + (int)this.Slider_Delay.Value + "secs / " + (int)(this.Slider_Delay.Value / 60) + "mins)";
+			this.Label_Delay.Content = "Delay (" + delay + "secs / " + (delay / 60) + "mins)";
+			this.CheckBox_Randomize.Content = "Randomize the delay (" + min + "~" + max + " secs / " + (min / 60) + "~" + (max / 60) + " mins)";
 		}
 
 		/*
@@ -72,6 +79,7 @@ namespace Hatate
 			Options.Default.TagsCount = Int32.Parse(this.TextBox_MinimumTagsCount.Text);
 			Options.Default.Similarity = (byte)this.Slider_Similarity.Value;
 			Options.Default.Delay = (int)this.Slider_Delay.Value;
+			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;

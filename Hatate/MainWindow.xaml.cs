@@ -116,7 +116,7 @@ namespace Hatate
 			this.Label_Action.Content = (this.remaining > 0 ? "Ready." : "No images found.");
 			this.Button_Start.IsEnabled = (this.remaining > 0);
 
-			this.UpdateLabels();
+			this.UpdateLabels(Options.Default.Delay);
 		}
 
 		/// <summary>
@@ -193,9 +193,7 @@ namespace Hatate
 				await this.RunIqdbApi(api, thumb, filename);
 
 				this.remaining--;
-				this.Label_Action.Content = (this.remaining > 0) ? "Next search in " + (Options.Default.Delay) + " seconds" : "Finished.";
 				this.ListBox_Files.Items.Remove(filepath);
-				this.UpdateLabels();
 
 				// Wait some time until the next search
 				if (i < count - 1) {
@@ -203,6 +201,7 @@ namespace Hatate
 				}
 			}
 
+			this.Label_Action.Content = "Finished.";
 			this.MenuItem_OpenFolder.IsEnabled = true;
 			this.Button_Start.IsEnabled = true;
 		}
@@ -213,15 +212,27 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task PutTaskDelay()
 		{
-			await Task.Delay(Options.Default.Delay * 1000);
+			int delay = Options.Default.Delay;
+
+			// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
+			if (Options.Default.Randomize) {
+				int half = delay / 2;
+
+				delay += new Random().Next(half*-1, half);
+			}
+
+			this.UpdateLabels(delay);
+			this.Label_Action.Content = "Next search in " + delay + " seconds";
+
+			await Task.Delay(delay * 1000);
 		}
 
 		/// <summary>
 		/// Update the labels with some useful informations.
 		/// </summary>
-		private void UpdateLabels()
+		private void UpdateLabels(int lastDelay)
 		{
-			int remainSeconds = (Options.Default.Delay + lastSearchedInSeconds) * this.remaining;
+			int remainSeconds = (lastDelay + lastSearchedInSeconds) * this.remaining;
 			int remainMinutes = remainSeconds / 60;
 
 			this.Label_Remaining.Content = this.remaining + " files remaining, approximatly " + remainSeconds + " seconds (" + remainMinutes + " minutes) until completion";

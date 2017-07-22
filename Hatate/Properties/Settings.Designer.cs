@@ -250,5 +250,17 @@ namespace Hatate.Properties {
                 this["AddRating"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Randomize {
+            get {
+                return ((bool)(this["Randomize"]));
+            }
+            set {
+                this["Randomize"] = value;
+            }
+        }
     }
 }
