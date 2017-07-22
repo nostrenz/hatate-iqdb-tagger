@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Directory = System.IO.Directory;
-using Path = System.IO.Path;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -26,7 +25,6 @@ namespace Hatate
 		private string[] characters;
 		private string[] creators;
 
-		private static string appFolder = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 		private int lastSearchedInSeconds = 0;
 		private string[] files;
 		private int remaining = 0;
@@ -81,20 +79,20 @@ namespace Hatate
 			string chara = @"\tags\characters.txt";
 			string creator = @"\tags\creators.txt";
 
-			if (File.Exists(appFolder + tag)) {
-				this.tags = File.ReadAllLines(appFolder + tag);
+			if (File.Exists(App.appDir + tag)) {
+				this.tags = File.ReadAllLines(App.appDir + tag);
 			}
 
-			if (File.Exists(appFolder + serie)) {
-				this.series = File.ReadAllLines(appFolder + serie);
+			if (File.Exists(App.appDir + serie)) {
+				this.series = File.ReadAllLines(App.appDir + serie);
 			}
 
-			if (File.Exists(appFolder + chara)) {
-				this.characters = File.ReadAllLines(appFolder + chara);
+			if (File.Exists(App.appDir + chara)) {
+				this.characters = File.ReadAllLines(App.appDir + chara);
 			}
 
-			if (File.Exists(appFolder + creator)) {
-				this.creators = File.ReadAllLines(appFolder + creator);
+			if (File.Exists(App.appDir + creator)) {
+				this.creators = File.ReadAllLines(App.appDir + creator);
 			}
 
 			this.Label_Action.Content = "Tags loaded.";
@@ -435,7 +433,7 @@ namespace Hatate
 		private string ThumbsDirPath
 		{
 			get {
-				string path = appFolder + @"\" + DIR_THUMBS;
+				string path = App.appDir + @"\" + DIR_THUMBS;
 
 				if (!Directory.Exists(path)) {
 					Directory.CreateDirectory(path);
