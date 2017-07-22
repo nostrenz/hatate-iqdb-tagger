@@ -237,7 +237,18 @@ namespace Hatate
 		private async Task RunIqdbApi(IqdbApi.IqdbApi api, string thumbPath, string filename)
 		{
 			using (var fs = new FileStream(thumbPath, FileMode.Open)) {
-				IqdbApi.Models.SearchResult result = await api.SearchFile(fs);
+				IqdbApi.Models.SearchResult result = null;
+
+				try {
+					result = await api.SearchFile(fs);
+				} catch (FormatException) {
+					// FormatException may happen in cas of an invalid HTML response where no tags could be parsed
+				}
+
+				// No result found
+				if (result == null) {
+					return;
+				}
 
 				this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
 				bool found = this.CheckMatches(result.Matches, filename, thumbPath);
