@@ -27,7 +27,8 @@ namespace Hatate
 
 		private int lastSearchedInSeconds = 0;
 		private string[] files;
-		private int remaining = 0;
+		private int found = 0;
+		private int notFound = 0;
 		private string workingFolder = Options.Default.LastFolder;
 
 		public MainWindow()
@@ -95,7 +96,7 @@ namespace Hatate
 				this.creators = File.ReadAllLines(App.appDir + creator);
 			}
 
-			this.Label_Action.Content = "Tags loaded.";
+			this.Label_Status.Content = "Tags loaded.";
 		}
 
 		/// <summary>
@@ -104,15 +105,15 @@ namespace Hatate
 		private void GetImagesFromFolder()
 		{
 			this.files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(this.workingFolder, filter, SearchOption.TopDirectoryOnly)).ToArray();
-			this.remaining = this.files.Length;
 			this.ListBox_Files.Items.Clear();
 
 			foreach (string file in this.files) {
 				this.ListBox_Files.Items.Add(file);
 			}
 
-			this.Label_Action.Content = (this.remaining > 0 ? "Ready." : "No images found.");
-			this.Button_Start.IsEnabled = (this.remaining > 0);
+			int remaining = this.files.Length;
+			this.Label_Status.Content = (remaining > 0 ? "Ready." : "No images found.");
+			this.Button_Start.IsEnabled = (remaining > 0);
 
 			this.UpdateLabels(Options.Default.Delay);
 		}
@@ -183,46 +184,37 @@ namespace Hatate
 				}
 
 				// Generate a smaller image for uploading
-				this.Label_Action.Content = "Generating thumbnail...";
+				this.Label_Status.Content = "Generating thumbnail...";
 				string thumb = this.GenerateThumbnail(filepath, filename);
 
 				// Search the image on IQDB
-				this.Label_Action.Content = "Searching file on IQDB...";
+				this.Label_Status.Content = "Searching file on IQDB...";
 				await this.RunIqdbApi(api, thumb, filename);
 
-				this.remaining--;
 				this.ListBox_Files.Items.Remove(filepath);
+
+				int delay = Options.Default.Delay;
+
+				// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
+				if (Options.Default.Randomize) {
+					int half = delay / 2;
+
+					delay += new Random().Next(half*-1, half);
+				}
+
+				this.UpdateLabels(delay);
 
 				// Wait some time until the next search
 				if (i < count - 1) {
-					await PutTaskDelay();
+					this.Label_Status.Content = "Next search in " + delay + " seconds";
+
+					await Task.Delay(delay * 1000);
 				}
 			}
 
-			this.Label_Action.Content = "Finished.";
+			this.Label_Status.Content = "Finished.";
 			this.MenuItem_OpenFolder.IsEnabled = true;
 			this.Button_Start.IsEnabled = true;
-		}
-
-		/// <summary>
-		/// Make an async task wait.
-		/// </summary>
-		/// <returns></returns>
-		private async Task PutTaskDelay()
-		{
-			int delay = Options.Default.Delay;
-
-			// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
-			if (Options.Default.Randomize) {
-				int half = delay / 2;
-
-				delay += new Random().Next(half*-1, half);
-			}
-
-			this.UpdateLabels(delay);
-			this.Label_Action.Content = "Next search in " + delay + " seconds";
-
-			await Task.Delay(delay * 1000);
 		}
 
 		/// <summary>
@@ -230,10 +222,12 @@ namespace Hatate
 		/// </summary>
 		private void UpdateLabels(int lastDelay)
 		{
-			int remainSeconds = (lastDelay + lastSearchedInSeconds) * this.remaining;
+			int remaining = this.ListBox_Files.Items.Count;
+			int remainSeconds = (lastDelay + lastSearchedInSeconds) * remaining;
 			int remainMinutes = remainSeconds / 60;
 
-			this.Label_Remaining.Content = this.remaining + " files remaining, approximatly " + remainSeconds + " seconds (" + remainMinutes + " minutes) until completion";
+			this.Label_Remaining.Content = "Remaining: " + remaining + " files (~ " + remainSeconds + " seconds / " + remainMinutes + " minutes)";
+			this.Label_Results.Content = "Results: " + this.found + " found, " + this.notFound + " not";
 		}
 
 		/// <summary>
@@ -258,9 +252,10 @@ namespace Hatate
 				if (result != null) {
 					this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
 
-					// If found, move the image to the tagged folder 
+					// If found, move the image to the tagged folder
 					if (this.CheckMatches(result.Matches, filename, thumbPath)) {
 						File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
+						this.found++;
 
 						return;
 					}
@@ -268,6 +263,7 @@ namespace Hatate
 
 				// The search produced not result, move the image to the notfound folder
 				File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
+				this.notFound++;
 			}
 		}
 

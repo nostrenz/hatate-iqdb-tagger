@@ -5,17 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hatate - iqdb images tagger" Height="374.096" Width="525" MinWidth="500" MinHeight="186">
+        Title="Hatate - iqdb images tagger" Height="318.015" Width="525" MinWidth="500" MinHeight="186">
 	<Grid>
-		<ListBox x:Name="ListBox_Files" Margin="0,18,0,57"/>
-		<Label x:Name="Label_Action" Content="Label" Margin="0,0,75,26" Height="26" VerticalAlignment="Bottom"/>
-		<Label x:Name="Label_Remaining" Content="Label" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,0"/>
-		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20"/>
+		<ListBox x:Name="ListBox_Files" Margin="0,18,0,90"/>
+		<Label x:Name="Label_Remaining" Content="Remaining" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,64"/>
+		<Label x:Name="Label_Results" Content="Results" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,33"/>
+		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20" Margin="0,0,0,33"/>
 		<Menu Height="18" VerticalAlignment="Top">
 			<MenuItem x:Name="MenuItem_OpenFolder" Header="Open folder" Click="MenuItem_OpenFolder_Click"/>
 			<MenuItem x:Name="MenuItem_Refresh" Header="Refresh list" Click="MenuItem_Refresh_Click" Height="18"/>
 			<MenuItem Header="Reload known tags" Click="MenuItem_ReloadKnownTags_Click"/>
 			<MenuItem Header="Options" Click="MenuItem_Options_Click"/>
 		</Menu>
+		<StatusBar Height="32" VerticalAlignment="Bottom">
+			<Label x:Name="Label_Status" Content="Status"/>
+		</StatusBar>
 	</Grid>
 </Window>
