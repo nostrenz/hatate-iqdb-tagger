@@ -20,7 +20,8 @@ namespace Hatate
 	{
 		const string DIR_THUMBS = @"thumbs\";
 
-		private string[] tags;
+		// Tags list
+		private string[] unnamespaceds;
 		private string[] series;
 		private string[] characters;
 		private string[] creators;
@@ -75,21 +76,21 @@ namespace Hatate
 		/// </summary>
 		private void LoadKnownTags()
 		{
-			string tag = @"\tags\tags.txt";
+			string unnamespaced = @"\tags\unnamespaceds.txt";
 			string serie = @"\tags\series.txt";
-			string chara = @"\tags\characters.txt";
+			string character = @"\tags\characters.txt";
 			string creator = @"\tags\creators.txt";
 
-			if (File.Exists(App.appDir + tag)) {
-				this.tags = File.ReadAllLines(App.appDir + tag);
+			if (File.Exists(App.appDir + unnamespaced)) {
+				this.unnamespaceds = File.ReadAllLines(App.appDir + unnamespaced);
 			}
 
 			if (File.Exists(App.appDir + serie)) {
 				this.series = File.ReadAllLines(App.appDir + serie);
 			}
 
-			if (File.Exists(App.appDir + chara)) {
-				this.characters = File.ReadAllLines(App.appDir + chara);
+			if (File.Exists(App.appDir + character)) {
+				this.characters = File.ReadAllLines(App.appDir + character);
 			}
 
 			if (File.Exists(App.appDir + creator)) {
@@ -400,14 +401,14 @@ namespace Hatate
 				return tag;
 			}
 
-			if (this.tags != null && this.tags.Contains(tag)) {
+			if (this.unnamespaceds != null && this.unnamespaceds.Contains(tag)) {
 				return tag;
 			} else if (this.series != null && this.series.Contains(tag)) {
 				return "series:" + tag;
 			} else if (this.characters != null && this.characters.Contains(tag)) {
-				return "characters:" + tag;
+				return "character:" + tag;
 			} else if (this.creators != null && this.creators.Contains(tag)) {
-				return "creators:" + tag;
+				return "creator:" + tag;
 			}
 
 			return null;
