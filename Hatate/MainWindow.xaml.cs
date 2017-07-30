@@ -192,7 +192,9 @@ namespace Hatate
 				this.Label_Status.Content = "Searching file on IQDB...";
 				await this.RunIqdbApi(api, thumb, filename);
 
+				// Remove the file from list and delete the thumbnail 
 				this.ListBox_Files.Items.Remove(filepath);
+				File.Delete(thumb);
 
 				int delay = Options.Default.Delay;
 
