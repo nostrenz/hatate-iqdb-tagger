@@ -13,8 +13,8 @@ namespace Hatate
 		{
 			InitializeComponent();
 
-			this.Title += " (source: " + source.ToString() + ")";
-
+			this.Owner = App.Current.MainWindow;
+			this.Label_UnknownTags.Content += " from " + source.ToString();
 			this.ListBox_UnknownTags.SelectionMode = SelectionMode.Extended;
 
 			this.CreateUnknownTagsContextMenu();
