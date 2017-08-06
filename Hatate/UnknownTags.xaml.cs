@@ -9,9 +9,11 @@ namespace Hatate
 	/// </summary>
 	public partial class UnknownTags : Window
 	{
-		public UnknownTags(List<string> tags)
+		public UnknownTags(List<string> tags, IqdbApi.Enums.Source source)
 		{
 			InitializeComponent();
+
+			this.Title += " (source: " + source.ToString() + ")";
 
 			this.ListBox_UnknownTags.SelectionMode = SelectionMode.Extended;
 

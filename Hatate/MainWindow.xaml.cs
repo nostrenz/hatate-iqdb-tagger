@@ -290,7 +290,7 @@ namespace Hatate
 					continue;
 				}
 
-				List<string> tagList = this.FilterTags(match.Tags, match.Rating);
+				List<string> tagList = this.FilterTags(match);
 
 				if (Options.Default.Compare) {
 					Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl, tagList);
@@ -343,13 +343,13 @@ namespace Hatate
 		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
 		/// </summary>
 		/// <returns></returns>
-		private List<string> FilterTags(System.Collections.Immutable.ImmutableList<string> tags, IqdbApi.Enums.Rating rating)
+		private List<string> FilterTags(IqdbApi.Models.Match match)
 		{
 			List<string> tagList = new List<string>();
 			List<string> unknownTags = new List<string>();
 
 			// Write each tags
-			foreach (string tag in tags) {
+			foreach (string tag in match.Tags) {
 				// Format the tag
 				string formated = tag;
 
@@ -376,7 +376,7 @@ namespace Hatate
 
 			// Add rating
 			if (Options.Default.AddRating) {
-				string strRating = rating.ToString().ToLower();
+				string strRating = match.Rating.ToString().ToLower();
 
 				if (String.IsNullOrWhiteSpace(strRating)) {
 					tagList.Add("rating:" + strRating);
@@ -385,7 +385,7 @@ namespace Hatate
 
 			// Check the unknown tags
 			if (Options.Default.ShowUnknownTags && unknownTags.Count > 0) {
-				UnknownTags ut = new UnknownTags(unknownTags);
+				UnknownTags ut = new UnknownTags(unknownTags, match.Source);
 				ut.ShowDialog();
 
 				// Add to the tag list
