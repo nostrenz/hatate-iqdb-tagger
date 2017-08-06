@@ -19,6 +19,10 @@ namespace Hatate
 	public partial class MainWindow : Window
 	{
 		const string DIR_THUMBS = @"thumbs\";
+		const string TXT_UNNAMESPACEDS = @"\tags\unnamespaceds.txt";
+		const string TXT_SERIES = @"\tags\series.txt";
+		const string TXT_CHARACTERS = @"\tags\characters.txt";
+		const string TXT_CREATORS = @"\tags\creators.txt";
 
 		// Tags list
 		private string[] unnamespaceds;
@@ -76,25 +80,20 @@ namespace Hatate
 		/// </summary>
 		private void LoadKnownTags()
 		{
-			string unnamespaced = @"\tags\unnamespaceds.txt";
-			string serie = @"\tags\series.txt";
-			string character = @"\tags\characters.txt";
-			string creator = @"\tags\creators.txt";
-
-			if (File.Exists(App.appDir + unnamespaced)) {
-				this.unnamespaceds = File.ReadAllLines(App.appDir + unnamespaced);
+			if (File.Exists(App.appDir + TXT_UNNAMESPACEDS)) {
+				this.unnamespaceds = File.ReadAllLines(App.appDir + TXT_UNNAMESPACEDS);
 			}
 
-			if (File.Exists(App.appDir + serie)) {
-				this.series = File.ReadAllLines(App.appDir + serie);
+			if (File.Exists(App.appDir + TXT_SERIES)) {
+				this.series = File.ReadAllLines(App.appDir + TXT_SERIES);
 			}
 
-			if (File.Exists(App.appDir + character)) {
-				this.characters = File.ReadAllLines(App.appDir + character);
+			if (File.Exists(App.appDir + TXT_CHARACTERS)) {
+				this.characters = File.ReadAllLines(App.appDir + TXT_CHARACTERS);
 			}
 
-			if (File.Exists(App.appDir + creator)) {
-				this.creators = File.ReadAllLines(App.appDir + creator);
+			if (File.Exists(App.appDir + TXT_CREATORS)) {
+				this.creators = File.ReadAllLines(App.appDir + TXT_CREATORS);
 			}
 
 			this.Label_Status.Content = "Tags loaded.";
@@ -301,7 +300,7 @@ namespace Hatate
 					}
 				}
 
-				this.WriteTagsToTxt(filename, tagList);
+				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", tagList);
 
 				return true;
 			}
@@ -347,14 +346,32 @@ namespace Hatate
 		private List<string> FilterTags(System.Collections.Immutable.ImmutableList<string> tags, IqdbApi.Enums.Rating rating)
 		{
 			List<string> tagList = new List<string>();
+			List<string> unknownTags = new List<string>();
 
 			// Write each tags
 			foreach (string tag in tags) {
-				string tmp = this.FormatTag(tag);
+				// Format the tag
+				string formated = tag;
 
-				if (tmp != null) {
-					tagList.Add(tmp);
+				formated = formated.Replace("_", " ");
+				formated = formated.Replace(",", "");
+				formated = formated.ToLower().Trim();
+
+				if (String.IsNullOrWhiteSpace(tag)) {
+					continue;
 				}
+
+				string found = this.FindTag(formated);
+
+				if (found == null) {
+					if (Options.Default.ShowUnknownTags) {
+						unknownTags.Add(formated);
+					}
+
+					continue;
+				}
+
+				tagList.Add(found);
 			}
 
 			// Add rating
@@ -366,6 +383,24 @@ namespace Hatate
 				}
 			}
 
+			// Check the unknown tags
+			if (Options.Default.ShowUnknownTags && unknownTags.Count > 0) {
+				UnknownTags ut = new UnknownTags(unknownTags);
+				ut.ShowDialog();
+
+				// Add to the tag list
+				ut.Unnamespaceds.ForEach(tag => tagList.Add(tag));
+				ut.Series.ForEach(tag => tagList.Add("series:" + tag));
+				ut.Characters.ForEach(tag => tagList.Add("character:" + tag));
+				ut.Creators.ForEach(tag => tagList.Add("creator:" + tag));
+
+				// Add to the text files
+				this.WriteTagsToTxt(App.appDir + TXT_UNNAMESPACEDS, ut.Unnamespaceds, true);
+				this.WriteTagsToTxt(App.appDir + TXT_SERIES, ut.Series, true);
+				this.WriteTagsToTxt(App.appDir + TXT_CHARACTERS, ut.Characters, true);
+				this.WriteTagsToTxt(App.appDir + TXT_CREATORS, ut.Creators, true);
+			}
+
 			return tagList;
 		}
 
@@ -374,9 +409,9 @@ namespace Hatate
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="tags"></param>
-		private void WriteTagsToTxt(string filename, List<string> tags)
+		private void WriteTagsToTxt(string filename, List<string> tags, bool append=false)
 		{
-			using (StreamWriter file = new StreamWriter(this.TaggedDirPath + filename + ".txt")) {
+			using (StreamWriter file = new StreamWriter(filename, append)) {
 				// Write each tags
 				foreach (string tag in tags) {
 					file.WriteLine(tag);
@@ -385,20 +420,12 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Remove unwanted characters and compare the tag with the known ones if enabled.
+		/// Find a tag in one of the known tags list.
 		/// </summary>
 		/// <param name="tag"></param>
 		/// <returns></returns>
-		private string FormatTag(string tag)
+		private string FindTag(string tag)
 		{
-			tag = tag.Replace("_", " ");
-			tag = tag.Replace(",", "");
-			tag = tag.ToLower().Trim();
-
-			if (String.IsNullOrWhiteSpace(tag)) {
-				return null;
-			}
-
 			if (!Options.Default.KnownTags) {
 				return tag;
 			}

@@ -262,5 +262,17 @@ namespace Hatate.Properties {
                 this["Randomize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowUnknownTags {
+            get {
+                return ((bool)(this["ShowUnknownTags"]));
+            }
+            set {
+                this["ShowUnknownTags"] = value;
+            }
+        }
     }
 }

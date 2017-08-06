@@ -1,0 +1,22 @@
+﻿<Window x:Class="Hatate.UnknownTags"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hatate"
+        mc:Ignorable="d"
+        Title="UnknownTags" Height="462.434" Width="426.455">
+	<Grid>
+		<ListBox x:Name="ListBox_UnknownTags" HorizontalAlignment="Left" Height="347" Margin="10,41,0,0" VerticalAlignment="Top" Width="160"/>
+		<Label Content="Unknown tags" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="160"/>
+		<ListBox x:Name="ListBox_Unnamespaceds" HorizontalAlignment="Left" Height="61" Margin="273,36,0,0" VerticalAlignment="Top" Width="129"/>
+		<ListBox x:Name="ListBox_Series" HorizontalAlignment="Left" Height="61" Margin="273,133,0,0" VerticalAlignment="Top" Width="129"/>
+		<ListBox x:Name="ListBox_Characters" HorizontalAlignment="Left" Height="61" Margin="273,230,0,0" VerticalAlignment="Top" Width="129"/>
+		<ListBox x:Name="ListBox_Creators" HorizontalAlignment="Left" Height="61" Margin="273,327,0,0" VerticalAlignment="Top" Width="129"/>
+		<Label Content="Unnamespaceds" HorizontalAlignment="Left" Margin="273,10,0,0" VerticalAlignment="Top" Width="129"/>
+		<Label Content="Series" HorizontalAlignment="Left" Margin="273,102,0,0" VerticalAlignment="Top" Width="129"/>
+		<Label Content="Characters" HorizontalAlignment="Left" Margin="273,199,0,0" VerticalAlignment="Top" Width="129"/>
+		<Label Content="Creators" HorizontalAlignment="Left" Margin="273,296,0,0" VerticalAlignment="Top" Width="129"/>
+		<Button Content="Ok" HorizontalAlignment="Left" Margin="10,393,0,0" VerticalAlignment="Top" Width="398" Height="28" Click="Button_Ok_Click"/>
+	</Grid>
+</Window>
