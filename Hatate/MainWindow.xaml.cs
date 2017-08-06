@@ -399,6 +399,9 @@ namespace Hatate
 				this.WriteTagsToTxt(App.appDir + TXT_SERIES, ut.Series, true);
 				this.WriteTagsToTxt(App.appDir + TXT_CHARACTERS, ut.Characters, true);
 				this.WriteTagsToTxt(App.appDir + TXT_CREATORS, ut.Creators, true);
+
+				// Reload known tags
+				this.LoadKnownTags();
 			}
 
 			return tagList;
