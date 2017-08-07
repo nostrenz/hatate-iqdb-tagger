@@ -17,8 +17,11 @@
 				<MenuItem x:Name="MenuItem_ShowFolder" Header="Open current" Click="MenuItem_ShowFolder_Click"/>
 			</MenuItem>
 			<MenuItem Header="Reload">
-				<MenuItem x:Name="MenuItem_Refresh" Header="Refresh list" Click="MenuItem_Refresh_Click" Height="18"/>
+				<MenuItem x:Name="MenuItem_Refresh" Header="Refresh list" Click="MenuItem_Refresh_Click"/>
 				<MenuItem Header="Reload known tags" Click="MenuItem_ReloadKnownTags_Click"/>
+			</MenuItem>
+			<MenuItem Header="Maintenance">
+				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
 			</MenuItem>
 			<MenuItem Header="Options" Click="MenuItem_Options_Click"/>
 		</Menu>

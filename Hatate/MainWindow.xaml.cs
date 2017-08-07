@@ -37,7 +37,6 @@ namespace Hatate
 		private string[] creators;
 
 		private int lastSearchedInSeconds = 0;
-		private string[] files;
 		private int found = 0;
 		private int notFound = 0;
 		private string workingFolder = Options.Default.LastFolder;
@@ -113,17 +112,17 @@ namespace Hatate
 		/// </summary>
 		private void GetImagesFromFolder()
 		{
-			this.files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(this.workingFolder, filter, SearchOption.TopDirectoryOnly)).ToArray();
+			string[] files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => Directory.GetFiles(this.workingFolder, filter, SearchOption.TopDirectoryOnly)).ToArray();
 
 			this.ListBox_Files.Items.Clear();
 			this.ListBox_Tags.Items.Clear();
 			this.ListBox_UnknownTags.Items.Clear();
 
-			foreach (string file in this.files) {
+			foreach (string file in files) {
 				this.ListBox_Files.Items.Add(file);
 			}
 
-			int remaining = this.files.Length;
+			int remaining = files.Length;
 			this.Label_Status.Content = (remaining > 0 ? "Ready." : "No images found.");
 			this.Button_Start.IsEnabled = (remaining > 0);
 
@@ -176,7 +175,9 @@ namespace Hatate
 		/// </summary>
 		private async void StartSearch()
 		{
-			if (this.ListBox_Files.Items.Count < 1) {
+			int count = this.ListBox_Files.Items.Count;
+
+			if (count < 1) {
 				return;
 			}
 
@@ -184,10 +185,9 @@ namespace Hatate
 			this.Button_Start.IsEnabled = false;
 
 			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
-			int count = this.files.Length;
 
 			for (int i = 0; i < count; i++) {
-				string filepath = this.files[i];
+				string filepath = this.ListBox_Files.Items[i].ToString();
 				string filename = this.GetFilenameFromPath(filepath);
 
 				// Skip file if a txt with the same name already exists
@@ -203,10 +203,14 @@ namespace Hatate
 				this.Label_Status.Content = "Searching file on IQDB...";
 				await this.RunIqdbApi(iqdbApi, i, thumb, filename);
 
-				// Update the row, green for found and red for not found
-				int index = this.ListBox_Files.Items.IndexOf(filepath);
+				// The search produced not result, move the image to the notfound folder and remove the row
+				if (!this.HasResult(i)) {
+					this.MoveToNotFoundFolder(filename);
+					this.ListBox_Files.Items.RemoveAt(i);
+					this.notFound++;
+				}
 
-				this.UpdateFileRowColor(index, this.GetResultFromItem(index).KnownTags.Count > 0 ? Brushes.Orange : Brushes.Red);
+				this.UpdateFileRowColor(i, this.GetResultFromItem(i).KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
 				this.UpdateLabels();
 
 				// Wait some time until the next search
@@ -285,10 +289,6 @@ namespace Hatate
 						return;
 					}
 				}
-
-				// The search produced not result, move the image to the notfound folder
-				this.MoveToNotFoundFolder(filename);
-				this.notFound++;
 			}
 		}
 
@@ -377,18 +377,18 @@ namespace Hatate
 					continue;
 				}
 
-				if (Options.Default.KnownTags) {
-					formated = this.FindTag(formated);
+				string found = this.FindTag(formated);
 
-					// Tag not found in the known tags
-					if (formated == null) {
+				// Tag not found in the known tags
+				if (found == null) {
+					if (Options.Default.KnownTags) {
 						unknownTags.Add(formated);
-
-						continue;
 					}
+
+					continue;
 				}
 
-				tagList.Add(formated);
+				tagList.Add(found);
 			}
 
 			// Add rating
@@ -441,6 +441,10 @@ namespace Hatate
 		/// <returns></returns>
 		private string FindTag(string tag)
 		{
+			if (!Options.Default.KnownTags) {
+				return tag;
+			}
+
 			if (this.unnamespaceds != null && this.unnamespaceds.Contains(tag)) {
 				return tag;
 			} else if (this.series != null && this.series.Contains(tag)) {
@@ -517,24 +521,22 @@ namespace Hatate
 		/// </summary>
 		private void WriteTagsForSelectedItems()
 		{
-			foreach (var item in this.ListBox_Files.SelectedItems) {
-				int index = this.ListBox_Files.Items.IndexOf(item);
+			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
+				int index = this.ListBox_Files.Items.IndexOf(this.ListBox_Files.Items[i]);
 				Result result = this.GetResultFromItem(index);
 
-				if (result == null || this.RowHasMoved(index)) {
+				if (result == null) {
 					continue;
 				}
 
-				string filename = this.GetFilenameFromPath(item.ToString());
+				string filename = this.GetFilenameFromPath(this.ListBox_Files.Items[i].ToString());
 
 				// Move the file to the tagged folder and write tags
 				File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
 				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", result.KnownTags);
 
-				// Delete the thmubnail
-				File.Delete(result.ThumbPath);
-
-				this.UpdateFileRowColor(index, Brushes.LimeGreen);
+				// Remove the row
+				this.ListBox_Files.Items.RemoveAt(index);
 			}
 		}
 
@@ -544,22 +546,19 @@ namespace Hatate
 		/// <param name="filename"></param>
 		private void MoveSelectedItemsToNotFoundFolder()
 		{
-			foreach (var item in this.ListBox_Files.SelectedItems) {
-				int index = this.ListBox_Files.Items.IndexOf(item);
+			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
+				int index = this.ListBox_Files.Items.IndexOf(this.ListBox_Files.Items[i]);
 				Result result = this.GetResultFromItem(index);
 
-				if (result != null || this.RowHasMoved(index)) {
+				if (result != null) {
 					continue;
 				}
 
 				// Move the file to the tagged folder and write tags
-				this.MoveToNotFoundFolder(this.GetFilenameFromPath(item.ToString()));
+				this.MoveToNotFoundFolder(this.GetFilenameFromPath(this.ListBox_Files.Items[i].ToString()));
 
-				// Delete the thmubnail
-				File.Delete(result.ThumbPath);
-
-				// Turn the row red
-				this.UpdateFileRowColor(index, Brushes.Red);
+				// Remove the row
+				this.ListBox_Files.Items.RemoveAt(index);
 			}
 		}
 
@@ -580,17 +579,6 @@ namespace Hatate
 		private bool HasResult(int index)
 		{
 			return this.GetResultFromItem(index) != null;
-		}
-
-		/// <summary>
-		/// Check if we moved the row's file (colored in green or red)
-		/// </summary>
-		/// <returns></returns>
-		private bool RowHasMoved(int index)
-		{
-			ListBoxItem lbItem = this.GetFilesListBoxItemByIndex(index);
-
-			return lbItem.Background == Brushes.Red || lbItem.Background == Brushes.LimeGreen;
 		}
 
 		/// <summary>
@@ -931,6 +919,22 @@ namespace Hatate
 
 			// Reload known tags
 			this.LoadKnownTags();
+		}
+
+		/// <summary>
+		/// Delete all the generated thumbnails.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_DeleteThumbs_Click(object sender, RoutedEventArgs e)
+		{
+			string[] files = Directory.GetFiles(this.ThumbsDirPath);
+
+			foreach (string file in files) {
+				try {
+					File.Delete(file);
+				} catch (Exception) { }
+			}
 		}
 
 		#endregion Event
