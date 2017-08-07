@@ -666,6 +666,17 @@ namespace Hatate
 			this.Button_Apply.IsEnabled = true;
 		}
 
+		/// <summary>
+		/// Reset the elements in the right panel (source, preview, etc).
+		/// </summary>
+		private void ResetRightPanel()
+		{
+			this.Label_Match.Content = "Match";
+			this.Label_UnknownTags.Content = "Unknown tags";
+			this.Image_Original.Source = null;
+			this.Image_Match.Source = null;
+		}
+
 		#endregion Private
 
 		/*
@@ -802,16 +813,11 @@ namespace Hatate
 
 			this.Button_Apply.IsEnabled = false;
 
-			if (this.ListBox_Files.SelectedIndex < 0) {
-				this.Label_Match.Content = "Match";
-				this.Label_UnknownTags.Content = "Unknown tags";
-
-				return;
-			}
-
 			Result result = this.GetResultFromItem(this.ListBox_Files.SelectedIndex);
 
 			if (result == null) {
+				this.ResetRightPanel();
+
 				return;
 			}
 
