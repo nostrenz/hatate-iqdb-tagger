@@ -42,8 +42,6 @@ namespace Hatate
 		private int notFound = 0;
 		private string workingFolder = Options.Default.LastFolder;
 
-		private List<Result> results = new List<Result>();
-
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -203,12 +201,12 @@ namespace Hatate
 
 				// Search the image on IQDB
 				this.Label_Status.Content = "Searching file on IQDB...";
-				await this.RunIqdbApi(iqdbApi, thumb, filename);
+				await this.RunIqdbApi(iqdbApi, i, thumb, filename);
 
 				// Update the row, green for found and red for not found
 				int index = this.ListBox_Files.Items.IndexOf(filepath);
 
-				this.UpdateFileRowColor(index, this.results[index].KnownTags.Count > 0 ? Brushes.Orange : Brushes.Red);
+				this.UpdateFileRowColor(index, this.GetResultFromItem(index).KnownTags.Count > 0 ? Brushes.Orange : Brushes.Red);
 				this.UpdateLabels();
 
 				// Wait some time until the next search
@@ -265,7 +263,7 @@ namespace Hatate
 		/// <param name="thumbPath"></param>
 		/// <param name="filename"></param>
 		/// <returns></returns>
-		private async Task RunIqdbApi(IqdbApi.IqdbApi api, string thumbPath, string filename)
+		private async Task RunIqdbApi(IqdbApi.IqdbApi api, int index, string thumbPath, string filename)
 		{
 			using (var fs = new FileStream(thumbPath, FileMode.Open)) {
 				IqdbApi.Models.SearchResult result = null;
@@ -281,7 +279,7 @@ namespace Hatate
 					this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
 
 					// If found, move the image to the tagged folder
-					if (this.CheckMatches(result.Matches, filename, thumbPath)) {
+					if (this.CheckMatches(result.Matches, index, filename, thumbPath)) {
 						this.found++;
 
 						return;
@@ -297,7 +295,7 @@ namespace Hatate
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
-		private bool CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, string filename, string thumbPath)
+		private bool CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, int index, string filename, string thumbPath)
 		{
 			foreach (IqdbApi.Models.Match match in matches) {
 				// Check minimum similarity and number of tags
@@ -318,7 +316,7 @@ namespace Hatate
 				Result result = this.FilterTags(match);
 				result.ThumbPath = thumbPath;
 
-				this.results.Add(result);
+				this.GetFilesListBoxItemByIndex(index).Tag = result;
 
 				return true;
 			}
@@ -521,8 +519,9 @@ namespace Hatate
 		{
 			foreach (var item in this.ListBox_Files.SelectedItems) {
 				int index = this.ListBox_Files.Items.IndexOf(item);
+				Result result = this.GetResultFromItem(index);
 
-				if (index >= this.results.Count || this.RowHasMoved(index)) {
+				if (result == null || this.RowHasMoved(index)) {
 					continue;
 				}
 
@@ -530,10 +529,10 @@ namespace Hatate
 
 				// Move the file to the tagged folder and write tags
 				File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
-				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", this.results[index].KnownTags);
+				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", result.KnownTags);
 
 				// Delete the thmubnail
-				File.Delete(this.results[index].ThumbPath);
+				File.Delete(result.ThumbPath);
 
 				this.UpdateFileRowColor(index, Brushes.LimeGreen);
 			}
@@ -547,8 +546,9 @@ namespace Hatate
 		{
 			foreach (var item in this.ListBox_Files.SelectedItems) {
 				int index = this.ListBox_Files.Items.IndexOf(item);
+				Result result = this.GetResultFromItem(index);
 
-				if (!this.HasResult(index) || this.RowHasMoved(index)) {
+				if (result != null || this.RowHasMoved(index)) {
 					continue;
 				}
 
@@ -556,7 +556,7 @@ namespace Hatate
 				this.MoveToNotFoundFolder(this.GetFilenameFromPath(item.ToString()));
 
 				// Delete the thmubnail
-				File.Delete(this.results[index].ThumbPath);
+				File.Delete(result.ThumbPath);
 
 				// Turn the row red
 				this.UpdateFileRowColor(index, Brushes.Red);
@@ -579,7 +579,7 @@ namespace Hatate
 		/// <returns></returns>
 		private bool HasResult(int index)
 		{
-			return index < this.results.Count;
+			return this.GetResultFromItem(index) != null;
 		}
 
 		/// <summary>
@@ -601,6 +601,16 @@ namespace Hatate
 		private ListBoxItem GetFilesListBoxItemByIndex(int index)
 		{
 			return this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(this.ListBox_Files.Items[index]) as ListBoxItem;
+		}
+
+		/// <summary>
+		/// Get the result object attached to an item in the Files ListBox.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private Result GetResultFromItem(int index)
+		{
+			return (Result)this.GetFilesListBoxItemByIndex(index).Tag;
 		}
 
 		/// <summary>
@@ -804,14 +814,18 @@ namespace Hatate
 
 			this.Button_Apply.IsEnabled = false;
 
-			if (this.ListBox_Files.SelectedIndex < 0 || this.ListBox_Files.SelectedIndex >= this.results.Count) {
+			if (this.ListBox_Files.SelectedIndex < 0) {
 				this.Label_Match.Content = "Match";
 				this.Label_UnknownTags.Content = "Unknown tags";
 
 				return;
 			}
 
-			Result result = this.results[this.ListBox_Files.SelectedIndex];
+			Result result = this.GetResultFromItem(this.ListBox_Files.SelectedIndex);
+
+			if (result == null) {
+				return;
+			}
 
 			foreach (string tag in result.KnownTags) {
 				this.ListBox_Tags.Items.Add(new ListBoxItem() {
@@ -876,7 +890,7 @@ namespace Hatate
 		private void ListBox_Files_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
 			this.ListBox_Files.ContextMenu.Visibility = (this.ListBox_Files.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Hidden);
-			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = ((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = this.results.Count > 0;
+			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = ((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = this.HasResult(this.ListBox_Files.SelectedIndex);
 		}
 
 		/// <summary>
@@ -902,16 +916,17 @@ namespace Hatate
 			this.Button_Apply.IsEnabled = false;
 
 			int index = this.ListBox_Files.SelectedIndex;
+			Result result = this.GetResultFromItem(index);
 
-			this.results[index].KnownTags.Clear();
-			this.results[index].UnknownTags.Clear();
+			result.KnownTags.Clear();
+			result.UnknownTags.Clear();
 
 			foreach (var item in this.ListBox_Tags.Items) {
-				this.results[index].KnownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
+				result.KnownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
 			}
 
 			foreach (var item in this.ListBox_UnknownTags.Items) {
-				this.results[index].UnknownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
+				result.UnknownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
 			}
 
 			// Reload known tags
