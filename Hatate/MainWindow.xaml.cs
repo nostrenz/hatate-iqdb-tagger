@@ -877,8 +877,10 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void ListBox_Files_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
-			this.ListBox_Files.ContextMenu.Visibility = (this.ListBox_Files.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Hidden);
-			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = ((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = this.HasResult(this.ListBox_Files.SelectedIndex);
+			bool hasResult = this.HasResult(this.ListBox_Files.SelectedIndex);
+
+			this.ListBox_Files.ContextMenu.Visibility = (hasResult ? Visibility.Visible : Visibility.Hidden);
+			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = ((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = hasResult;
 		}
 
 		/// <summary>
