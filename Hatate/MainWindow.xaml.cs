@@ -2,14 +2,20 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Directory = System.IO.Directory;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using System.Diagnostics;
+using Directory = System.IO.Directory;
 using Options = Hatate.Properties.Settings;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using MenuItem = System.Windows.Controls.MenuItem;
+using Brush = System.Windows.Media.Brush;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace Hatate
 {
@@ -36,6 +42,8 @@ namespace Hatate
 		private int notFound = 0;
 		private string workingFolder = Options.Default.LastFolder;
 
+		private List<Result> results = new List<Result>();
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -47,6 +55,10 @@ namespace Hatate
 			if (!String.IsNullOrWhiteSpace(this.workingFolder)) {
 				this.GetImagesFromFolder();
 			}
+
+			this.ListBox_Files.SelectionMode = SelectionMode.Extended;
+
+			this.CreateFilesListContextMenu();
 		}
 
 		/*
@@ -62,8 +74,8 @@ namespace Hatate
 		/// </summary>
 		private void OpenFolder()
 		{
-			using (FolderBrowserDialog fbd = new FolderBrowserDialog()) {
-				DialogResult result = fbd.ShowDialog();
+			using (System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog()) {
+				System.Windows.Forms.DialogResult result = fbd.ShowDialog();
 
 				if (result != System.Windows.Forms.DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath)) {
 					return;
@@ -142,7 +154,7 @@ namespace Hatate
 			gr.SmoothingMode = SmoothingMode.HighQuality;
 			gr.CompositingQuality = CompositingQuality.HighQuality;
 			gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-			System.Drawing.Rectangle rectDestination = new System.Drawing.Rectangle(0, 0, width, thumbHeight);
+			Rectangle rectDestination = new Rectangle(0, 0, width, thumbHeight);
 			gr.DrawImage(image, rectDestination, 0, 0, srcWidth, srcHeight, GraphicsUnit.Pixel);
 
 			try {
@@ -176,7 +188,7 @@ namespace Hatate
 
 			for (int i = 0; i < count; i++) {
 				string filepath = this.files[i];
-				string filename = filepath.Substring(filepath.LastIndexOf(@"\") + 1, filepath.Length - filepath.LastIndexOf(@"\") - 1);
+				string filename = this.GetFilenameFromPath(filepath);
 
 				// Skip file if a txt with the same name already exists
 				if (File.Exists(filepath + ".txt")) {
@@ -191,8 +203,12 @@ namespace Hatate
 				this.Label_Status.Content = "Searching file on IQDB...";
 				await this.RunIqdbApi(api, thumb, filename);
 
-				// Remove the file from list and delete the thumbnail 
-				this.ListBox_Files.Items.Remove(filepath);
+				// Update the row, green for found and red for not found
+				//this.ListBox_Files.Items.Remove(filepath);
+				int index = this.ListBox_Files.Items.IndexOf(filepath);
+				((ListBoxItem)this.ListBox_Files.Items[index]).Foreground = this.results[index].Tags.Count > 0 ? Brushes.Green : Brushes.Red;
+
+				// Delete the thmubnail
 				File.Delete(thumb);
 
 				this.UpdateLabels();
@@ -256,7 +272,6 @@ namespace Hatate
 
 					// If found, move the image to the tagged folder
 					if (this.CheckMatches(result.Matches, filename, thumbPath)) {
-						File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
 						this.found++;
 
 						return;
@@ -264,7 +279,7 @@ namespace Hatate
 				}
 
 				// The search produced not result, move the image to the notfound folder
-				File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
+				this.MoveToNotFoundFolder(filename);
 				this.notFound++;
 			}
 		}
@@ -300,7 +315,11 @@ namespace Hatate
 					}
 				}
 
-				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", tagList);
+				this.results.Add(new Result() {
+					Tags       = tagList,
+					ThumbPath  = thumbPath,
+					PreviewUrl = "http://iqdb.org" + match.PreviewUrl
+				});
 
 				return true;
 			}
@@ -363,6 +382,7 @@ namespace Hatate
 
 				string found = this.FindTag(formated);
 
+				// Tag not found in the known tags
 				if (found == null) {
 					if (Options.Default.ShowUnknownTags) {
 						unknownTags.Add(formated);
@@ -415,7 +435,6 @@ namespace Hatate
 		private void WriteTagsToTxt(string filename, List<string> tags, bool append=false)
 		{
 			using (StreamWriter file = new StreamWriter(filename, append)) {
-				// Write each tags
 				foreach (string tag in tags) {
 					file.WriteLine(tag);
 				}
@@ -444,6 +463,121 @@ namespace Hatate
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Create the context menu for the Files ListBox.
+		/// </summary>
+		private void CreateFilesListContextMenu()
+		{
+			ContextMenu context = new ContextMenu();
+			MenuItem item = new MenuItem();
+
+			item = new MenuItem();
+			item.Header = "Write tags";
+			item.Tag = "writeTags";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Set as not found";
+			item.Tag = "notFound";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			this.ListBox_Files.ContextMenu = context;
+		}
+
+		/// <summary>
+		/// Move all the files selected in the Files list to the "tagged" folder and write their tags.
+		/// </summary>
+		private void WriteTagsForSelectedItems()
+		{
+			foreach (var item in this.ListBox_Files.SelectedItems) {
+				int index = this.ListBox_Files.Items.IndexOf(item);
+
+				if (index >= this.results.Count) {
+					continue;
+				}
+
+				string filename = this.GetFilenameFromPath(item.ToString());
+
+				// Move the file to the tagged folder and write tags
+				File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
+				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", this.results[index].Tags);
+			}
+
+			// Remove
+			this.RemoveSelectedItems();
+		}
+
+		/// <summary>
+		/// Move all the files selected in the Files list to the "notfound" folder.
+		/// </summary>
+		/// <param name="filename"></param>
+		private void MoveSelectedItemsToNotFoundFolder()
+		{
+			foreach (var item in this.ListBox_Files.SelectedItems) {
+				// Move the file to the tagged folder and write tags
+				this.MoveToNotFoundFolder(this.GetFilenameFromPath(item.ToString()));
+			}
+
+			// Remove
+			this.RemoveSelectedItems();
+		}
+
+		/// <summary>
+		/// Move a file to the "notfound" folder using its filename.
+		/// </summary>
+		/// <param name="filename"></param>
+		private void MoveToNotFoundFolder(string filename)
+		{
+			File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
+		}
+
+		/// <summary>
+		/// Remove selected items from both the Files LisBox and the result list.
+		/// </summary>
+		private void RemoveSelectedItems()
+		{
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				int index = this.ListBox_Files.Items.IndexOf(this.ListBox_Files.SelectedItems[0]);
+
+				if (index < this.results.Count) {
+					this.results.RemoveAt(index);
+				}
+
+				this.ListBox_Files.Items.Remove(this.ListBox_Files.SelectedItems[0]);
+			}
+		}
+
+		/// <summary>
+		/// Extract the filename (eg. something.jpg) from a full path (eg. c:/somedir/something.jpg).
+		/// </summary>
+		private string GetFilenameFromPath(string filepath)
+		{
+			return filepath.Substring(filepath.LastIndexOf(@"\") + 1, filepath.Length - filepath.LastIndexOf(@"\") - 1);
+		}
+
+		/// <summary>
+		/// Get a color for a tag depending on its namespace
+		/// </summary>
+		/// <returns></returns>
+		private Brush GetBrushFromTag(string tag)
+		{
+			if (tag.StartsWith("series:")) {
+				return Brushes.DeepPink;
+			}
+
+			if (tag.StartsWith("character:")) {
+				return Brushes.LimeGreen;
+			}
+
+			if (tag.StartsWith("creator:")) {
+				return Brushes.Brown;
+			}
+
+			return Brushes.CadetBlue;
 		}
 
 		#endregion Private
@@ -567,6 +701,80 @@ namespace Hatate
 
 			if (this.workingFolder != null) {
 				this.GetImagesFromFolder();
+			}
+		}
+
+		/// <summary>
+		/// Called when selecting a row in the files list.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			this.ListBox_Tags.Items.Clear();
+
+			if (this.ListBox_Files.SelectedIndex < 0 || this.ListBox_Files.SelectedIndex >= this.results.Count) {
+				return;
+			}
+
+			Result result = this.results[this.ListBox_Files.SelectedIndex];
+
+			foreach (string tag in result.Tags) {
+				this.ListBox_Tags.Items.Add(new ListBoxItem() {
+					Content = tag,
+					Foreground = this.GetBrushFromTag(tag)
+				});
+			}
+
+			try {
+				this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
+				this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
+			} catch (UriFormatException x) { }
+		}
+
+		/// <summary>
+		/// Called after clicking on an option from the Files ListBox's context menu.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ContextMenu_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem mi = sender as MenuItem;
+
+			if (mi == null) {
+				return;
+			}
+
+			switch (mi.Tag) {
+				case "writeTags":
+					this.WriteTagsForSelectedItems();
+				break;
+				case "notFound":
+					this.MoveSelectedItemsToNotFoundFolder();
+				break;
+			}
+		}
+
+		/// <summary>
+		/// Called when the Files ListBox's context menu is oppened.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Files_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		{
+			this.ListBox_Files.ContextMenu.Visibility = (this.ListBox_Files.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Hidden);
+			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = this.results.Count > 0;
+		}
+
+		/// <summary>
+		/// Called when clicking on the "ShowFolder" menubar item, open the current working folder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_ShowFolder_Click(object sender, RoutedEventArgs e)
+		{
+			if (Directory.Exists(this.workingFolder)) {
+				Process myProcess = Process.Start(new ProcessStartInfo(this.workingFolder));
 			}
 		}
 
