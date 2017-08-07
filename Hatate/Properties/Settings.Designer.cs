@@ -25,18 +25,6 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Compare {
-            get {
-                return ((bool)(this["Compare"]));
-            }
-            set {
-                this["Compare"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
         public byte Similarity {
             get {
@@ -217,7 +205,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool Source_Zerochan {
             get {
                 return ((bool)(this["Source_Zerochan"]));
@@ -260,18 +248,6 @@ namespace Hatate.Properties {
             }
             set {
                 this["Randomize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ShowUnknownTags {
-            get {
-                return ((bool)(this["ShowUnknownTags"]));
-            }
-            set {
-                this["ShowUnknownTags"] = value;
             }
         }
     }

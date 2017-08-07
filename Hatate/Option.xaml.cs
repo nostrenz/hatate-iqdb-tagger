@@ -19,8 +19,7 @@ namespace Hatate
 			foreach (var item in Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
 				Combo_MatchType.Items.Add(item);
 			}
-
-			this.CheckBox_Compare.IsChecked = Options.Default.Compare;
+			
 			this.CheckBox_KnownTags.IsChecked = Options.Default.KnownTags;
 			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
 			this.CheckBox_MatchType.IsChecked = Options.Default.CheckMatchType;
@@ -29,7 +28,6 @@ namespace Hatate
 			this.Slider_Similarity.Value = Options.Default.Similarity;
 			this.Slider_Delay.Value = Options.Default.Delay;
 			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
-			this.CheckBox_ShowUnknownTags.IsChecked = Options.Default.ShowUnknownTags;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -72,7 +70,6 @@ namespace Hatate
 
 		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
-			Options.Default.Compare = (bool)this.CheckBox_Compare.IsChecked;
 			Options.Default.KnownTags = (bool)this.CheckBox_KnownTags.IsChecked;
 			Options.Default.AddRating = (bool)this.CheckBox_AddRating.IsChecked;
 			Options.Default.CheckMatchType = (bool)this.CheckBox_MatchType.IsChecked;
@@ -81,7 +78,6 @@ namespace Hatate
 			Options.Default.Similarity = (byte)this.Slider_Similarity.Value;
 			Options.Default.Delay = (int)this.Slider_Delay.Value;
 			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
-			Options.Default.ShowUnknownTags = (bool)this.CheckBox_ShowUnknownTags.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;

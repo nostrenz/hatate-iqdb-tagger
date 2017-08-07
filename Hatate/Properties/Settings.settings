@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Hatate.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Compare" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="Similarity" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
@@ -51,7 +48,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Source_Zerochan" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Source_AnimePictures" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -60,9 +57,6 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Randomize" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="ShowUnknownTags" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

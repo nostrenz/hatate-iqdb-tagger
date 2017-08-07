@@ -56,9 +56,8 @@ namespace Hatate
 				this.GetImagesFromFolder();
 			}
 
-			this.ListBox_Files.SelectionMode = SelectionMode.Extended;
-
 			this.CreateFilesListContextMenu();
+			this.CreateUnknownTagsListContextMenu();
 		}
 
 		/*
@@ -117,7 +116,10 @@ namespace Hatate
 		private void GetImagesFromFolder()
 		{
 			this.files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(this.workingFolder, filter, SearchOption.TopDirectoryOnly)).ToArray();
+
 			this.ListBox_Files.Items.Clear();
+			this.ListBox_Tags.Items.Clear();
+			this.ListBox_UnknownTags.Items.Clear();
 
 			foreach (string file in this.files) {
 				this.ListBox_Files.Items.Add(file);
@@ -183,7 +185,7 @@ namespace Hatate
 			this.MenuItem_OpenFolder.IsEnabled = false;
 			this.Button_Start.IsEnabled = false;
 
-			IqdbApi.IqdbApi api = new IqdbApi.IqdbApi();
+			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
 			int count = this.files.Length;
 
 			for (int i = 0; i < count; i++) {
@@ -201,16 +203,12 @@ namespace Hatate
 
 				// Search the image on IQDB
 				this.Label_Status.Content = "Searching file on IQDB...";
-				await this.RunIqdbApi(api, thumb, filename);
+				await this.RunIqdbApi(iqdbApi, thumb, filename);
 
 				// Update the row, green for found and red for not found
-				//this.ListBox_Files.Items.Remove(filepath);
 				int index = this.ListBox_Files.Items.IndexOf(filepath);
-				((ListBoxItem)this.ListBox_Files.Items[index]).Foreground = this.results[index].Tags.Count > 0 ? Brushes.Green : Brushes.Red;
 
-				// Delete the thmubnail
-				File.Delete(thumb);
-
+				this.UpdateFileRowColor(index, this.results[index].KnownTags.Count > 0 ? Brushes.Orange : Brushes.Red);
 				this.UpdateLabels();
 
 				// Wait some time until the next search
@@ -233,6 +231,18 @@ namespace Hatate
 			this.Label_Status.Content = "Finished.";
 			this.MenuItem_OpenFolder.IsEnabled = true;
 			this.Button_Start.IsEnabled = true;
+		}
+
+		/// <summary>
+		/// Update the color of a file row using its index.
+		/// </summary>
+		/// <param name="index"></param>
+		private void UpdateFileRowColor(int index, Brush brush)
+		{
+			ListBoxItem lbItem = this.GetFilesListBoxItemByIndex(index);
+
+			lbItem.Background = brush;
+			lbItem.Foreground = Brushes.White;
 		}
 
 		/// <summary>
@@ -263,7 +273,7 @@ namespace Hatate
 				try {
 					result = await api.SearchFile(fs);
 				} catch (FormatException) {
-					// FormatException may happen in cas of an invalid HTML response where no tags could be parsed
+					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
 				}
 
 				// Result found
@@ -305,21 +315,10 @@ namespace Hatate
 					continue;
 				}
 
-				List<string> tagList = this.FilterTags(match);
+				Result result = this.FilterTags(match);
+				result.ThumbPath = thumbPath;
 
-				if (Options.Default.Compare) {
-					Compare compare = new Compare(thumbPath, "http://iqdb.org" + match.PreviewUrl, tagList);
-
-					if (!compare.IsGood) {
-						continue;
-					}
-				}
-
-				this.results.Add(new Result() {
-					Tags       = tagList,
-					ThumbPath  = thumbPath,
-					PreviewUrl = "http://iqdb.org" + match.PreviewUrl
-				});
+				this.results.Add(result);
 
 				return true;
 			}
@@ -362,7 +361,7 @@ namespace Hatate
 		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
 		/// </summary>
 		/// <returns></returns>
-		private List<string> FilterTags(IqdbApi.Models.Match match)
+		private Result FilterTags(IqdbApi.Models.Match match)
 		{
 			List<string> tagList = new List<string>();
 			List<string> unknownTags = new List<string>();
@@ -380,18 +379,18 @@ namespace Hatate
 					continue;
 				}
 
-				string found = this.FindTag(formated);
+				if (Options.Default.KnownTags) {
+					formated = this.FindTag(formated);
 
-				// Tag not found in the known tags
-				if (found == null) {
-					if (Options.Default.ShowUnknownTags) {
+					// Tag not found in the known tags
+					if (formated == null) {
 						unknownTags.Add(formated);
-					}
 
-					continue;
+						continue;
+					}
 				}
 
-				tagList.Add(found);
+				tagList.Add(formated);
 			}
 
 			// Add rating
@@ -403,41 +402,37 @@ namespace Hatate
 				}
 			}
 
-			// Check the unknown tags
-			if (Options.Default.ShowUnknownTags && unknownTags.Count > 0) {
-				UnknownTags ut = new UnknownTags(unknownTags, match.Source);
-				ut.ShowDialog();
-
-				// Add to the tag list
-				ut.Unnamespaceds.ForEach(tag => tagList.Add(tag));
-				ut.Series.ForEach(tag => tagList.Add("series:" + tag));
-				ut.Characters.ForEach(tag => tagList.Add("character:" + tag));
-				ut.Creators.ForEach(tag => tagList.Add("creator:" + tag));
-
-				// Add to the text files
-				this.WriteTagsToTxt(App.appDir + TXT_UNNAMESPACEDS, ut.Unnamespaceds, true);
-				this.WriteTagsToTxt(App.appDir + TXT_SERIES, ut.Series, true);
-				this.WriteTagsToTxt(App.appDir + TXT_CHARACTERS, ut.Characters, true);
-				this.WriteTagsToTxt(App.appDir + TXT_CREATORS, ut.Creators, true);
-
-				// Reload known tags
-				this.LoadKnownTags();
-			}
-
-			return tagList;
+			return new Result() {
+				KnownTags   = tagList,
+				UnknownTags = unknownTags,
+				PreviewUrl  = "http://iqdb.org" + match.PreviewUrl,
+				Source      = match.Source
+			};
 		}
 
 		/// <summary>
 		/// Take the tag list and write it into a text file with the same name as the image.
 		/// </summary>
-		/// <param name="filename"></param>
+		/// <param name="filepath"></param>
 		/// <param name="tags"></param>
-		private void WriteTagsToTxt(string filename, List<string> tags, bool append=false)
+		private void WriteTagsToTxt(string filepath, List<string> tags, bool append=false)
 		{
-			using (StreamWriter file = new StreamWriter(filename, append)) {
+			using (StreamWriter file = new StreamWriter(filepath, append)) {
 				foreach (string tag in tags) {
 					file.WriteLine(tag);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Add a single tag into a text file.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <param name="tag"></param>
+		private void AppendTagToTxt(string filepath, string tag)
+		{
+			using (StreamWriter file = new StreamWriter(filepath, true)) {
+				file.WriteLine(tag);
 			}
 		}
 
@@ -448,10 +443,6 @@ namespace Hatate
 		/// <returns></returns>
 		private string FindTag(string tag)
 		{
-			if (!Options.Default.KnownTags) {
-				return tag;
-			}
-
 			if (this.unnamespaceds != null && this.unnamespaceds.Contains(tag)) {
 				return tag;
 			} else if (this.series != null && this.series.Contains(tag)) {
@@ -489,6 +480,41 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Create the context menu for the UnknownTags ListBox.
+		/// </summary>
+		private void CreateUnknownTagsListContextMenu()
+		{
+			ContextMenu context = new ContextMenu();
+			MenuItem item = new MenuItem();
+
+			item = new MenuItem();
+			item.Header = "Add as unnamespaced";
+			item.Tag = "addUnnamespaced";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Add as series";
+			item.Tag = "addSeries";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Add as character";
+			item.Tag = "addCharacter";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Add as creator";
+			item.Tag = "addCreator";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			this.ListBox_UnknownTags.ContextMenu = context;
+		}
+
+		/// <summary>
 		/// Move all the files selected in the Files list to the "tagged" folder and write their tags.
 		/// </summary>
 		private void WriteTagsForSelectedItems()
@@ -496,7 +522,7 @@ namespace Hatate
 			foreach (var item in this.ListBox_Files.SelectedItems) {
 				int index = this.ListBox_Files.Items.IndexOf(item);
 
-				if (index >= this.results.Count) {
+				if (index >= this.results.Count || this.RowHasMoved(index)) {
 					continue;
 				}
 
@@ -504,11 +530,13 @@ namespace Hatate
 
 				// Move the file to the tagged folder and write tags
 				File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
-				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", this.results[index].Tags);
-			}
+				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", this.results[index].KnownTags);
 
-			// Remove
-			this.RemoveSelectedItems();
+				// Delete the thmubnail
+				File.Delete(this.results[index].ThumbPath);
+
+				this.UpdateFileRowColor(index, Brushes.LimeGreen);
+			}
 		}
 
 		/// <summary>
@@ -518,12 +546,21 @@ namespace Hatate
 		private void MoveSelectedItemsToNotFoundFolder()
 		{
 			foreach (var item in this.ListBox_Files.SelectedItems) {
+				int index = this.ListBox_Files.Items.IndexOf(item);
+
+				if (!this.HasResult(index) || this.RowHasMoved(index)) {
+					continue;
+				}
+
 				// Move the file to the tagged folder and write tags
 				this.MoveToNotFoundFolder(this.GetFilenameFromPath(item.ToString()));
-			}
 
-			// Remove
-			this.RemoveSelectedItems();
+				// Delete the thmubnail
+				File.Delete(this.results[index].ThumbPath);
+
+				// Turn the row red
+				this.UpdateFileRowColor(index, Brushes.Red);
+			}
 		}
 
 		/// <summary>
@@ -536,19 +573,34 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Remove selected items from both the Files LisBox and the result list.
+		/// Check if a row in the Files ListBox has an associated result.
 		/// </summary>
-		private void RemoveSelectedItems()
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private bool HasResult(int index)
 		{
-			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				int index = this.ListBox_Files.Items.IndexOf(this.ListBox_Files.SelectedItems[0]);
+			return index < this.results.Count;
+		}
 
-				if (index < this.results.Count) {
-					this.results.RemoveAt(index);
-				}
+		/// <summary>
+		/// Check if we moved the row's file (colored in green or red)
+		/// </summary>
+		/// <returns></returns>
+		private bool RowHasMoved(int index)
+		{
+			ListBoxItem lbItem = this.GetFilesListBoxItemByIndex(index);
 
-				this.ListBox_Files.Items.Remove(this.ListBox_Files.SelectedItems[0]);
-			}
+			return lbItem.Background == Brushes.Red || lbItem.Background == Brushes.LimeGreen;
+		}
+
+		/// <summary>
+		/// Get a ListBoxItem from the Files ListBox using an index.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private ListBoxItem GetFilesListBoxItemByIndex(int index)
+		{
+			return this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(this.ListBox_Files.Items[index]) as ListBoxItem;
 		}
 
 		/// <summary>
@@ -577,7 +629,43 @@ namespace Hatate
 				return Brushes.Brown;
 			}
 
+			if (tag.StartsWith("rating:")) {
+				return Brushes.LightSlateGray;
+			}
+
 			return Brushes.CadetBlue;
+		}
+
+		/// <summary>
+		/// Move an item from a list to another one.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		private void MoveToList(ListBox from, ListBox to, string prefix=null)
+		{
+			foreach (string item in from.SelectedItems) {
+				ListBoxItem lbItem = new ListBoxItem();
+				string content = prefix + item;
+
+				lbItem.Content = content;
+				lbItem.Foreground = this.GetBrushFromTag(content);
+
+				to.Items.Add(lbItem);
+			}
+
+			while (from.SelectedItems.Count > 0) {
+				from.Items.Remove(from.SelectedItems[0]);
+			}
+		}
+
+		/// <summary>
+		/// Add an unknown tags to the tag list.
+		/// </summary>
+		private void AddNewTag(string txt, string prefix=null)
+		{
+			this.AppendTagToTxt(App.appDir + txt, this.ListBox_UnknownTags.SelectedItem.ToString());
+			this.MoveToList(this.ListBox_UnknownTags, this.ListBox_Tags, prefix);
+			this.Button_Apply.IsEnabled = true;
 		}
 
 		#endregion Private
@@ -712,24 +800,37 @@ namespace Hatate
 		private void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			this.ListBox_Tags.Items.Clear();
+			this.ListBox_UnknownTags.Items.Clear();
+
+			this.Button_Apply.IsEnabled = false;
 
 			if (this.ListBox_Files.SelectedIndex < 0 || this.ListBox_Files.SelectedIndex >= this.results.Count) {
+				this.Label_Match.Content = "Match";
+				this.Label_UnknownTags.Content = "Unknown tags";
+
 				return;
 			}
 
 			Result result = this.results[this.ListBox_Files.SelectedIndex];
 
-			foreach (string tag in result.Tags) {
+			foreach (string tag in result.KnownTags) {
 				this.ListBox_Tags.Items.Add(new ListBoxItem() {
 					Content = tag,
 					Foreground = this.GetBrushFromTag(tag)
 				});
 			}
 
+			foreach (string tag in result.UnknownTags) {
+				this.ListBox_UnknownTags.Items.Add(tag);
+			}
+
 			try {
 				this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
 				this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
-			} catch (UriFormatException x) { }
+			} catch (UriFormatException) { }
+
+			this.Label_Match.Content = result.Source.ToString();
+			this.Label_UnknownTags.Content = "Unknown tags from " + result.Source.ToString();
 		}
 
 		/// <summary>
@@ -752,6 +853,18 @@ namespace Hatate
 				case "notFound":
 					this.MoveSelectedItemsToNotFoundFolder();
 				break;
+				case "addUnnamespaced":
+					this.AddNewTag(TXT_UNNAMESPACEDS);
+				break;
+				case "addSeries":
+					this.AddNewTag(TXT_SERIES, "series:");
+				break;
+				case "addCharacter":
+					this.AddNewTag(TXT_CHARACTERS, "character:");
+				break;
+				case "addCreator":
+					this.AddNewTag(TXT_CREATORS, "creator:");
+				break;
 			}
 		}
 
@@ -763,7 +876,7 @@ namespace Hatate
 		private void ListBox_Files_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
 			this.ListBox_Files.ContextMenu.Visibility = (this.ListBox_Files.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Hidden);
-			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = this.results.Count > 0;
+			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = ((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = this.results.Count > 0;
 		}
 
 		/// <summary>
@@ -776,6 +889,33 @@ namespace Hatate
 			if (Directory.Exists(this.workingFolder)) {
 				Process myProcess = Process.Start(new ProcessStartInfo(this.workingFolder));
 			}
+		}
+
+		/// <summary>
+		/// Called when clicking on the "Apply" button.
+		/// Update a result from the changes made in the right panel.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_Apply_Click(object sender, RoutedEventArgs e)
+		{
+			this.Button_Apply.IsEnabled = false;
+
+			int index = this.ListBox_Files.SelectedIndex;
+
+			this.results[index].KnownTags.Clear();
+			this.results[index].UnknownTags.Clear();
+
+			foreach (var item in this.ListBox_Tags.Items) {
+				this.results[index].KnownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
+			}
+
+			foreach (var item in this.ListBox_UnknownTags.Items) {
+				this.results[index].UnknownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
+			}
+
+			// Reload known tags
+			this.LoadKnownTags();
 		}
 
 		#endregion Event
