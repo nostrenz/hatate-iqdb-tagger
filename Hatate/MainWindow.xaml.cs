@@ -40,6 +40,7 @@ namespace Hatate
 		private int found = 0;
 		private int notFound = 0;
 		private string workingFolder = Options.Default.LastFolder;
+		private int progress = -1;
 
 		public MainWindow()
 		{
@@ -175,6 +176,7 @@ namespace Hatate
 		/// </summary>
 		private async void StartSearch()
 		{
+			this.progress = -1;
 			int count = this.ListBox_Files.Items.Count;
 
 			if (count < 1) {
@@ -186,8 +188,20 @@ namespace Hatate
 
 			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
 
-			for (int i = 0; i < count; i++) {
-				string filepath = this.ListBox_Files.Items[i].ToString();
+			while (this.ListBox_Files.Items.Count > 0) {
+				this.progress++;
+
+				// No more files
+				if (this.progress >= this.ListBox_Files.Items.Count) {
+					break;
+				}
+
+				// Already searched
+				if (this.HasResult(this.progress)) {
+					continue;
+				}
+
+				string filepath = this.ListBox_Files.Items[this.progress].ToString();
 				string filename = this.GetFilenameFromPath(filepath);
 
 				// Skip file if a txt with the same name already exists
@@ -201,20 +215,20 @@ namespace Hatate
 
 				// Search the image on IQDB
 				this.Label_Status.Content = "Searching file on IQDB...";
-				await this.RunIqdbApi(iqdbApi, i, thumb, filename);
+				await this.RunIqdbApi(iqdbApi, this.progress, thumb, filename);
 
 				// The search produced not result, move the image to the notfound folder and remove the row
-				if (!this.HasResult(i)) {
+				if (!this.HasResult(this.progress)) {
 					this.MoveToNotFoundFolder(filename);
-					this.ListBox_Files.Items.RemoveAt(i);
 					this.notFound++;
+					this.RemoveFileListItemAt(this.progress);
+				} else {
+					this.UpdateFileRowColor(this.progress, this.GetResultFromItem(this.progress).KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
+					this.UpdateLabels();
 				}
 
-				this.UpdateFileRowColor(i, this.GetResultFromItem(i).KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
-				this.UpdateLabels();
-
 				// Wait some time until the next search
-				if (i < count - 1) {
+				if (this.progress < count - 1) {
 					int delay = Options.Default.Delay;
 
 					// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
@@ -233,6 +247,32 @@ namespace Hatate
 			this.Label_Status.Content = "Finished.";
 			this.MenuItem_OpenFolder.IsEnabled = true;
 			this.Button_Start.IsEnabled = true;
+		}
+
+		/// <summary>
+		/// Remove a row from the Files list.
+		/// </summary>
+		private void RemoveFileListItem(object item)
+		{
+			// Remove the row
+			this.ListBox_Files.Items.Remove(item);
+
+			if (this.progress > 0) {
+				this.progress--;
+			}
+		}
+
+		/// <summary>
+		/// Remove a row from the Files list by its index.
+		/// </summary>
+		private void RemoveFileListItemAt(int index)
+		{
+			// Remove the row
+			this.ListBox_Files.Items.RemoveAt(index);
+			
+			if (this.progress > 0) {
+				this.progress--;
+			}
 		}
 
 		/// <summary>
@@ -521,22 +561,23 @@ namespace Hatate
 		/// </summary>
 		private void WriteTagsForSelectedItems()
 		{
-			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
-				int index = this.ListBox_Files.Items.IndexOf(this.ListBox_Files.Items[i]);
-				Result result = this.GetResultFromItem(index);
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				var selected = this.ListBox_Files.SelectedItems[0];
+				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
+				Result result = (Result)item.Tag;
+
+				// Remove the row
+				this.RemoveFileListItem(selected);
 
 				if (result == null) {
 					continue;
 				}
 
-				string filename = this.GetFilenameFromPath(this.ListBox_Files.Items[i].ToString());
+				string filename = this.GetFilenameFromPath(selected.ToString());
 
 				// Move the file to the tagged folder and write tags
 				File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
 				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", result.KnownTags);
-
-				// Remove the row
-				this.ListBox_Files.Items.RemoveAt(index);
 			}
 		}
 
@@ -546,19 +587,20 @@ namespace Hatate
 		/// <param name="filename"></param>
 		private void MoveSelectedItemsToNotFoundFolder()
 		{
-			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
-				int index = this.ListBox_Files.Items.IndexOf(this.ListBox_Files.Items[i]);
-				Result result = this.GetResultFromItem(index);
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				var selected = this.ListBox_Files.SelectedItems[0];
+				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
+				Result result = (Result)item.Tag;
 
-				if (result != null) {
+				// Remove the row
+				this.RemoveFileListItem(selected);
+
+				if (result == null) {
 					continue;
 				}
 
 				// Move the file to the tagged folder and write tags
-				this.MoveToNotFoundFolder(this.GetFilenameFromPath(this.ListBox_Files.Items[i].ToString()));
-
-				// Remove the row
-				this.ListBox_Files.Items.RemoveAt(index);
+				this.MoveToNotFoundFolder(this.GetFilenameFromPath(selected.ToString()));
 			}
 		}
 
@@ -812,6 +854,12 @@ namespace Hatate
 			this.ListBox_UnknownTags.Items.Clear();
 
 			this.Button_Apply.IsEnabled = false;
+
+			if (this.ListBox_Files.SelectedIndex < 0) {
+				this.ResetRightPanel();
+
+				return;
+			}
 
 			Result result = this.GetResultFromItem(this.ListBox_Files.SelectedIndex);
 
