@@ -45,7 +45,7 @@ namespace Hatate
 		private int lastSearchedInSeconds = 0;
 		private int found = 0;
 		private int notFound = 0;
-		private int progress = -1;
+		private int progress = 0;
 		private bool running = false;
 
 		public MainWindow()
@@ -204,10 +204,9 @@ namespace Hatate
 		/// </summary>
 		private async void StartSearch()
 		{
-			this.progress = -1;
-			int count = this.ListBox_Files.Items.Count;
+			this.progress = 0;
 
-			if (count < 1) {
+			if (this.ListBox_Files.Items.Count < 1) {
 				return;
 			}
 
@@ -217,9 +216,8 @@ namespace Hatate
 			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
 
 			// Will run until the list is empty or every files in it has been searched
+			// NOTE: this.progress is incremented each time the loop doesn't reach the end where it is reset to 0
 			while (this.ListBox_Files.Items.Count > 0) {
-				this.progress++;
-
 				// No more files
 				if (this.progress >= this.ListBox_Files.Items.Count) {
 					break;
@@ -227,6 +225,8 @@ namespace Hatate
 
 				// Already searched
 				if (this.HasResult(this.progress)) {
+					this.progress++;
+
 					continue;
 				}
 
@@ -235,6 +235,8 @@ namespace Hatate
 
 				// Skip file if a txt with the same name already exists
 				if (File.Exists(filepath + ".txt")) {
+					this.progress++;
+
 					continue;
 				}
 
@@ -257,7 +259,7 @@ namespace Hatate
 				}
 
 				// Wait some time until the next search
-				if (this.progress < count - 1) {
+				if (this.progress < this.ListBox_Files.Items.Count - 1) {
 					int delay = Options.Default.Delay;
 
 					// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
@@ -271,6 +273,8 @@ namespace Hatate
 
 					await Task.Delay(delay * 1000);
 				}
+
+				this.progress = 0;
 			}
 
 			this.Label_Status.Content = "Finished.";
@@ -295,12 +299,7 @@ namespace Hatate
 		/// </summary>
 		private void RemoveFileListItem(object item)
 		{
-			// Remove the row
 			this.ListBox_Files.Items.Remove(item);
-
-			if (this.progress > 0) {
-				this.progress--;
-			}
 		}
 
 		/// <summary>
@@ -308,12 +307,7 @@ namespace Hatate
 		/// </summary>
 		private void RemoveFileListItemAt(int index)
 		{
-			// Remove the row
 			this.ListBox_Files.Items.RemoveAt(index);
-			
-			if (this.progress > 0) {
-				this.progress--;
-			}
 		}
 
 		/// <summary>
