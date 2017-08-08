@@ -216,6 +216,7 @@ namespace Hatate
 
 			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
 
+			// Will run until the list is empty or every files in it has been searched
 			while (this.ListBox_Files.Items.Count > 0) {
 				this.progress++;
 
@@ -251,7 +252,7 @@ namespace Hatate
 					this.notFound++;
 					this.RemoveFileListItemAt(this.progress);
 				} else {
-					this.UpdateFileRowColor(this.progress, this.GetResultFromItem(this.progress).KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
+					this.UpdateFileRowColor(this.progress, this.CountKnownTagsForItem(this.progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
 					this.UpdateLabels();
 				}
 
@@ -275,6 +276,18 @@ namespace Hatate
 			this.Label_Status.Content = "Finished.";
 			this.Button_Start.IsEnabled = false;
 			this.running = false;
+		}
+
+		/// <summary>
+		/// Count the number of known tags for a row by index.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private int CountKnownTagsForItem(int index)
+		{
+			Result result = this.GetResultFromItem(this.progress);
+
+			return result == null ? 0 : result.KnownTags.Count;
 		}
 
 		/// <summary>
