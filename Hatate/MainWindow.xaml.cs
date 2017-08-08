@@ -456,7 +456,7 @@ namespace Hatate
 
 				// Tag not found in the known tags
 				if (found == null) {
-					if (Options.Default.KnownTags && !this.ignoreds.Contains(tag)) {
+					if (Options.Default.KnownTags && !this.IsTagInList(tag, this.ignoreds)) {
 						unknownTags.Add(formated);
 					}
 
@@ -520,13 +520,13 @@ namespace Hatate
 				return tag;
 			}
 
-			if (this.unnamespaceds != null && this.unnamespaceds.Contains(tag)) {
+			if (this.IsTagInList(tag, this.unnamespaceds)) {
 				return tag;
-			} else if (this.series != null && this.series.Contains(tag)) {
+			} else if (this.IsTagInList(tag, this.series)) {
 				return "series:" + tag;
-			} else if (this.characters != null && this.characters.Contains(tag)) {
+			} else if (this.IsTagInList(tag, this.characters)) {
 				return "character:" + tag;
-			} else if (this.creators != null && this.creators.Contains(tag)) {
+			} else if (this.IsTagInList(tag, this.creators)) {
 				return "creator:" + tag;
 			}
 
@@ -786,9 +786,7 @@ namespace Hatate
 		{
 			using (StreamWriter file = new StreamWriter(filepath, true)) {
 				foreach (var item in from.SelectedItems) {
-					ListBoxItem listBoxItem = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
-
-					string tag = listBoxItem.Content.ToString();
+					string tag = item.ToString();
 
 					if (prefix != null) {
 						tag = prefix + tag;
@@ -994,6 +992,21 @@ namespace Hatate
 		private void ChangeStartButtonEnabledValue()
 		{
 			this.Button_Start.IsEnabled = this.ListBox_Files.Items.Count > 0 && !this.running;
+		}
+
+		/// <summary>
+		/// Check if a tag is in the given list.
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <param name="list"></param>
+		/// <returns></returns>
+		private bool IsTagInList(string tag, string[] list)
+		{
+			if (list == null) {
+				return false;
+			}
+
+			return list.Contains(tag);
 		}
 
 		#endregion Accessor
