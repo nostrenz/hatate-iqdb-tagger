@@ -818,7 +818,6 @@ namespace Hatate
 		private void ResetRightPanel()
 		{
 			this.Label_Match.Content = "Match";
-			this.Label_UnknownTags.Content = "Unknown tags";
 			this.Image_Original.Source = null;
 			this.Image_Match.Source = null;
 		}
@@ -1092,7 +1091,6 @@ namespace Hatate
 			} catch (UriFormatException) { }
 
 			this.Label_Match.Content = result.Source.ToString();
-			this.Label_UnknownTags.Content = "Unknown tags from " + result.Source.ToString();
 		}
 
 		/// <summary>

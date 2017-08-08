@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Hatate - iqdb images tagger" Height="475" Width="610" MinWidth="610" MinHeight="475">
 	<Grid>
-		<ListBox x:Name="ListBox_Files" Margin="0,18,236,90" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True"/>
+		<ListBox x:Name="ListBox_Files" Margin="0,18,236,95" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True"/>
 		<Label x:Name="Label_Remaining" Content="Remaining" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,64"/>
 		<Label x:Name="Label_Results" Content="Results" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,33"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20" Margin="0,0,0,33"/>
@@ -27,16 +27,13 @@
 		<StatusBar Height="32" VerticalAlignment="Bottom">
 			<Label x:Name="Label_Status" Content="Status"/>
 		</StatusBar>
-		<ListBox x:Name="ListBox_Tags" Margin="0,97,0,242" HorizontalAlignment="Right" Width="231"/>
 		<Border BorderBrush="Black" BorderThickness="1" Height="74" Margin="0,18,121,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="110">
 			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Border>
 		<Border BorderBrush="Black" BorderThickness="1" Height="75" Margin="0,17,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="110">
 			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Border>
-		<ListBox x:Name="ListBox_UnknownTags" Margin="0,0,0,114" HorizontalAlignment="Right" Width="231" Height="94" VerticalAlignment="Bottom" SelectionMode="Extended"/>
-		<Label x:Name="Label_UnknownTags" Content="Unknown tags" Margin="0,0,10,213" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="221"/>
-		<Button x:Name="Button_Apply" Content="Apply" Margin="0,0,0,90" Click="Button_Apply_Click" HorizontalAlignment="Right" Width="231" Height="19" VerticalAlignment="Bottom" IsEnabled="False"/>
+		<Button x:Name="Button_Apply" Content="Apply" Margin="0,0,0,95" Click="Button_Apply_Click" HorizontalAlignment="Right" Width="231" Height="19" VerticalAlignment="Bottom" IsEnabled="False"/>
 		<Label Content="Original" Margin="0,23,121,0" VerticalAlignment="Top" Height="69" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="110">
 			<Label.RenderTransform>
 				<TransformGroup>
@@ -57,5 +54,15 @@
 				</TransformGroup>
 			</Label.RenderTransform>
 		</Label>
+		<Grid Margin="0,97,0,119" HorizontalAlignment="Right" Width="231">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="5" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<ListBox x:Name="ListBox_Tags" HorizontalAlignment="Right" Width="231" Margin="0,0,0,5"/>
+			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
+			<ListBox x:Name="ListBox_UnknownTags" HorizontalAlignment="Right" Width="231" SelectionMode="Extended" Grid.Row="2" Margin="0,5,0,0"/>
+		</Grid>
 	</Grid>
 </Window>
