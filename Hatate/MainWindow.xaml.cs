@@ -25,9 +25,9 @@ namespace Hatate
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		const string DIR_THUMBS = @"thumbs\";
-		const string DIR_NOT_FOUND = @"imgs\notfound\";
-		const string DIR_TAGGED = @"imgs\tagged\";
+		const string DIR_THUMBS = @"\thumbs\";
+		const string DIR_NOT_FOUND = @"\imgs\notfound\";
+		const string DIR_TAGGED = @"\imgs\tagged\";
 
 		const string TXT_UNNAMESPACEDS = @"\tags\unnamespaceds.txt";
 		const string TXT_SERIES = @"\tags\series.txt";
@@ -935,7 +935,7 @@ namespace Hatate
 		private string ThumbsDirPath
 		{
 			get {
-				string path = App.appDir + @"\" + DIR_THUMBS;
+				string path = App.appDir + DIR_THUMBS;
 
 				this.CreateDirIfNeeded(path);
 
