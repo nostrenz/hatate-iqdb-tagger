@@ -7,23 +7,22 @@
         mc:Ignorable="d"
         Title="Hatate - iqdb images tagger" Height="475" Width="610" MinWidth="610" MinHeight="475">
 	<Grid>
-		<ListBox x:Name="ListBox_Files" Margin="0,18,236,90" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended"/>
+		<ListBox x:Name="ListBox_Files" Margin="0,18,236,90" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True"/>
 		<Label x:Name="Label_Remaining" Content="Remaining" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,64"/>
 		<Label x:Name="Label_Results" Content="Results" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,33"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20" Margin="0,0,0,33"/>
 		<Menu Height="18" VerticalAlignment="Top">
-			<MenuItem Header="Folder">
-				<MenuItem x:Name="MenuItem_OpenFolder" Header="Select new" Click="MenuItem_OpenFolder_Click"/>
-				<MenuItem x:Name="MenuItem_ShowFolder" Header="Open current" Click="MenuItem_ShowFolder_Click"/>
-			</MenuItem>
-			<MenuItem Header="Reload">
-				<MenuItem x:Name="MenuItem_Refresh" Header="Refresh list" Click="MenuItem_Refresh_Click"/>
+			<MenuItem Header="Files" Height="18" >
+				<MenuItem x:Name="MenuItem_AddFiles" Header="Add files" Click="MenuItem_AddFiles_Click"/>
+				<MenuItem x:Name="MenuItem_AddFolder" Header="Add folder" Click="MenuItem_AddFolder_Click"/>
+				<MenuItem x:Name="MenuItem_OpenAppFolder" Header="Open app folder" Click="MenuItem_OpenAppFolder_Click"/>
 				<MenuItem Header="Reload known tags" Click="MenuItem_ReloadKnownTags_Click"/>
 			</MenuItem>
-			<MenuItem Header="Maintenance">
+			<MenuItem Header="Maintenance" Height="18" >
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
+				<MenuItem Header="Remove known tags duplicates" Click="MenuItem_RemoveDuplicates_Click"/>
 			</MenuItem>
-			<MenuItem Header="Options" Click="MenuItem_Options_Click"/>
+			<MenuItem Header="Options" Click="MenuItem_Options_Click" Height="18" />
 		</Menu>
 		<StatusBar Height="32" VerticalAlignment="Bottom">
 			<Label x:Name="Label_Status" Content="Status"/>

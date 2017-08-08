@@ -16,6 +16,7 @@ using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace Hatate
 {
@@ -25,22 +26,27 @@ namespace Hatate
 	public partial class MainWindow : Window
 	{
 		const string DIR_THUMBS = @"thumbs\";
+		const string DIR_NOT_FOUND = @"imgs\notfound\";
+		const string DIR_TAGGED = @"imgs\tagged\";
+
 		const string TXT_UNNAMESPACEDS = @"\tags\unnamespaceds.txt";
 		const string TXT_SERIES = @"\tags\series.txt";
 		const string TXT_CHARACTERS = @"\tags\characters.txt";
 		const string TXT_CREATORS = @"\tags\creators.txt";
+		const string TXT_IGNOREDS = @"\tags\ignoreds.txt";
 
 		// Tags list
 		private string[] unnamespaceds;
 		private string[] series;
 		private string[] characters;
 		private string[] creators;
+		private string[] ignoreds;
 
 		private int lastSearchedInSeconds = 0;
 		private int found = 0;
 		private int notFound = 0;
-		private string workingFolder = Options.Default.LastFolder;
 		private int progress = -1;
+		private bool running = false;
 
 		public MainWindow()
 		{
@@ -50,11 +56,8 @@ namespace Hatate
 				this.LoadKnownTags();
 			}
 
-			if (!String.IsNullOrWhiteSpace(this.workingFolder)) {
-				this.GetImagesFromFolder();
-			}
-
 			this.CreateFilesListContextMenu();
+			this.CreateTagsListContextMenu();
 			this.CreateUnknownTagsListContextMenu();
 		}
 
@@ -67,9 +70,29 @@ namespace Hatate
 		#region Private
 
 		/// <summary>
-		/// Select a folder to open.
+		/// Select multiple files to be added to the list.
 		/// </summary>
-		private void OpenFolder()
+		private void AddFiles()
+		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Image files|*.jpg;*.png;*.bmp;*.jpeg";
+			dlg.Multiselect = true;
+
+			if (!(bool)dlg.ShowDialog()) {
+				return;
+			}
+
+			foreach (string filename in dlg.FileNames) {
+				this.ListBox_Files.Items.Add(filename);
+			}
+
+			this.ChangeStartButtonEnabledValue();
+		}
+
+		/// <summary>
+		/// Select all the files from a folder to be added to the list.
+		/// </summary>
+		private void AddFolder()
 		{
 			using (System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog()) {
 				System.Windows.Forms.DialogResult result = fbd.ShowDialog();
@@ -78,10 +101,11 @@ namespace Hatate
 					return;
 				}
 
-				Options.Default.LastFolder = this.workingFolder = fbd.SelectedPath + @"\";
-
-				Options.Default.Save();
+				// Add files to the list
+				this.GetImagesFromFolder(fbd.SelectedPath + @"\");
 			}
+
+			this.ChangeStartButtonEnabledValue();
 		}
 
 		/// <summary>
@@ -105,15 +129,19 @@ namespace Hatate
 				this.creators = File.ReadAllLines(App.appDir + TXT_CREATORS);
 			}
 
+			if (File.Exists(App.appDir + TXT_IGNOREDS)) {
+				this.ignoreds = File.ReadAllLines(App.appDir + TXT_IGNOREDS);
+			}
+
 			this.Label_Status.Content = "Tags loaded.";
 		}
 
 		/// <summary>
 		/// Get all the images in the working directory and add them to the list.
 		/// </summary>
-		private void GetImagesFromFolder()
+		private void GetImagesFromFolder(string path)
 		{
-			string[] files = "*.jpg|*.jpeg|*.png".Split('|').SelectMany(filter => Directory.GetFiles(this.workingFolder, filter, SearchOption.TopDirectoryOnly)).ToArray();
+			string[] files = "*.jpg|*.jpeg|*.png|*.bmp".Split('|').SelectMany(filter => Directory.GetFiles(path, filter, SearchOption.TopDirectoryOnly)).ToArray();
 
 			this.ListBox_Files.Items.Clear();
 			this.ListBox_Tags.Items.Clear();
@@ -183,7 +211,7 @@ namespace Hatate
 				return;
 			}
 
-			this.MenuItem_OpenFolder.IsEnabled = false;
+			this.running = true;
 			this.Button_Start.IsEnabled = false;
 
 			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
@@ -219,7 +247,7 @@ namespace Hatate
 
 				// The search produced not result, move the image to the notfound folder and remove the row
 				if (!this.HasResult(this.progress)) {
-					this.MoveToNotFoundFolder(filename);
+					this.MoveToNotFoundFolder(filepath, filename);
 					this.notFound++;
 					this.RemoveFileListItemAt(this.progress);
 				} else {
@@ -245,8 +273,8 @@ namespace Hatate
 			}
 
 			this.Label_Status.Content = "Finished.";
-			this.MenuItem_OpenFolder.IsEnabled = true;
-			this.Button_Start.IsEnabled = true;
+			this.Button_Start.IsEnabled = false;
+			this.running = false;
 		}
 
 		/// <summary>
@@ -421,7 +449,7 @@ namespace Hatate
 
 				// Tag not found in the known tags
 				if (found == null) {
-					if (Options.Default.KnownTags) {
+					if (Options.Default.KnownTags && !this.ignoreds.Contains(tag)) {
 						unknownTags.Add(formated);
 					}
 
@@ -518,7 +546,30 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "Remove";
+			item.Tag = "removeFiles";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			this.ListBox_Files.ContextMenu = context;
+		}
+
+		/// <summary>
+		/// Create the context menu for the Tags ListBox.
+		/// </summary>
+		private void CreateTagsListContextMenu()
+		{
+			ContextMenu context = new ContextMenu();
+			MenuItem item = new MenuItem();
+
+			item = new MenuItem();
+			item.Header = "Remove";
+			item.Tag = "removeTags";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			this.ListBox_Tags.ContextMenu = context;
 		}
 
 		/// <summary>
@@ -553,6 +604,12 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "Add as ignored";
+			item.Tag = "addIgnored";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			this.ListBox_UnknownTags.ContextMenu = context;
 		}
 
@@ -573,10 +630,11 @@ namespace Hatate
 					continue;
 				}
 
-				string filename = this.GetFilenameFromPath(selected.ToString());
+				string filepath = selected.ToString();
+				string filename = this.GetFilenameFromPath(filepath);
 
 				// Move the file to the tagged folder and write tags
-				File.Move(this.workingFolder + filename, this.TaggedDirPath + filename);
+				File.Move(filepath, this.TaggedDirPath + filename);
 				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", result.KnownTags);
 			}
 		}
@@ -600,17 +658,17 @@ namespace Hatate
 				}
 
 				// Move the file to the tagged folder and write tags
-				this.MoveToNotFoundFolder(this.GetFilenameFromPath(selected.ToString()));
+				this.MoveToNotFoundFolder(selected.ToString(), this.GetFilenameFromPath(selected.ToString()));
 			}
 		}
 
 		/// <summary>
 		/// Move a file to the "notfound" folder using its filename.
 		/// </summary>
-		/// <param name="filename"></param>
-		private void MoveToNotFoundFolder(string filename)
+		/// <param name="filepath"></param>
+		private void MoveToNotFoundFolder(string filepath, string filename=null)
 		{
-			File.Move(this.workingFolder + filename, this.NotfoundDirPath + filename);
+			File.Move(filepath, this.NotfoundDirPath + filename);
 		}
 
 		/// <summary>
@@ -630,6 +688,10 @@ namespace Hatate
 		/// <returns></returns>
 		private ListBoxItem GetFilesListBoxItemByIndex(int index)
 		{
+			if (this.ListBox_Files.Items.Count < 1) {
+				return null;
+			}
+
 			return this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(this.ListBox_Files.Items[index]) as ListBoxItem;
 		}
 
@@ -640,7 +702,9 @@ namespace Hatate
 		/// <returns></returns>
 		private Result GetResultFromItem(int index)
 		{
-			return (Result)this.GetFilesListBoxItemByIndex(index).Tag;
+			ListBoxItem listBoxItem = this.GetFilesListBoxItemByIndex(index);
+
+			return listBoxItem != null ? (Result)listBoxItem.Tag : null;
 		}
 
 		/// <summary>
@@ -681,8 +745,9 @@ namespace Hatate
 		/// </summary>
 		/// <param name="from"></param>
 		/// <param name="to"></param>
-		private void MoveToList(ListBox from, ListBox to, string prefix=null)
+		private void MoveSelectedItemsToList(ListBox from, ListBox to, string prefix=null)
 		{
+			// Copy items to the destination list
 			foreach (string item in from.SelectedItems) {
 				ListBoxItem lbItem = new ListBoxItem();
 				string content = prefix + item;
@@ -693,18 +758,52 @@ namespace Hatate
 				to.Items.Add(lbItem);
 			}
 
+			// Remove from list
+			this.RemoveSelectedItemsFromList(from);
+		}
+
+		/// <summary>
+		/// Remove all the selected items from a given list.
+		/// </summary>
+		private void RemoveSelectedItemsFromList(ListBox from)
+		{
 			while (from.SelectedItems.Count > 0) {
 				from.Items.Remove(from.SelectedItems[0]);
 			}
 		}
 
 		/// <summary>
+		/// Write all the selected items from the given list into a txt file.
+		/// </summary>
+		private void WriteSelectedItemsToTxt(string filepath, ListBox from, string prefix=null)
+		{
+			using (StreamWriter file = new StreamWriter(filepath, true)) {
+				foreach (var item in from.SelectedItems) {
+					ListBoxItem listBoxItem = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
+
+					string tag = listBoxItem.Content.ToString();
+
+					if (prefix != null) {
+						tag = prefix + tag;
+					}
+
+					file.WriteLine(tag);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Add an unknown tags to the tag list.
 		/// </summary>
-		private void AddNewTag(string txt, string prefix=null)
+		private void MoveSelectedUnknownTagsToKnownTags(string txt, string prefix=null)
 		{
-			this.AppendTagToTxt(App.appDir + txt, this.ListBox_UnknownTags.SelectedItem.ToString());
-			this.MoveToList(this.ListBox_UnknownTags, this.ListBox_Tags, prefix);
+			if (this.ListBox_UnknownTags.Items.Count < 1) {
+				return;
+			}
+
+			this.WriteSelectedItemsToTxt(App.appDir + txt, this.ListBox_UnknownTags);
+			this.MoveSelectedItemsToList(this.ListBox_UnknownTags, this.ListBox_Tags, prefix);
+
 			this.Button_Apply.IsEnabled = true;
 		}
 
@@ -717,6 +816,102 @@ namespace Hatate
 			this.Label_UnknownTags.Content = "Unknown tags";
 			this.Image_Original.Source = null;
 			this.Image_Match.Source = null;
+		}
+
+		/// <summary>
+		/// Rewrite tags in a txt file without duplicates.
+		/// </summary>
+		/// <param name="txt"></param>
+		/// <param name="tags"></param>
+		private void RemoveKnownTagsDuplicates(string txt, string[] tags)
+		{
+			if (!File.Exists(App.appDir + txt)) {
+				return;
+			}
+
+			List<string> copies = new List<string>();
+
+			foreach (string tag in tags) {
+				if (!copies.Contains(tag)) {
+					copies.Add(tag);
+				}
+			}
+
+			this.WriteTagsToTxt(App.appDir + txt, copies, false);
+		}
+
+		/// <summary>
+		/// Write tags in a txt file without the ones in the exclude list.
+		/// </summary>
+		private void WriteTagsToTxtWithout(string txt, string[] tags, List<string> excludes)
+		{
+			if (!File.Exists(App.appDir + txt)) {
+				return;
+			}
+
+			List<string> includes = new List<string>();
+
+			foreach (string tag in tags) {
+				if (!excludes.Contains(tag)) {
+					includes.Add(tag);
+				}
+			}
+
+			this.WriteTagsToTxt(App.appDir + txt, includes, false);
+		}
+
+		/// <summary>
+		/// Set the text in the status bar at the window's bottom.
+		/// </summary>
+		/// <param name="text"></param>
+		private void SetStatus(string text)
+		{
+			this.Label_Status.Content = text;
+		}
+
+		/// <summary>
+		/// Create a directory if it doesn't exists yet. 
+		/// </summary>
+		/// <returns></returns>
+		private void CreateDirIfNeeded(string path)
+		{
+			if (!Directory.Exists(path)) {
+				Directory.CreateDirectory(path);
+			}
+		}
+
+		/// <summary>
+		/// Check if a file is an image using the extension.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="filters"></param>
+		/// <returns></returns>
+		private bool IsCorrespondingToFilter(string path, string[] filters)
+		{
+			foreach (string filter in filters) {
+				if (this.Extension(path).ToLower() == filter) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Get a file extension from its path.
+		/// Note: Dot included (example: returns ".txt").
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		private string Extension(string path)
+		{
+			int dot = path.LastIndexOf(".");
+
+			if (dot < 0) {
+				return String.Empty;
+			}
+
+			return path.Substring(dot, path.Length - path.LastIndexOf("."));
 		}
 
 		#endregion Private
@@ -737,9 +932,7 @@ namespace Hatate
 			get {
 				string path = App.appDir + @"\" + DIR_THUMBS;
 
-				if (!Directory.Exists(path)) {
-					Directory.CreateDirectory(path);
-				}
+				this.CreateDirIfNeeded(path);
 
 				return path;
 			}
@@ -752,11 +945,9 @@ namespace Hatate
 		{
 			get
 			{
-				string path = this.workingFolder + @"tagged\";
+				string path = App.appDir + DIR_TAGGED;
 
-				if (!Directory.Exists(path)) {
-					Directory.CreateDirectory(path);
-				}
+				this.CreateDirIfNeeded(path);
 
 				return path;
 			}
@@ -769,7 +960,7 @@ namespace Hatate
 		{
 			get
 			{
-				string path = this.workingFolder + @"notfound\";
+				string path = App.appDir + DIR_NOT_FOUND;
 
 				if (!Directory.Exists(path)) {
 					Directory.CreateDirectory(path);
@@ -777,6 +968,25 @@ namespace Hatate
 
 				return path;
 			}
+		}
+
+		/// <summary>
+		/// List of accepted image extentions.
+		/// </summary>
+		private string[] ImagesFilesExtensions
+		{
+			get
+			{
+				return new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
+			}
+		}
+
+		/// <summary>
+		/// Enable or disable the Start button depending if the list is empty or if the search loop is already running.
+		/// </summary>
+		private void ChangeStartButtonEnabledValue()
+		{
+			this.Button_Start.IsEnabled = this.ListBox_Files.Items.Count > 0 && !this.running;
 		}
 
 		#endregion Accessor
@@ -800,16 +1010,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Called when clicking on the menubar's refresh button, refresh the files list.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_Refresh_Click(object sender, RoutedEventArgs e)
-		{
-			this.GetImagesFromFolder();
-		}
-
-		/// <summary>
 		/// Called when clicking on the menubar's Options button, open the options window.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -827,20 +1027,6 @@ namespace Hatate
 		private void MenuItem_ReloadKnownTags_Click(object sender, RoutedEventArgs e)
 		{
 			this.LoadKnownTags();
-		}
-
-		/// <summary>
-		/// Called when clicking on the menubar's Open folder button, open a new folder to load images from.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_OpenFolder_Click(object sender, RoutedEventArgs e)
-		{
-			this.OpenFolder();
-
-			if (this.workingFolder != null) {
-				this.GetImagesFromFolder();
-			}
 		}
 
 		/// <summary>
@@ -910,16 +1096,26 @@ namespace Hatate
 					this.MoveSelectedItemsToNotFoundFolder();
 				break;
 				case "addUnnamespaced":
-					this.AddNewTag(TXT_UNNAMESPACEDS);
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_UNNAMESPACEDS);
 				break;
 				case "addSeries":
-					this.AddNewTag(TXT_SERIES, "series:");
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_SERIES, "series:");
 				break;
 				case "addCharacter":
-					this.AddNewTag(TXT_CHARACTERS, "character:");
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_CHARACTERS, "character:");
 				break;
 				case "addCreator":
-					this.AddNewTag(TXT_CREATORS, "creator:");
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_CREATORS, "creator:");
+				break;
+				case "addIgnored":
+					this.WriteSelectedItemsToTxt(App.appDir + TXT_IGNOREDS, this.ListBox_UnknownTags);
+					this.RemoveSelectedItemsFromList(this.ListBox_UnknownTags);
+				break;
+				case "removeFiles":
+					this.RemoveSelectedItemsFromList(this.ListBox_Files);
+				break;
+				case "removeTags":
+					this.RemoveSelectedItemsFromList(this.ListBox_Tags);
 				break;
 			}
 		}
@@ -931,22 +1127,12 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void ListBox_Files_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
+			//this.ListBox_Files.ContextMenu.Visibility = (this.ListBox_Files.Items.Count > 0 ? Visibility.Visible : Visibility.Hidden);
+
 			bool hasResult = this.HasResult(this.ListBox_Files.SelectedIndex);
 
-			this.ListBox_Files.ContextMenu.Visibility = (hasResult ? Visibility.Visible : Visibility.Hidden);
-			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = ((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = hasResult;
-		}
-
-		/// <summary>
-		/// Called when clicking on the "ShowFolder" menubar item, open the current working folder.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_ShowFolder_Click(object sender, RoutedEventArgs e)
-		{
-			if (Directory.Exists(this.workingFolder)) {
-				Process myProcess = Process.Start(new ProcessStartInfo(this.workingFolder));
-			}
+			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = hasResult;
+			((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = hasResult;
 		}
 
 		/// <summary>
@@ -984,12 +1170,104 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_DeleteThumbs_Click(object sender, RoutedEventArgs e)
 		{
+			this.SetStatus("Deleting thumbnails...");
+
 			string[] files = Directory.GetFiles(this.ThumbsDirPath);
 
 			foreach (string file in files) {
 				try {
 					File.Delete(file);
 				} catch (Exception) { }
+			}
+
+			this.SetStatus("Thumbnails deleted.");
+		}
+
+		/// <summary>
+		/// Remove duplicates entries in the txt files.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_RemoveDuplicates_Click(object sender, RoutedEventArgs e)
+		{
+			this.LoadKnownTags();
+			this.SetStatus("Removing known tags duplicates...");
+
+			this.RemoveKnownTagsDuplicates(TXT_UNNAMESPACEDS, this.unnamespaceds);
+			this.RemoveKnownTagsDuplicates(TXT_SERIES, this.series);
+			this.RemoveKnownTagsDuplicates(TXT_CHARACTERS, this.characters);
+			this.RemoveKnownTagsDuplicates(TXT_CREATORS, this.creators);
+			this.RemoveKnownTagsDuplicates(TXT_IGNOREDS, this.ignoreds);
+
+			this.LoadKnownTags();
+			this.SetStatus("Known tags duplicates removed.");
+		}
+
+		/// <summary>
+		/// Called when clicking on the "Add files" menubar item, open a dialog to select files to be added to the list.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_AddFiles_Click(object sender, RoutedEventArgs e)
+		{
+			this.AddFiles();
+		}
+
+
+		/// <summary>
+		/// Called when clicking on the "Add files" menubar item, open a dialog to select a folder to add all its files to the list.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_AddFolder_Click(object sender, RoutedEventArgs e)
+		{
+			this.AddFolder();
+		}
+
+		/// <summary>
+		/// Called when clicking on the "Open app folder" menubar item, open the current working folder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_OpenAppFolder_Click(object sender, RoutedEventArgs e)
+		{
+			Process myProcess = Process.Start(new ProcessStartInfo(App.appDir));
+		}
+
+		/// <summary>
+		/// Called when dropping files onto the Files ListBox.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Files_Drop(object sender, DragEventArgs e)
+		{
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+
+			if (files == null) {
+				return;
+			}
+
+			// Add images to the list
+			foreach (string file in files) {
+				if (this.IsCorrespondingToFilter(file, ImagesFilesExtensions)) {
+					this.ListBox_Files.Items.Add(file);
+				}
+			}
+
+			this.ChangeStartButtonEnabledValue();
+		}
+
+		/// <summary>
+		/// Called when draging files over the Files ListBox.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Files_DragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+				e.Effects = DragDropEffects.All;
+			} else {
+				e.Effects = DragDropEffects.None;
 			}
 		}
 
