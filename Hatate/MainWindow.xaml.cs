@@ -581,9 +581,25 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			context.Items.Add(new Separator());
+
 			item = new MenuItem();
 			item.Header = "Remove";
 			item.Tag = "removeFiles";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Copy path";
+			item.Tag = "copyFilePath";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Open file";
+			item.Tag = "launchFile";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -607,6 +623,14 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Remove and ignore";
 			item.Tag = "removeAndIgnore";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Copy to clipboard";
+			item.Tag = "copyTag";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -648,6 +672,14 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Add as ignored";
 			item.Tag = "addIgnored";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Copy to clipboard";
+			item.Tag = "copyUnknownTag";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1007,6 +1039,26 @@ namespace Hatate
 			this.Button_Start.Background = this.GetBrushFromString(color);
 		}
 
+		/// <summary>
+		/// Open a folder or launch a file.
+		/// </summary>
+		/// <param name="path"></param>
+		private void StartProcess(string path)
+		{
+			Process myProcess = Process.Start(new ProcessStartInfo(path));
+		}
+
+		/// <summary>
+		/// Copy the selected item of a given listbox to the clipboard.
+		/// </summary>
+		/// <param name="from"></param>
+		private void CopySelectedItemToClipboard(ListBox from)
+		{
+			if (from.SelectedItem != null) {
+				Clipboard.SetText(from.SelectedItem.ToString());
+			}
+		}
+
 		#endregion Private
 
 		/*
@@ -1248,6 +1300,20 @@ namespace Hatate
 				case "removeAndIgnore":
 					this.IngnoreSelectItemsFromList(this.ListBox_Tags);
 				break;
+				case "copyFilePath":
+					this.CopySelectedItemToClipboard(this.ListBox_Files);
+				break;
+				case "launchFile":
+					if (this.ListBox_Files.SelectedItem != null) {
+						this.StartProcess(this.ListBox_Files.SelectedItem.ToString());
+					}
+				break;
+				case "copyTag":
+					this.CopySelectedItemToClipboard(this.ListBox_Tags);
+				break;
+				case "copyUnknownTag":
+					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags);
+				break;
 			}
 		}
 
@@ -1371,7 +1437,7 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_OpenAppFolder_Click(object sender, RoutedEventArgs e)
 		{
-			Process myProcess = Process.Start(new ProcessStartInfo(App.appDir));
+			this.StartProcess(App.appDir);
 		}
 
 		/// <summary>
