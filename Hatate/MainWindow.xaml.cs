@@ -1082,7 +1082,11 @@ namespace Hatate
 		/// </summary>
 		private void OpenHelpForSelectedTag(ListBox from)
 		{
-			this.StartProcess("https://danbooru.donmai.us/posts?tags=" + this.FormatTag(from.SelectedItem.ToString()));
+			var selectedItem = from.SelectedItem;
+
+			if (selectedItem != null) {
+				this.StartProcess("https://danbooru.donmai.us/posts?tags=" + this.FormatTag(from.SelectedItem.ToString()));
+			}
 		}
 
 		/// <summary>
