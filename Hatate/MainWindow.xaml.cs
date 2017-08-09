@@ -485,7 +485,7 @@ namespace Hatate
 			if (Options.Default.AddRating) {
 				string strRating = match.Rating.ToString().ToLower();
 
-				if (String.IsNullOrWhiteSpace(strRating)) {
+				if (!String.IsNullOrWhiteSpace(strRating)) {
 					tagList.Add("rating:" + strRating);
 				}
 			}
