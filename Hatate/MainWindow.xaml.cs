@@ -246,11 +246,9 @@ namespace Hatate
 		{
 			int progress = this.GetNextIndex();
 
-			// No more files to search
+			// No more files to search, end here
 			if (progress < 0) {
-				this.SetStatus("Finished.");
-				this.SetStartButton("Start", "#FF3CB21A");
-				this.ChangeStartButtonEnabledValue();
+				this.EndSearch();
 
 				return;
 			}
@@ -281,22 +279,37 @@ namespace Hatate
 			// Update counters (remaining, found, not found)
 			this.UpdateLabels();
 
-			// Wait some time until the next search
-			if (progress < this.ListBox_Files.Items.Count - 1) {
-				this.delay = Options.Default.Delay;
+			// This is the last search, end here
+			if (progress >= this.ListBox_Files.Items.Count - 1) {
+				this.EndSearch();
 
-				// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
-				if (Options.Default.Randomize) {
-					int half = this.delay / 2;
-
-					this.delay += new Random().Next(half * -1, half);
-				}
-
-				this.timer = new Timer();
-				this.timer.Interval = 1000;
-				this.timer.Tick += new EventHandler(Timer_Tick);
-				this.timer.Start();
+				return;
 			}
+
+			// Wait some time until the next search
+			this.delay = Options.Default.Delay;
+
+			// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
+			if (Options.Default.Randomize) {
+				int half = this.delay / 2;
+
+				this.delay += new Random().Next(half * -1, half);
+			}
+
+			this.timer = new Timer();
+			this.timer.Interval = 1000;
+			this.timer.Tick += new EventHandler(Timer_Tick);
+			this.timer.Start();
+		}
+
+		/// <summary>
+		/// Reset the state of the window, ready for starting another search.
+		/// </summary>
+		private void EndSearch()
+		{
+			this.SetStatus("Finished.");
+			this.SetStartButton("Start", "#FF3CB21A");
+			this.ChangeStartButtonEnabledValue();
 		}
 
 		/// <summary>
