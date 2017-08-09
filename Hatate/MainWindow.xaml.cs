@@ -1052,10 +1052,17 @@ namespace Hatate
 		/// Copy the selected item of a given listbox to the clipboard.
 		/// </summary>
 		/// <param name="from"></param>
-		private void CopySelectedItemToClipboard(ListBox from)
+		private void CopySelectedItemToClipboard(ListBox from, bool formatTag=false)
 		{
 			if (from.SelectedItem != null) {
-				Clipboard.SetText(from.SelectedItem.ToString());
+				string value = from.SelectedItem.ToString();
+
+				if (formatTag) {
+					value = value.Replace("System.Windows.Controls.ListBoxItem: ", "");
+					value = value.Replace(" ", "_");
+				}
+
+				Clipboard.SetText(value);
 			}
 		}
 
@@ -1309,10 +1316,10 @@ namespace Hatate
 					}
 				break;
 				case "copyTag":
-					this.CopySelectedItemToClipboard(this.ListBox_Tags);
+					this.CopySelectedItemToClipboard(this.ListBox_Tags, true);
 				break;
 				case "copyUnknownTag":
-					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags);
+					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags, true);
 				break;
 			}
 		}
