@@ -34,26 +34,8 @@
 			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Border>
 		<Button x:Name="Button_Apply" Content="Apply" Margin="0,0,0,95" Click="Button_Apply_Click" HorizontalAlignment="Right" Width="231" Height="19" VerticalAlignment="Bottom" IsEnabled="False"/>
-		<Label Content="Original" Margin="0,23,121,0" VerticalAlignment="Top" Height="69" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="110">
-			<Label.RenderTransform>
-				<TransformGroup>
-					<ScaleTransform/>
-					<SkewTransform/>
-					<RotateTransform Angle="-34.574"/>
-					<TranslateTransform/>
-				</TransformGroup>
-			</Label.RenderTransform>
-		</Label>
-		<Label x:Name="Label_Match" Content="Match" Margin="0,17,0,0" VerticalAlignment="Top" Height="75" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="110">
-			<Label.RenderTransform>
-				<TransformGroup>
-					<ScaleTransform/>
-					<SkewTransform/>
-					<RotateTransform Angle="-30.345"/>
-					<TranslateTransform/>
-				</TransformGroup>
-			</Label.RenderTransform>
-		</Label>
+		<Label Content="Original" Margin="0,18,118,0" VerticalAlignment="Top" Height="74" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113"/>
+		<Label x:Name="Label_Match" Content="Match" Margin="0,18,0,0" VerticalAlignment="Top" Height="74" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113"/>
 		<Grid Margin="0,97,0,119" HorizontalAlignment="Right" Width="231">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
