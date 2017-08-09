@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Option" Height="253.84" Width="601.301" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Options" Height="253.84" Width="601.301" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid>
 		<Button Content="Save" HorizontalAlignment="Left" Width="595" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom"/>
 		<CheckBox x:Name="CheckBox_KnownTags" Content="Keep only known tags" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
