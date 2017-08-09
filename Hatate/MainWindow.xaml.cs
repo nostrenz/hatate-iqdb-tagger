@@ -1192,8 +1192,13 @@ namespace Hatate
 			}
 
 			try {
-				this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
-				this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
+				if (result.ThumbPath != null) {
+					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
+				}
+
+				if (result.PreviewUrl != null) {
+					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
+				}
 			} catch (UriFormatException) { }
 
 			this.Label_Match.Content = result.Source.ToString();
