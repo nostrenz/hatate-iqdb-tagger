@@ -83,9 +83,10 @@ namespace Hatate
 			}
 
 			foreach (string filename in dlg.FileNames) {
-				this.ListBox_Files.Items.Add(filename);
+				this.AddFileToList(filename);
 			}
 
+			this.UpdateLabels();
 			this.ChangeStartButtonEnabledValue();
 		}
 
@@ -105,6 +106,7 @@ namespace Hatate
 				this.GetImagesFromFolder(fbd.SelectedPath + @"\");
 			}
 
+			this.UpdateLabels();
 			this.ChangeStartButtonEnabledValue();
 		}
 
@@ -148,12 +150,12 @@ namespace Hatate
 			this.ListBox_UnknownTags.Items.Clear();
 
 			foreach (string file in files) {
-				this.ListBox_Files.Items.Add(file);
+				this.AddFileToList(file);
 			}
 
-			int remaining = files.Length;
-			this.Label_Status.Content = (remaining > 0 ? "Ready." : "No images found.");
-			this.Button_Start.IsEnabled = (remaining > 0);
+			int count = files.Length;
+			this.Label_Status.Content = (count > 0 ? "Ready." : "No images found.");
+			this.Button_Start.IsEnabled = (count > 0);
 
 			this.UpdateLabels();
 		}
@@ -251,12 +253,17 @@ namespace Hatate
 				// The search produced not result, move the image to the notfound folder and remove the row
 				if (!this.HasResult(this.progress)) {
 					this.MoveToNotFoundFolder(filepath, filename);
-					this.notFound++;
 					this.RemoveFileListItemAt(this.progress);
+
+					this.notFound++;
 				} else {
 					this.UpdateFileRowColor(this.progress, this.CountKnownTagsForItem(this.progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
-					this.UpdateLabels();
+
+					this.found++;
 				}
+
+				// Update counters (remaining, found, not found)
+				this.UpdateLabels();
 
 				// Wait some time until the next search
 				if (this.progress < this.ListBox_Files.Items.Count - 1) {
@@ -353,17 +360,15 @@ namespace Hatate
 					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
 				}
 
-				// Result found
-				if (result != null) {
-					this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
-
-					// If found, move the image to the tagged folder
-					if (this.CheckMatches(result.Matches, index, filename, thumbPath)) {
-						this.found++;
-
-						return;
-					}
+				// No result found
+				if (result == null) {
+					return;
 				}
+
+				this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
+
+				// If found, move the image to the tagged folder
+				this.CheckMatches(result.Matches, index, filename, thumbPath);
 			}
 		}
 
@@ -918,6 +923,16 @@ namespace Hatate
 			return path.Substring(dot, path.Length - path.LastIndexOf("."));
 		}
 
+		/// <summary>
+		/// Add a file to the list if it's not already in it.
+		/// </summary>
+		private void AddFileToList(string file)
+		{
+			if (!this.ListBox_Files.Items.Contains(file)) {
+				this.ListBox_Files.Items.Add(file);
+			}
+		}
+
 		#endregion Private
 
 		/*
@@ -1268,10 +1283,11 @@ namespace Hatate
 			// Add images to the list
 			foreach (string file in files) {
 				if (this.IsCorrespondingToFilter(file, ImagesFilesExtensions)) {
-					this.ListBox_Files.Items.Add(file);
+					this.AddFileToList(file);
 				}
 			}
 
+			this.UpdateLabels();
 			this.ChangeStartButtonEnabledValue();
 		}
 
