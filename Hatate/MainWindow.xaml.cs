@@ -589,6 +589,12 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "Remove and ignore";
+			item.Tag = "removeAndIgnore";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			this.ListBox_Tags.ContextMenu = context;
 		}
 
@@ -838,26 +844,32 @@ namespace Hatate
 
 		/// <summary>
 		/// Rewrite tags in a txt file without duplicates.
+		/// Also remove the tags if they are in the ignoreds list.
 		/// </summary>
 		/// <param name="txt"></param>
 		/// <param name="tags"></param>
-		private void RemoveKnownTagsDuplicates(string txt, string[] tags)
+		private int CleanKnownTagList(string txt, string[] tags)
 		{
 			string path = this.GetTxtPath(txt);
 
 			if (!File.Exists(path)) {
-				return;
+				return 0;
 			}
 
 			List<string> copies = new List<string>();
+			int unecessary = 0;
 
 			foreach (string tag in tags) {
-				if (!copies.Contains(tag)) {
+				if (!copies.Contains(tag) && !this.IsTagInList(tag, this.ignoreds)) {
 					copies.Add(tag);
+				} else {
+					unecessary++;
 				}
 			}
 
 			this.WriteTagsToTxt(path, copies, false);
+
+			return unecessary;
 		}
 
 		/// <summary>
@@ -951,6 +963,15 @@ namespace Hatate
 		private string GetTxtPath(string txt)
 		{
 			return App.appDir + DIR_TAGS + txt;
+		}
+
+		/// <summary>
+		/// Add all the selected items in a given list to he ignoreds list and remove them from the listbox.
+		/// </summary>
+		private void IngnoreSelectItemsFromList(ListBox from)
+		{
+			this.WriteSelectedItemsToTxt(this.GetTxtPath(TXT_IGNOREDS), from);
+			this.RemoveSelectedItemsFromList(from);
 		}
 
 		#endregion Private
@@ -1161,14 +1182,16 @@ namespace Hatate
 					this.MoveSelectedUnknownTagsToKnownTags(TXT_CREATORS, "creator:");
 				break;
 				case "addIgnored":
-					this.WriteSelectedItemsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ListBox_UnknownTags);
-					this.RemoveSelectedItemsFromList(this.ListBox_UnknownTags);
+					this.IngnoreSelectItemsFromList(this.ListBox_UnknownTags);
 				break;
 				case "removeFiles":
 					this.RemoveSelectedItemsFromList(this.ListBox_Files);
 				break;
 				case "removeTags":
 					this.RemoveSelectedItemsFromList(this.ListBox_Tags);
+				break;
+				case "removeAndIgnore":
+					this.IngnoreSelectItemsFromList(this.ListBox_Tags);
 				break;
 			}
 		}
@@ -1226,34 +1249,43 @@ namespace Hatate
 			this.SetStatus("Deleting thumbnails...");
 
 			string[] files = Directory.GetFiles(this.ThumbsDirPath);
+			int deleted = 0;
+			int locked = 0;
 
 			foreach (string file in files) {
 				try {
 					File.Delete(file);
-				} catch (Exception) { }
+
+					deleted++;
+				} catch (Exception) {
+					locked++;
+				}
 			}
 
-			this.SetStatus("Thumbnails deleted.");
+			this.SetStatus(deleted + " thumbnails deleted (" + locked + " in use).");
 		}
 
 		/// <summary>
 		/// Remove duplicates entries in the txt files.
+		/// Also remove the tags if they are in the ignoreds list.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MenuItem_RemoveDuplicates_Click(object sender, RoutedEventArgs e)
+		private void MenuItem_CleanLists_Click(object sender, RoutedEventArgs e)
 		{
 			this.LoadKnownTags();
-			this.SetStatus("Removing known tags duplicates...");
+			this.SetStatus("Cleaning known tag lists...");
 
-			this.RemoveKnownTagsDuplicates(TXT_UNNAMESPACEDS, this.unnamespaceds);
-			this.RemoveKnownTagsDuplicates(TXT_SERIES, this.series);
-			this.RemoveKnownTagsDuplicates(TXT_CHARACTERS, this.characters);
-			this.RemoveKnownTagsDuplicates(TXT_CREATORS, this.creators);
-			this.RemoveKnownTagsDuplicates(TXT_IGNOREDS, this.ignoreds);
+			int unecessary = 0;
+
+			unecessary += this.CleanKnownTagList(TXT_UNNAMESPACEDS, this.unnamespaceds);
+			unecessary += this.CleanKnownTagList(TXT_SERIES, this.series);
+			unecessary += this.CleanKnownTagList(TXT_CHARACTERS, this.characters);
+			unecessary += this.CleanKnownTagList(TXT_CREATORS, this.creators);
+			unecessary += this.CleanKnownTagList(TXT_IGNOREDS, this.ignoreds);
 
 			this.LoadKnownTags();
-			this.SetStatus("Known tags duplicates removed.");
+			this.SetStatus(unecessary + " unecessary tags removed from the lists.");
 		}
 
 		/// <summary>

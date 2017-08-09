@@ -20,7 +20,7 @@
 			</MenuItem>
 			<MenuItem Header="Maintenance" Height="18" >
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
-				<MenuItem Header="Remove known tags duplicates" Click="MenuItem_RemoveDuplicates_Click"/>
+				<MenuItem Header="Clean tag lists" Click="MenuItem_CleanLists_Click"/>
 			</MenuItem>
 			<MenuItem Header="Options" Click="MenuItem_Options_Click" Height="18" />
 		</Menu>
@@ -43,7 +43,7 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<GroupBox Header="Tags" HorizontalAlignment="Right" Width="231" Margin="0,0,0,2">
-				<ListBox x:Name="ListBox_Tags" HorizontalAlignment="Right" Width="219" BorderThickness="0"/>
+				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" HorizontalAlignment="Right" Width="219" BorderThickness="0"/>
 			</GroupBox>
 			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
 			<GroupBox Header="Unknown tags" HorizontalAlignment="Right" Margin="0,5,0,0" Width="231" Grid.Row="1" Grid.RowSpan="2">
