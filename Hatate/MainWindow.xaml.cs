@@ -476,7 +476,7 @@ namespace Hatate
 				formated = formated.Replace(",", "");
 				formated = formated.ToLower().Trim();
 
-				if (String.IsNullOrWhiteSpace(tag)) {
+				if (String.IsNullOrWhiteSpace(formated)) {
 					continue;
 				}
 
@@ -484,7 +484,7 @@ namespace Hatate
 
 				// Tag not found in the known tags
 				if (found == null) {
-					if (Options.Default.KnownTags && !this.IsTagInList(tag, this.ignoreds)) {
+					if (Options.Default.KnownTags && !this.IsTagInList(formated, this.ignoreds)) {
 						unknownTags.Add(formated);
 					}
 
