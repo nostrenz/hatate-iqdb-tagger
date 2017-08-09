@@ -17,6 +17,7 @@ using MenuItem = System.Windows.Controls.MenuItem;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Hatate
 {
@@ -47,8 +48,9 @@ namespace Hatate
 		private int lastSearchedInSeconds = 0;
 		private int found = 0;
 		private int notFound = 0;
-		private int progress = 0;
 		private bool running = false;
+		private int delay = 0;
+		private Timer timer;
 
 		public MainWindow()
 		{
@@ -214,7 +216,7 @@ namespace Hatate
 		/// </summary>
 		private async void StartSearch()
 		{
-			this.progress = 0;
+			int progress = 0;
 
 			if (this.ListBox_Files.Items.Count < 1) {
 				return;
@@ -226,26 +228,26 @@ namespace Hatate
 			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
 
 			// Will run until the list is empty or every files in it has been searched
-			// NOTE: this.progress is incremented each time the loop doesn't reach the end where it is reset to 0
+			// NOTE: progress is incremented each time the loop doesn't reach the end where it is reset to 0
 			while (this.ListBox_Files.Items.Count > 0) {
 				// No more files
-				if (this.progress >= this.ListBox_Files.Items.Count) {
+				if (progress >= this.ListBox_Files.Items.Count) {
 					break;
 				}
 
 				// Already searched
-				if (this.HasResult(this.progress)) {
-					this.progress++;
+				if (this.HasResult(progress)) {
+					progress++;
 
 					continue;
 				}
 
-				string filepath = this.ListBox_Files.Items[this.progress].ToString();
+				string filepath = this.ListBox_Files.Items[progress].ToString();
 				string filename = this.GetFilenameFromPath(filepath);
 
 				// Skip file if a txt with the same name already exists
 				if (File.Exists(filepath + ".txt")) {
-					this.progress++;
+					progress++;
 
 					continue;
 				}
@@ -256,16 +258,16 @@ namespace Hatate
 
 				// Search the image on IQDB
 				this.Label_Status.Content = "Searching file on IQDB...";
-				await this.RunIqdbApi(iqdbApi, this.progress, thumb, filename);
+				await this.RunIqdbApi(iqdbApi, progress, thumb, filename);
 
 				// The search produced not result, move the image to the notfound folder and remove the row
-				if (!this.HasResult(this.progress)) {
+				if (!this.HasResult(progress)) {
 					this.MoveToNotFoundFolder(filepath, filename);
-					this.RemoveFileListItemAt(this.progress);
+					this.RemoveFileListItemAt(progress);
 
 					this.notFound++;
 				} else {
-					this.UpdateFileRowColor(this.progress, this.CountKnownTagsForItem(this.progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
+					this.UpdateFileRowColor(progress, this.CountKnownTagsForItem(progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
 
 					this.found++;
 				}
@@ -274,22 +276,31 @@ namespace Hatate
 				this.UpdateLabels();
 
 				// Wait some time until the next search
-				if (this.progress < this.ListBox_Files.Items.Count - 1) {
-					int delay = Options.Default.Delay;
+				if (progress < this.ListBox_Files.Items.Count - 1) {
+					this.delay = Options.Default.Delay;
 
 					// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
 					if (Options.Default.Randomize) {
-						int half = delay / 2;
+						int half = this.delay / 2;
 
-						delay += new Random().Next(half*-1, half);
+						this.delay += new Random().Next(half*-1, half);
 					}
 
-					this.Label_Status.Content = "Next search in " + delay + " seconds";
+					// Stop the previous timer (prevent from stacking them)
+					if (this.timer != null) {
+						timer.Stop();
+					}
 
-					await Task.Delay(delay * 1000);
+					this.timer = new Timer();
+					this.timer.Stop();
+					this.timer.Interval = 1000;
+					this.timer.Enabled = true;
+					this.timer.Tick += new EventHandler(Timer_Tick);
+
+					await Task.Delay(this.delay * 1000);
 				}
 
-				this.progress = 0;
+				progress = 0;
 			}
 
 			this.Label_Status.Content = "Finished.";
@@ -304,7 +315,7 @@ namespace Hatate
 		/// <returns></returns>
 		private int CountKnownTagsForItem(int index)
 		{
-			Result result = this.GetResultFromItem(this.progress);
+			Result result = this.GetResultFromItem(index);
 
 			return result == null ? 0 : result.KnownTags.Count;
 		}
@@ -1355,6 +1366,18 @@ namespace Hatate
 			} else {
 				e.Effects = DragDropEffects.None;
 			}
+		}
+
+		/// <summary>
+		/// Called each second by the timer.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Timer_Tick(object sender, EventArgs e)
+		{
+			this.delay--;
+
+			this.SetStatus("Next search in " + this.delay + " seconds");
 		}
 
 		#endregion Event
