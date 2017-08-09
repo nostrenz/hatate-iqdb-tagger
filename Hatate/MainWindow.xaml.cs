@@ -634,6 +634,12 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "What is it?";
+			item.Tag = "helpTag";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			this.ListBox_Tags.ContextMenu = context;
 		}
 
@@ -680,6 +686,12 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Copy to clipboard";
 			item.Tag = "copyUnknownTag";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "What is it?";
+			item.Tag = "helpUnknownTag";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1058,12 +1070,28 @@ namespace Hatate
 				string value = from.SelectedItem.ToString();
 
 				if (formatTag) {
-					value = value.Replace("System.Windows.Controls.ListBoxItem: ", "");
-					value = value.Replace(" ", "_");
+					value = this.FormatTag(value);
 				}
 
 				Clipboard.SetText(value);
 			}
+		}
+
+		/// <summary>
+		/// Search the selected tag on danbooru.
+		/// </summary>
+		private void OpenHelpForSelectedTag(ListBox from)
+		{
+			this.StartProcess("https://danbooru.donmai.us/posts?tags=" + this.FormatTag(from.SelectedItem.ToString()));
+		}
+
+		/// <summary>
+		/// Format a tag from a listbox.
+		/// </summary>
+		/// <param name="tag"></param>
+		private string FormatTag(string tag)
+		{
+			return tag.Replace("System.Windows.Controls.ListBoxItem: ", "").Replace(" ", "_");
 		}
 
 		#endregion Private
@@ -1320,6 +1348,12 @@ namespace Hatate
 				break;
 				case "copyUnknownTag":
 					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags, true);
+				break;
+				case "helpTag":
+					this.OpenHelpForSelectedTag(this.ListBox_Tags);
+				break;
+				case "helpUnknownTag":
+					this.OpenHelpForSelectedTag(this.ListBox_UnknownTags);
 				break;
 			}
 		}
