@@ -48,7 +48,6 @@ namespace Hatate
 		private int lastSearchedInSeconds = 0;
 		private int found = 0;
 		private int notFound = 0;
-		private bool running = false;
 		private int delay = 0;
 		private Timer timer;
 
@@ -145,7 +144,7 @@ namespace Hatate
 				this.ignoreds = File.ReadAllLines(ignored);
 			}
 
-			this.Label_Status.Content = "Tags loaded.";
+			this.SetStatus("Tags loaded.");
 		}
 
 		/// <summary>
@@ -164,10 +163,10 @@ namespace Hatate
 			}
 
 			int count = files.Length;
-			this.Label_Status.Content = (count > 0 ? "Ready." : "No images found.");
 			this.Button_Start.IsEnabled = (count > 0);
 
 			this.UpdateLabels();
+			this.SetStatus(count > 0 ? "Ready." : "No images found.");
 		}
 
 		/// <summary>
@@ -212,27 +211,19 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Start the search operations.
+		/// Get the next row index in the list.
 		/// </summary>
-		private async void StartSearch()
+		/// <returns></returns>
+		private int GetNextIndex()
 		{
 			int progress = 0;
-
-			if (this.ListBox_Files.Items.Count < 1) {
-				return;
-			}
-
-			this.running = true;
-			this.Button_Start.IsEnabled = false;
-
-			IqdbApi.IqdbApi iqdbApi = new IqdbApi.IqdbApi();
 
 			// Will run until the list is empty or every files in it has been searched
 			// NOTE: progress is incremented each time the loop doesn't reach the end where it is reset to 0
 			while (this.ListBox_Files.Items.Count > 0) {
 				// No more files
 				if (progress >= this.ListBox_Files.Items.Count) {
-					break;
+					return -1;
 				}
 
 				// Already searched
@@ -242,69 +233,70 @@ namespace Hatate
 					continue;
 				}
 
-				string filepath = this.ListBox_Files.Items[progress].ToString();
-				string filename = this.GetFilenameFromPath(filepath);
-
-				// Skip file if a txt with the same name already exists
-				if (File.Exists(filepath + ".txt")) {
-					progress++;
-
-					continue;
-				}
-
-				// Generate a smaller image for uploading
-				this.Label_Status.Content = "Generating thumbnail...";
-				string thumb = this.GenerateThumbnail(filepath, filename);
-
-				// Search the image on IQDB
-				this.Label_Status.Content = "Searching file on IQDB...";
-				await this.RunIqdbApi(iqdbApi, progress, thumb, filename);
-
-				// The search produced not result, move the image to the notfound folder and remove the row
-				if (!this.HasResult(progress)) {
-					this.MoveToNotFoundFolder(filepath, filename);
-					this.RemoveFileListItemAt(progress);
-
-					this.notFound++;
-				} else {
-					this.UpdateFileRowColor(progress, this.CountKnownTagsForItem(progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
-
-					this.found++;
-				}
-
-				// Update counters (remaining, found, not found)
-				this.UpdateLabels();
-
-				// Wait some time until the next search
-				if (progress < this.ListBox_Files.Items.Count - 1) {
-					this.delay = Options.Default.Delay;
-
-					// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
-					if (Options.Default.Randomize) {
-						int half = this.delay / 2;
-
-						this.delay += new Random().Next(half*-1, half);
-					}
-
-					// Stop the previous timer (prevent from stacking them)
-					if (this.timer != null) {
-						timer.Stop();
-					}
-
-					this.timer = new Timer();
-					this.timer.Interval = 1000;
-					this.timer.Tick += new EventHandler(Timer_Tick);
-					this.timer.Start();
-
-					await Task.Delay(this.delay * 1000);
-				}
-
-				progress = 0;
+				return progress;
 			}
 
-			this.Label_Status.Content = "Finished.";
-			this.Button_Start.IsEnabled = false;
-			this.running = false;
+			return -1;
+		}
+
+		/// <summary>
+		/// Execute the next image search.
+		/// </summary>
+		private async void NextSearch()
+		{
+			int progress = this.GetNextIndex();
+
+			// No more files to search
+			if (progress < 0) {
+				this.SetStatus("Finished.");
+				this.SetStartButton("Start", "#FF3CB21A");
+				this.ChangeStartButtonEnabledValue();
+
+				return;
+			}
+
+			string filepath = this.ListBox_Files.Items[progress].ToString();
+			string filename = this.GetFilenameFromPath(filepath);
+
+			// Generate a smaller image for uploading
+			this.SetStatus("Generating thumbnail...");
+			string thumb = this.GenerateThumbnail(filepath, filename);
+
+			// Search the image on IQDB
+			this.SetStatus("Searching file on IQDB...");
+			await this.RunIqdbApi(progress, thumb, filename);
+
+			// The search produced not result, move the image to the notfound folder and remove the row
+			if (!this.HasResult(progress)) {
+				this.MoveToNotFoundFolder(filepath, filename);
+				this.RemoveFileListItemAt(progress);
+
+				this.notFound++;
+			} else {
+				this.UpdateFileRowColor(progress, this.CountKnownTagsForItem(progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
+
+				this.found++;
+			}
+
+			// Update counters (remaining, found, not found)
+			this.UpdateLabels();
+
+			// Wait some time until the next search
+			if (progress < this.ListBox_Files.Items.Count - 1) {
+				this.delay = Options.Default.Delay;
+
+				// If the delay is 60 seconds, this will randomly change to between 30 and 90 seconds
+				if (Options.Default.Randomize) {
+					int half = this.delay / 2;
+
+					this.delay += new Random().Next(half * -1, half);
+				}
+
+				this.timer = new Timer();
+				this.timer.Interval = 1000;
+				this.timer.Tick += new EventHandler(Timer_Tick);
+				this.timer.Start();
+			}
 		}
 
 		/// <summary>
@@ -367,13 +359,13 @@ namespace Hatate
 		/// <param name="thumbPath"></param>
 		/// <param name="filename"></param>
 		/// <returns></returns>
-		private async Task RunIqdbApi(IqdbApi.IqdbApi api, int index, string thumbPath, string filename)
+		private async Task RunIqdbApi(int index, string thumbPath, string filename)
 		{
 			using (var fs = new FileStream(thumbPath, FileMode.Open)) {
 				IqdbApi.Models.SearchResult result = null;
 
 				try {
-					result = await api.SearchFile(fs);
+					result = await new IqdbApi.IqdbApi().SearchFile(fs);
 				} catch (FormatException) {
 					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
 				}
@@ -984,6 +976,24 @@ namespace Hatate
 			this.RemoveSelectedItemsFromList(from);
 		}
 
+		/// <summary>
+		/// Get a brush from an hexadeciaml string value.
+		/// </summary>
+		/// <returns></returns>
+		private Brush GetBrushFromString(string value)
+		{
+			return (Brush)new System.Windows.Media.BrushConverter().ConvertFromString(value);
+		}
+
+		/// <summary>
+		/// Set the content and background color of the start button.
+		/// </summary>
+		private void SetStartButton(string content, string color)
+		{
+			this.Button_Start.Content = content;
+			this.Button_Start.Background = this.GetBrushFromString(color);
+		}
+
 		#endregion Private
 
 		/*
@@ -1056,7 +1066,7 @@ namespace Hatate
 		/// </summary>
 		private void ChangeStartButtonEnabledValue()
 		{
-			this.Button_Start.IsEnabled = this.ListBox_Files.Items.Count > 0 && !this.running;
+			this.Button_Start.IsEnabled = this.ListBox_Files.Items.Count > 0;
 		}
 
 		/// <summary>
@@ -1072,6 +1082,14 @@ namespace Hatate
 			}
 
 			return list.Contains(tag);
+		}
+
+		/// <summary>
+		/// Check if the search process is currently running.
+		/// </summary>
+		private bool IsRunning
+		{
+			get { return this.timer != null && this.timer.Enabled; }
 		}
 
 		#endregion Accessor
@@ -1091,7 +1109,16 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void Button_Start_Click(object sender, RoutedEventArgs e)
 		{
-			this.StartSearch();
+			// Start searching
+			if (!this.IsRunning && this.ListBox_Files.Items.Count > 0) {
+				this.NextSearch();
+				this.SetStartButton("Stop", "#FFE82B0D");
+			} else { // Stop the search
+				this.timer.Stop();
+
+				this.SetStatus("Stopped.");
+				this.SetStartButton("Start", "#FF3CB21A");
+			}
 		}
 
 		/// <summary>
@@ -1376,7 +1403,13 @@ namespace Hatate
 		{
 			this.delay--;
 
-			this.SetStatus("Next search in " + this.delay + " seconds");
+			// The delay has reached the end, start the next search
+			if (this.delay <= 0) {
+				this.timer.Stop();
+				this.NextSearch();
+			} else {
+				this.SetStatus("Next search in " + this.delay + " seconds");
+			}
 		}
 
 		#endregion Event
