@@ -25,15 +25,17 @@ namespace Hatate
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		const string DIR_THUMBS = @"\thumbs\";
-		const string DIR_NOT_FOUND = @"\imgs\notfound\";
-		const string DIR_TAGGED = @"\imgs\tagged\";
+		const string DIR_TAGS      = @"\tags\";
+		const string DIR_THUMBS    = @"\thumbs\";
+		const string DIR_IMGS      = @"\imgs\";
+		const string DIR_NOT_FOUND = @"notfound\";
+		const string DIR_TAGGED    = @"tagged\";
 
-		const string TXT_UNNAMESPACEDS = @"\tags\unnamespaceds.txt";
-		const string TXT_SERIES = @"\tags\series.txt";
-		const string TXT_CHARACTERS = @"\tags\characters.txt";
-		const string TXT_CREATORS = @"\tags\creators.txt";
-		const string TXT_IGNOREDS = @"\tags\ignoreds.txt";
+		const string TXT_UNNAMESPACEDS = "unnamespaceds.txt";
+		const string TXT_SERIES        = "series.txt";
+		const string TXT_CHARACTERS    = "characters.txt";
+		const string TXT_CREATORS      = "creators.txt";
+		const string TXT_IGNOREDS      = "ignoreds.txt";
 
 		// Tags list
 		private string[] unnamespaceds;
@@ -115,24 +117,30 @@ namespace Hatate
 		/// </summary>
 		private void LoadKnownTags()
 		{
-			if (File.Exists(App.appDir + TXT_UNNAMESPACEDS)) {
-				this.unnamespaceds = File.ReadAllLines(App.appDir + TXT_UNNAMESPACEDS);
+			string unnamespaced = this.GetTxtPath(TXT_UNNAMESPACEDS);
+			string series = this.GetTxtPath(TXT_SERIES);
+			string character = this.GetTxtPath(TXT_CHARACTERS);
+			string creator = this.GetTxtPath(TXT_CREATORS);
+			string ignored = this.GetTxtPath(TXT_IGNOREDS);
+
+			if (File.Exists(unnamespaced)) {
+				this.unnamespaceds = File.ReadAllLines(unnamespaced);
 			}
 
-			if (File.Exists(App.appDir + TXT_SERIES)) {
-				this.series = File.ReadAllLines(App.appDir + TXT_SERIES);
+			if (File.Exists(series)) {
+				this.series = File.ReadAllLines(series);
 			}
 
-			if (File.Exists(App.appDir + TXT_CHARACTERS)) {
-				this.characters = File.ReadAllLines(App.appDir + TXT_CHARACTERS);
+			if (File.Exists(character)) {
+				this.characters = File.ReadAllLines(character);
 			}
 
-			if (File.Exists(App.appDir + TXT_CREATORS)) {
-				this.creators = File.ReadAllLines(App.appDir + TXT_CREATORS);
+			if (File.Exists(creator)) {
+				this.creators = File.ReadAllLines(creator);
 			}
 
-			if (File.Exists(App.appDir + TXT_IGNOREDS)) {
-				this.ignoreds = File.ReadAllLines(App.appDir + TXT_IGNOREDS);
+			if (File.Exists(ignored)) {
+				this.ignoreds = File.ReadAllLines(ignored);
 			}
 
 			this.Label_Status.Content = "Tags loaded.";
@@ -644,10 +652,11 @@ namespace Hatate
 
 				string filepath = selected.ToString();
 				string filename = this.GetFilenameFromPath(filepath);
+				string taggedDirPath = this.TaggedDirPath;
 
 				// Move the file to the tagged folder and write tags
-				File.Move(filepath, this.TaggedDirPath + filename);
-				this.WriteTagsToTxt(this.TaggedDirPath + filename + ".txt", result.KnownTags);
+				File.Move(filepath, taggedDirPath + filename);
+				this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
 			}
 		}
 
@@ -811,7 +820,7 @@ namespace Hatate
 				return;
 			}
 
-			this.WriteSelectedItemsToTxt(App.appDir + txt, this.ListBox_UnknownTags);
+			this.WriteSelectedItemsToTxt(this.GetTxtPath(txt), this.ListBox_UnknownTags);
 			this.MoveSelectedItemsToList(this.ListBox_UnknownTags, this.ListBox_Tags, prefix);
 
 			this.Button_Apply.IsEnabled = true;
@@ -834,7 +843,9 @@ namespace Hatate
 		/// <param name="tags"></param>
 		private void RemoveKnownTagsDuplicates(string txt, string[] tags)
 		{
-			if (!File.Exists(App.appDir + txt)) {
+			string path = this.GetTxtPath(txt);
+
+			if (!File.Exists(path)) {
 				return;
 			}
 
@@ -846,7 +857,7 @@ namespace Hatate
 				}
 			}
 
-			this.WriteTagsToTxt(App.appDir + txt, copies, false);
+			this.WriteTagsToTxt(path, copies, false);
 		}
 
 		/// <summary>
@@ -933,6 +944,15 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Get the path to one of the text file.
+		/// </summary>
+		/// <returns></returns>
+		private string GetTxtPath(string txt)
+		{
+			return App.appDir + DIR_TAGS + txt;
+		}
+
 		#endregion Private
 
 		/*
@@ -964,7 +984,7 @@ namespace Hatate
 		{
 			get
 			{
-				string path = App.appDir + DIR_TAGGED;
+				string path = App.appDir + DIR_IMGS + DIR_TAGGED;
 
 				this.CreateDirIfNeeded(path);
 
@@ -979,7 +999,7 @@ namespace Hatate
 		{
 			get
 			{
-				string path = App.appDir + DIR_NOT_FOUND;
+				string path = App.appDir + DIR_IMGS + DIR_NOT_FOUND;
 
 				if (!Directory.Exists(path)) {
 					Directory.CreateDirectory(path);
@@ -1141,7 +1161,7 @@ namespace Hatate
 					this.MoveSelectedUnknownTagsToKnownTags(TXT_CREATORS, "creator:");
 				break;
 				case "addIgnored":
-					this.WriteSelectedItemsToTxt(App.appDir + TXT_IGNOREDS, this.ListBox_UnknownTags);
+					this.WriteSelectedItemsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ListBox_UnknownTags);
 					this.RemoveSelectedItemsFromList(this.ListBox_UnknownTags);
 				break;
 				case "removeFiles":
