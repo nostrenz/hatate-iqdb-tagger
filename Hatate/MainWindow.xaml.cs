@@ -379,7 +379,7 @@ namespace Hatate
 
 				try {
 					result = await new IqdbApi.IqdbApi().SearchFile(fs);
-				} catch (FormatException) {
+				} catch (Exception) {
 					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
 				}
 
