@@ -863,7 +863,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="txt"></param>
 		/// <param name="tags"></param>
-		private int CleanKnownTagList(string txt, string[] tags)
+		private int CleanKnownTagList(string txt, string[] tags, bool excludeIgnored=true)
 		{
 			string path = this.GetTxtPath(txt);
 
@@ -875,10 +875,10 @@ namespace Hatate
 			int unecessary = 0;
 
 			foreach (string tag in tags) {
-				if (!copies.Contains(tag) && !this.IsTagInList(tag, this.ignoreds)) {
-					copies.Add(tag);
-				} else {
+				if (copies.Contains(tag) || (excludeIgnored && this.IsTagInList(tag, this.ignoreds))) {
 					unecessary++;
+				} else {
+					copies.Add(tag);
 				}
 			}
 
@@ -1337,7 +1337,7 @@ namespace Hatate
 			unecessary += this.CleanKnownTagList(TXT_SERIES, this.series);
 			unecessary += this.CleanKnownTagList(TXT_CHARACTERS, this.characters);
 			unecessary += this.CleanKnownTagList(TXT_CREATORS, this.creators);
-			unecessary += this.CleanKnownTagList(TXT_IGNOREDS, this.ignoreds);
+			unecessary += this.CleanKnownTagList(TXT_IGNOREDS, this.ignoreds, false);
 
 			this.LoadKnownTags();
 			this.SetStatus(unecessary + " unecessary tags removed from the lists.");
