@@ -292,7 +292,6 @@ namespace Hatate
 					}
 
 					this.timer = new Timer();
-					this.timer.Stop();
 					this.timer.Interval = 1000;
 					this.timer.Enabled = true;
 					this.timer.Tick += new EventHandler(Timer_Tick);
