@@ -293,8 +293,8 @@ namespace Hatate
 
 					this.timer = new Timer();
 					this.timer.Interval = 1000;
-					this.timer.Enabled = true;
 					this.timer.Tick += new EventHandler(Timer_Tick);
+					this.timer.Start();
 
 					await Task.Delay(this.delay * 1000);
 				}
