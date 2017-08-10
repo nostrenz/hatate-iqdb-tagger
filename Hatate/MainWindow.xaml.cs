@@ -865,7 +865,7 @@ namespace Hatate
 		{
 			using (StreamWriter file = new StreamWriter(filepath, true)) {
 				foreach (var item in from.SelectedItems) {
-					string tag = item.ToString();
+					string tag = item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", "");
 
 					if (prefix != null) {
 						tag = prefix + tag;
