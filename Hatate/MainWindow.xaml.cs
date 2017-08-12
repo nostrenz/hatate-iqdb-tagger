@@ -1073,7 +1073,7 @@ namespace Hatate
 			if (selectedItem != null) {
 				Tag item = from.SelectedItem as Tag;
 
-				this.StartProcess("https://danbooru.donmai.us/posts?tags=" + item.Underscored);
+				this.StartProcess("https://danbooru.donmai.us/wiki_pages/show_or_new?title=" + item.Underscored);
 			}
 		}
 
