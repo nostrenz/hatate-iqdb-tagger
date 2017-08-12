@@ -1250,6 +1250,10 @@ namespace Hatate
 				return;
 			}
 
+			// Sort in natural order
+			result.KnownTags.Sort();
+			result.UnknownTags.Sort();
+
 			foreach (Tag tag in result.KnownTags) {
 				this.ListBox_Tags.Items.Add(tag);
 			}
