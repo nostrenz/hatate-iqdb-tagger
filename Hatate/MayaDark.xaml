@@ -908,6 +908,8 @@
 			<TickBar x:Name="BottomTick" Grid.Row="2" Visibility="Hidden" Height="4" SnapsToDevicePixels="True" Placement="Bottom" Fill="Transparent" />
 		</Grid>
 	</ControlTemplate>
+
+	<!-- ScrollViewer -->
 	<Style x:Key="MayaScrollViewer" TargetType="{x:Type ScrollViewer}" BasedOn="{StaticResource CommonStyle}">
 		<Setter Property="Template">
 			<Setter.Value>
@@ -952,6 +954,8 @@
 			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
+
+	<!-- ListBox -->
 	<Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource CommonStyle}">
 		<Setter Property="SnapsToDevicePixels" Value="True" />
 		<Setter Property="OverridesDefaultStyle" Value="True" />
@@ -992,9 +996,6 @@
 	</ControlTemplate>
 	<Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource CommonStyle}">
 		<Setter Property="SnapsToDevicePixels" Value="True" />
-		<Setter Property="OverridesDefaultStyle" Value="True" />
-		<Setter Property="Template" Value="{StaticResource ListBoxItemTemplate}" />
-		<Setter Property="Foreground" Value="{StaticResource TextBrush}" />
 	</Style>
 
 	<!-- ComboBox -->
