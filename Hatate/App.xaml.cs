@@ -44,7 +44,7 @@ namespace Hatate
 			string timeStamp = System.DateTime.Now.ToString("yyyyMMddHHmmssffff");
 
 			// Write a new log file
-			using (StreamWriter file = new StreamWriter(path + @"\crash" + timeStamp + ".txt")) {
+			using (StreamWriter file = new StreamWriter(path + @"\crash_" + timeStamp + ".txt")) {
 				file.WriteLine(e.ToString());
 				file.WriteLine(e.Exception.Message);
 				file.WriteLine(e.Exception.Source);

@@ -384,7 +384,7 @@ namespace Hatate
 				}
 
 				// No result found
-				if (result == null) {
+				if (result == null || result.Matches == null) {
 					return;
 				}
 
@@ -402,7 +402,7 @@ namespace Hatate
 		{
 			foreach (IqdbApi.Models.Match match in matches) {
 				// Check minimum similarity and number of tags
-				if (match.Similarity < Options.Default.Similarity || match.Tags.Count < Options.Default.TagsCount) {
+				if (match.Similarity < Options.Default.Similarity || match.Tags == null || match.Tags.Count < Options.Default.TagsCount) {
 					continue;
 				}
 
