@@ -62,6 +62,9 @@ namespace Hatate
 			this.CreateFilesListContextMenu();
 			this.CreateTagsListContextMenu();
 			this.CreateUnknownTagsListContextMenu();
+
+			// Prevent closing the window is we have some search results left
+			this.Closing += new System.ComponentModel.CancelEventHandler(CustomClosing);
 		}
 
 		/*
@@ -1511,6 +1514,32 @@ namespace Hatate
 				this.NextSearch();
 			} else {
 				this.SetStatus("Next search in " + this.delay + " seconds");
+			}
+		}
+
+		/// <summary>
+		/// Called when the user try to close the window (by clicking on the close button for example).
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void CustomClosing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			int count = 0;
+
+			// Count results
+			for (int i=0; i<this.ListBox_Files.Items.Count; i++) {
+				if (this.HasResult(i)) count++;
+			}
+
+			if (count > 0) {
+				MessageBoxResult result = MessageBox.Show(
+					"Some files have search results. Do you realy want to close?",
+					"Are you sure?",
+					MessageBoxButton.YesNo,
+					MessageBoxImage.Warning
+				);
+
+				e.Cancel = (result == MessageBoxResult.No);
 			}
 		}
 
