@@ -1006,13 +1006,19 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Add a file to the list if it's not already in it.
+		/// Add a file to the list if it's not already in it or not in the tagged or notfound folder.
 		/// </summary>
-		private void AddFileToList(string file)
+		private void AddFileToList(string filepath)
 		{
-			if (!this.ListBox_Files.Items.Contains(file)) {
-				this.ListBox_Files.Items.Add(file);
+			string filename = this.GetFilenameFromPath(filepath);
+
+			if (this.ListBox_Files.Items.Contains(filepath)
+			|| File.Exists(this.TaggedDirPath + filename)
+			|| File.Exists(this.NotfoundDirPath + filename)) {
+				return;
 			}
+
+			this.ListBox_Files.Items.Add(filepath);
 		}
 
 		/// <summary>
