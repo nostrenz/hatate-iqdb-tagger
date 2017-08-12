@@ -3,15 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
         Title="Hatate - iqdb images tagger" Height="475" Width="610" MinWidth="610" MinHeight="475">
-	<Grid>
+	<Grid Background="{DynamicResource WindowBackground}">
 		<ListBox x:Name="ListBox_Files" Margin="0,18,236,95" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True"/>
 		<Label x:Name="Label_Remaining" Content="Remaining" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,64"/>
 		<Label x:Name="Label_Results" Content="Results" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,33"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20" Margin="0,0,0,33"/>
-		<Menu Height="18" VerticalAlignment="Top">
+		<Menu Height="18" VerticalAlignment="Top" Background="{DynamicResource HeaderBackground}">
 			<MenuItem Header="Files" Height="18" >
 				<MenuItem x:Name="MenuItem_AddFiles" Header="Add files" Click="MenuItem_AddFiles_Click"/>
 				<MenuItem x:Name="MenuItem_AddFolder" Header="Add folder" Click="MenuItem_AddFolder_Click"/>
@@ -22,28 +21,28 @@
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
 				<MenuItem Header="Clean tag lists" Click="MenuItem_CleanLists_Click"/>
 			</MenuItem>
-			<MenuItem Header="Options" Click="MenuItem_Options_Click" Height="18" />
+			<MenuItem Header="Options" Height="18" Click="MenuItem_Options_Click" />
 		</Menu>
-		<StatusBar Height="32" VerticalAlignment="Bottom">
+		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}">
 			<Label x:Name="Label_Status" Content="Status"/>
 		</StatusBar>
-		<Border BorderBrush="Black" BorderThickness="1" Height="74" Margin="0,18,118,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113">
+		<Border BorderThickness="1" Height="74" Margin="0,18,118,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
 			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Border>
-		<Border BorderBrush="Black" BorderThickness="1" Height="74" Margin="0,18,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113">
+		<Border BorderThickness="1" Height="74" Margin="0,18,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
 			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Border>
 		<Button x:Name="Button_Apply" Content="Apply" Margin="0,0,0,95" Click="Button_Apply_Click" HorizontalAlignment="Right" Width="231" Height="27" VerticalAlignment="Bottom" IsEnabled="False" Background="#FFF57F08" Foreground="White" BorderBrush="{x:Null}"/>
 		<Label Content="Original" Margin="0,92,118,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0"/>
 		<Label x:Name="Label_Match" Content="Match" Margin="0,92,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0"/>
-		<Grid Margin="0,106,0,127" HorizontalAlignment="Right" Width="231">
+		<Grid Margin="0,113,0,127" HorizontalAlignment="Right" Width="231">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
 				<RowDefinition Height="5" />
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<GroupBox Header="Tags" HorizontalAlignment="Right" Width="231" Margin="0,0,0,2">
-				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" HorizontalAlignment="Right" Width="219" BorderThickness="0">
+				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="-2">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>
@@ -52,8 +51,8 @@
 				</ListBox>
 			</GroupBox>
 			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-			<GroupBox Header="Unknown tags" HorizontalAlignment="Right" Margin="0,5,0,0" Width="231" Grid.Row="1" Grid.RowSpan="2">
-				<ListBox x:Name="ListBox_UnknownTags" SelectionMode="Extended" BorderThickness="0">
+			<GroupBox Header="Unknown tags" HorizontalAlignment="Right" Margin="0,3,0,0" Width="231" Grid.Row="2">
+				<ListBox x:Name="ListBox_UnknownTags" SelectionMode="Extended" BorderThickness="0" Margin="-2">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Value}"/>

@@ -4,5 +4,6 @@
              xmlns:local="clr-namespace:Hatate"
              StartupUri="MainWindow.xaml">
 	<Application.Resources>
+		<ResourceDictionary Source="MayaDark.xaml" />
 	</Application.Resources>
 </Application>
