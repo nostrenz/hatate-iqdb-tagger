@@ -635,7 +635,7 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "What is it?";
+			item.Header = "Search on Danbooru";
 			item.Tag = "helpTag";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
