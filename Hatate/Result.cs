@@ -7,9 +7,9 @@ namespace Hatate
 	/// </summary>
 	class Result
 	{
-		public List<string> KnownTags { get; set; }
+		public List<Tag> KnownTags { get; set; }
 
-		public List<string> UnknownTags { get; set; }
+		public List<Tag> UnknownTags { get; set; }
 
 		public string ThumbPath { get; set; }
 

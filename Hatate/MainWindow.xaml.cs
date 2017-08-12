@@ -464,8 +464,8 @@ namespace Hatate
 		/// <returns></returns>
 		private Result FilterTags(IqdbApi.Models.Match match)
 		{
-			List<string> tagList = new List<string>();
-			List<string> unknownTags = new List<string>();
+			List<Tag> tagList = new List<Tag>();
+			List<Tag> unknownTags = new List<Tag>();
 
 			// Write each tags
 			foreach (string tag in match.Tags) {
@@ -480,12 +480,12 @@ namespace Hatate
 					continue;
 				}
 
-				string found = this.FindTag(formated);
+				Tag found = this.FindTag(formated);
 
 				// Tag not found in the known tags
 				if (found == null) {
 					if (Options.Default.KnownTags && !this.IsTagInList(formated, this.ignoreds)) {
-						unknownTags.Add(formated);
+						unknownTags.Add(new Tag(formated));
 					}
 
 					continue;
@@ -499,7 +499,7 @@ namespace Hatate
 				string strRating = match.Rating.ToString().ToLower();
 
 				if (!String.IsNullOrWhiteSpace(strRating)) {
-					tagList.Add("rating:" + strRating);
+					tagList.Add(new Tag(strRating, "rating"));
 				}
 			}
 
@@ -526,6 +526,20 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Take the tag list and write it into a text file with the same name as the image.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <param name="tags"></param>
+		private void WriteTagsToTxt(string filepath, List<Tag> tags, bool append = false)
+		{
+			using (StreamWriter file = new StreamWriter(filepath, append)) {
+				foreach (Tag tag in tags) {
+					file.WriteLine(tag.Value);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Add a single tag into a text file.
 		/// </summary>
 		/// <param name="filepath"></param>
@@ -542,20 +556,20 @@ namespace Hatate
 		/// </summary>
 		/// <param name="tag"></param>
 		/// <returns></returns>
-		private string FindTag(string tag)
+		private Tag FindTag(string tag)
 		{
 			if (!Options.Default.KnownTags) {
-				return tag;
+				return new Tag(tag);
 			}
 
 			if (this.IsTagInList(tag, this.unnamespaceds)) {
-				return tag;
+				return new Tag(tag);
 			} else if (this.IsTagInList(tag, this.series)) {
-				return "series:" + tag;
+				return new Tag(tag, "series");
 			} else if (this.IsTagInList(tag, this.characters)) {
-				return "character:" + tag;
+				return new Tag(tag, "character");
 			} else if (this.IsTagInList(tag, this.creators)) {
-				return "creator:" + tag;
+				return new Tag(tag, "creator");
 			}
 
 			return null;
@@ -802,46 +816,19 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Get a color for a tag depending on its namespace
-		/// </summary>
-		/// <returns></returns>
-		private Brush GetBrushFromTag(string tag)
-		{
-			if (tag.StartsWith("series:")) {
-				return Brushes.DeepPink;
-			}
-
-			if (tag.StartsWith("character:")) {
-				return Brushes.LimeGreen;
-			}
-
-			if (tag.StartsWith("creator:")) {
-				return Brushes.Brown;
-			}
-
-			if (tag.StartsWith("rating:")) {
-				return Brushes.LightSlateGray;
-			}
-
-			return Brushes.CadetBlue;
-		}
-
-		/// <summary>
 		/// Move an item from a list to another one.
 		/// </summary>
 		/// <param name="from"></param>
 		/// <param name="to"></param>
-		private void MoveSelectedItemsToList(ListBox from, ListBox to, string prefix=null)
+		private void MoveSelectedItemsToList(ListBox from, ListBox to, string nameSpace=null)
 		{
 			// Copy items to the destination list
-			foreach (string item in from.SelectedItems) {
-				ListBoxItem lbItem = new ListBoxItem();
-				string content = prefix + item;
+			foreach (Tag item in from.SelectedItems) {
+				if (nameSpace != null) {
+					item.Namespace = nameSpace;
+				}
 
-				lbItem.Content = content;
-				lbItem.Foreground = this.GetBrushFromTag(content);
-
-				to.Items.Add(lbItem);
+				to.Items.Add(item);
 			}
 
 			// Remove from list
@@ -861,17 +848,11 @@ namespace Hatate
 		/// <summary>
 		/// Write all the selected items from the given list into a txt file.
 		/// </summary>
-		private void WriteSelectedItemsToTxt(string filepath, ListBox from, string prefix=null)
+		private void WriteSelectedItemsToTxt(string filepath, ListBox from)
 		{
 			using (StreamWriter file = new StreamWriter(filepath, true)) {
-				foreach (var item in from.SelectedItems) {
-					string tag = item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", "");
-
-					if (prefix != null) {
-						tag = prefix + tag;
-					}
-
-					file.WriteLine(tag);
+				foreach (Tag item in from.SelectedItems) {
+					file.WriteLine(item.Value);
 				}
 			}
 		}
@@ -879,14 +860,14 @@ namespace Hatate
 		/// <summary>
 		/// Add an unknown tags to the tag list.
 		/// </summary>
-		private void MoveSelectedUnknownTagsToKnownTags(string txt, string prefix=null)
+		private void MoveSelectedUnknownTagsToKnownTags(string txt, string nameSpace=null)
 		{
 			if (this.ListBox_UnknownTags.Items.Count < 1) {
 				return;
 			}
 
 			this.WriteSelectedItemsToTxt(this.GetTxtPath(txt), this.ListBox_UnknownTags);
-			this.MoveSelectedItemsToList(this.ListBox_UnknownTags, this.ListBox_Tags, prefix);
+			this.MoveSelectedItemsToList(this.ListBox_UnknownTags, this.ListBox_Tags, nameSpace);
 
 			this.Button_Apply.IsEnabled = true;
 		}
@@ -1070,16 +1051,12 @@ namespace Hatate
 		/// Copy the selected item of a given listbox to the clipboard.
 		/// </summary>
 		/// <param name="from"></param>
-		private void CopySelectedItemToClipboard(ListBox from, bool formatTag=false)
+		private void CopySelectedItemToClipboard(ListBox from)
 		{
 			if (from.SelectedItem != null) {
-				string value = from.SelectedItem.ToString();
+				Tag item = from.SelectedItem as Tag;
 
-				if (formatTag) {
-					value = this.FormatTag(value);
-				}
-
-				Clipboard.SetText(value);
+				Clipboard.SetText(item.Underscored);
 			}
 		}
 
@@ -1091,17 +1068,10 @@ namespace Hatate
 			var selectedItem = from.SelectedItem;
 
 			if (selectedItem != null) {
-				this.StartProcess("https://danbooru.donmai.us/posts?tags=" + this.FormatTag(from.SelectedItem.ToString()));
-			}
-		}
+				Tag item = from.SelectedItem as Tag;
 
-		/// <summary>
-		/// Format a tag from a listbox.
-		/// </summary>
-		/// <param name="tag"></param>
-		private string FormatTag(string tag)
-		{
-			return tag.Replace("System.Windows.Controls.ListBoxItem: ", "").Replace(" ", "_");
+				this.StartProcess("https://danbooru.donmai.us/posts?tags=" + item.Underscored);
+			}
 		}
 
 		#endregion Private
@@ -1277,14 +1247,11 @@ namespace Hatate
 				return;
 			}
 
-			foreach (string tag in result.KnownTags) {
-				this.ListBox_Tags.Items.Add(new ListBoxItem() {
-					Content = tag,
-					Foreground = this.GetBrushFromTag(tag)
-				});
+			foreach (Tag tag in result.KnownTags) {
+				this.ListBox_Tags.Items.Add(tag);
 			}
 
-			foreach (string tag in result.UnknownTags) {
+			foreach (Tag tag in result.UnknownTags) {
 				this.ListBox_UnknownTags.Items.Add(tag);
 			}
 
@@ -1325,13 +1292,13 @@ namespace Hatate
 					this.MoveSelectedUnknownTagsToKnownTags(TXT_UNNAMESPACEDS);
 				break;
 				case "addSeries":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_SERIES, "series:");
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_SERIES, "series");
 				break;
 				case "addCharacter":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_CHARACTERS, "character:");
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_CHARACTERS, "character");
 				break;
 				case "addCreator":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_CREATORS, "creator:");
+					this.MoveSelectedUnknownTagsToKnownTags(TXT_CREATORS, "creator");
 				break;
 				case "addIgnored":
 					this.IngnoreSelectItemsFromList(this.ListBox_UnknownTags);
@@ -1340,7 +1307,7 @@ namespace Hatate
 					this.RemoveSelectedItemsFromList(this.ListBox_Files);
 				break;
 				case "removeTags":
-					this.RemoveSelectedItemsFromList(this.ListBox_Tags);
+					this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_UnknownTags);
 				break;
 				case "removeAndIgnore":
 					this.IngnoreSelectItemsFromList(this.ListBox_Tags);
@@ -1354,10 +1321,10 @@ namespace Hatate
 					}
 				break;
 				case "copyTag":
-					this.CopySelectedItemToClipboard(this.ListBox_Tags, true);
+					this.CopySelectedItemToClipboard(this.ListBox_Tags);
 				break;
 				case "copyUnknownTag":
-					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags, true);
+					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags);
 				break;
 				case "helpTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Tags);
@@ -1399,12 +1366,12 @@ namespace Hatate
 			result.KnownTags.Clear();
 			result.UnknownTags.Clear();
 
-			foreach (var item in this.ListBox_Tags.Items) {
-				result.KnownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
+			foreach (Tag item in this.ListBox_Tags.Items) {
+				result.KnownTags.Add(item);
 			}
 
-			foreach (var item in this.ListBox_UnknownTags.Items) {
-				result.UnknownTags.Add(item.ToString().Replace("System.Windows.Controls.ListBoxItem: ", ""));
+			foreach (Tag item in this.ListBox_UnknownTags.Items) {
+				result.UnknownTags.Add(item);
 			}
 
 			// Reload known tags
