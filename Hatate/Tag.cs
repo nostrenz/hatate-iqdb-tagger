@@ -14,12 +14,20 @@ namespace Hatate
 
 		/// <summary>
 		/// This method allow comparison functions to be used on a List<Tag> like Sort().
+		/// Tag's value will be sorted alphabeticaly but namespaced tags will be put before the others.
 		/// </summary>
 		/// <param name="obj"></param>
-		/// <returns></returns>
+		/// <returns>
+		/// -1: this.Value will be placed before tag.Value (example: a / b)
+		///  1: this.Value will be placed after tag.Value (example: b / a)
+		/// </returns>
 		int IComparable.CompareTo(object obj)
 		{
 			Tag tag = (Tag)obj;
+
+			if (!string.IsNullOrEmpty(this.Namespace) || !string.IsNullOrEmpty(tag.Namespace)) {
+				return string.Compare(tag.Namespace, this.Namespace);
+			}
 
 			return string.Compare(this.Value, tag.Value);
 		}
