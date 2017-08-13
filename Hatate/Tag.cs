@@ -12,7 +12,11 @@ namespace Hatate
 			this.Namespace = nameSpace;
 		}
 
-		// Implémente la méthode IComparable CompareTo - fournit l'ordre de tri par défaut.
+		/// <summary>
+		/// This method allow comparison functions to be used on a List<Tag> like Sort().
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		int IComparable.CompareTo(object obj)
 		{
 			Tag tag = (Tag)obj;
