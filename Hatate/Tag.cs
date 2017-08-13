@@ -1,15 +1,32 @@
-﻿using Brush = System.Windows.Media.Brush;
+﻿using IComparable = System.IComparable;
+using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace Hatate
 {
-	class Tag
+	class Tag : IComparable
 	{
 		public Tag(string value, string nameSpace=null)
 		{
 			this.Value = value;
 			this.Namespace = nameSpace;
 		}
+
+		// Implémente la méthode IComparable CompareTo - fournit l'ordre de tri par défaut.
+		int IComparable.CompareTo(object obj)
+		{
+			Tag tag = (Tag)obj;
+
+			return string.Compare(this.Value, tag.Value);
+		}
+
+		/*
+		============================================
+		Accessor
+		============================================
+		*/
+
+		#region Accessor
 
 		public string Value
 		{
@@ -68,5 +85,7 @@ namespace Hatate
 				}
 			}
 		}
+
+		#endregion Accessor
 	}
 }
