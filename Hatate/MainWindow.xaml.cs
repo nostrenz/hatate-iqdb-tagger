@@ -230,7 +230,7 @@ namespace Hatate
 				}
 
 				// Already searched
-				if (this.HasResult(progress) || this.FileRowIsRed(progress)) {
+				if (this.HasResult(progress)) {
 					progress++;
 
 					continue;
@@ -288,32 +288,139 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task SearchFile(int index)
 		{
+			Result result = new Result();
+
 			string filepath = this.ListBox_Files.Items[index].ToString();
 			string filename = this.GetFilenameFromPath(filepath);
 
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
-			string thumb = this.GenerateThumbnail(filepath, filename);
+			result.ThumbPath = this.GenerateThumbnail(filepath, filename);
 
 			// Search the image on IQDB
 			this.SetStatus("Searching file on IQDB...");
-			await this.RunIqdbApi(index, thumb, filename);
+			await this.RunIqdbApi(result);
 
-			// The search produced not result, move the image to the notfound folder and remove the row
-			if (!this.HasResult(index)) {
+			// Set row result
+			this.GetFilesListBoxItemByIndex(index).Tag = result;
+
+			// We have tags
+			if (result.Found) {
+				this.SetStatus("File found.");
+				this.UpdateFileRowColor(index, result.KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
+
+				this.found++;
+			} else { // No tags were found
 				this.SetStatus("File not found.");
 				this.UpdateFileRowColor(index, Brushes.Red);
 
 				this.notFound++;
-			} else {
-				this.SetStatus("File found.");
-				this.UpdateFileRowColor(index, this.CountKnownTagsForItem(index) > 0 ? Brushes.LimeGreen : Brushes.Orange);
-
-				this.found++;
 			}
 
 			// Update counters (remaining, found, not found)
 			this.UpdateLabels();
+		}
+
+		/// <summary>
+		/// Run the IQDB search.
+		/// </summary>
+		/// <param name="api"></param>
+		/// <param name="thumbPath"></param>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		private async Task RunIqdbApi(Result result)
+		{
+			using (var fs = new FileStream(result.ThumbPath, FileMode.Open)) {
+				IqdbApi.Models.SearchResult searchResult = null;
+
+				try {
+					searchResult = await new IqdbApi.IqdbApi().SearchFile(fs);
+				} catch (Exception) {
+					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
+				}
+
+				// No result found
+				if (searchResult == null || searchResult.Matches == null) {
+					return;
+				}
+
+				this.lastSearchedInSeconds = (int)searchResult.SearchedInSeconds;
+
+				// If found, move the image to the tagged folder
+				this.CheckMatches(searchResult.Matches, result);
+			}
+		}
+
+		/// <summary>
+		/// Check the various matches to find the best one.
+		/// </summary>
+		private void CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, Result result)
+		{
+			foreach (IqdbApi.Models.Match match in matches) {
+				// Check minimum similarity and number of tags
+				if (match.Similarity < Options.Default.Similarity || match.Tags == null || match.Tags.Count < Options.Default.TagsCount) {
+					continue;
+				}
+
+				// Check match type if enabled
+				if (Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
+					continue;
+				}
+
+				// Check source
+				if (!this.CheckSource(match.Source)) {
+					continue;
+				}
+
+				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
+				result.Source = match.Source;
+				result.Rating = match.Rating;
+
+				this.FilterTags(result, match.Tags);
+
+				return;
+			}
+		}
+
+		/// <summary>
+		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
+		/// </summary>
+		/// <returns></returns>
+		private void FilterTags(Result result, System.Collections.Immutable.ImmutableList<string> tags)
+		{
+			// Write each tags
+			foreach (string tag in tags) {
+				// Format the tag
+				string formated = tag;
+
+				formated = formated.Replace("_", " ");
+				formated = formated.Replace(",", "");
+				formated = formated.ToLower().Trim();
+
+				if (String.IsNullOrWhiteSpace(formated)) {
+					continue;
+				}
+
+				Tag found = this.FindTag(formated);
+
+				// Tag not found in the known tags
+				if (found == null) {
+					if (Options.Default.KnownTags && !this.IsTagInList(formated, this.ignoreds)) {
+						result.UnknownTags.Add(new Tag(formated));
+					}
+
+					continue;
+				}
+
+				result.KnownTags.Add(found);
+			}
+
+			// Add rating
+			string rating = result.Rating.ToString().ToLower();
+
+			if (Options.Default.AddRating && !String.IsNullOrWhiteSpace(rating)) {
+				result.KnownTags.Add(new Tag(rating, "rating"));
+			}
 		}
 
 		/// <summary>
@@ -324,18 +431,6 @@ namespace Hatate
 			this.SetStatus("Finished.");
 			this.SetStartButton("Start", "#FF3CB21A");
 			this.ChangeStartButtonEnabledValue();
-		}
-
-		/// <summary>
-		/// Count the number of known tags for a row by index.
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		private int CountKnownTagsForItem(int index)
-		{
-			Result result = this.GetResultFromItem(index);
-
-			return result == null ? 0 : result.KnownTags.Count;
 		}
 
 		/// <summary>
@@ -381,66 +476,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Run the IQDB search.
-		/// </summary>
-		/// <param name="api"></param>
-		/// <param name="thumbPath"></param>
-		/// <param name="filename"></param>
-		/// <returns></returns>
-		private async Task RunIqdbApi(int index, string thumbPath, string filename)
-		{
-			using (var fs = new FileStream(thumbPath, FileMode.Open)) {
-				IqdbApi.Models.SearchResult result = null;
-
-				try {
-					result = await new IqdbApi.IqdbApi().SearchFile(fs);
-				} catch (Exception) {
-					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
-				}
-
-				// No result found
-				if (result == null || result.Matches == null) {
-					return;
-				}
-
-				this.lastSearchedInSeconds = (int)result.SearchedInSeconds;
-
-				// If found, move the image to the tagged folder
-				this.CheckMatches(result.Matches, index, filename, thumbPath);
-			}
-		}
-
-		/// <summary>
-		/// Check the various matches to find the best one.
-		/// </summary>
-		private void CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, int index, string filename, string thumbPath)
-		{
-			foreach (IqdbApi.Models.Match match in matches) {
-				// Check minimum similarity and number of tags
-				if (match.Similarity < Options.Default.Similarity || match.Tags == null || match.Tags.Count < Options.Default.TagsCount) {
-					continue;
-				}
-
-				// Check match type if enabled
-				if (Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
-					continue;
-				}
-
-				// Check source
-				if (!this.CheckSource(match.Source)) {
-					continue;
-				}
-
-				Result result = this.FilterTags(match);
-				result.ThumbPath = thumbPath;
-
-				this.GetFilesListBoxItemByIndex(index).Tag = result;
-
-				return;
-			}
-		}
-
-		/// <summary>
 		/// Check if the given source checked in the options.
 		/// </summary>
 		/// <param name=""></param>
@@ -469,59 +504,6 @@ namespace Hatate
 			}
 
 			return false;
-		}
-
-		/// <summary>
-		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
-		/// </summary>
-		/// <returns></returns>
-		private Result FilterTags(IqdbApi.Models.Match match)
-		{
-			List<Tag> tagList = new List<Tag>();
-			List<Tag> unknownTags = new List<Tag>();
-
-			// Write each tags
-			foreach (string tag in match.Tags) {
-				// Format the tag
-				string formated = tag;
-
-				formated = formated.Replace("_", " ");
-				formated = formated.Replace(",", "");
-				formated = formated.ToLower().Trim();
-
-				if (String.IsNullOrWhiteSpace(formated)) {
-					continue;
-				}
-
-				Tag found = this.FindTag(formated);
-
-				// Tag not found in the known tags
-				if (found == null) {
-					if (Options.Default.KnownTags && !this.IsTagInList(formated, this.ignoreds)) {
-						unknownTags.Add(new Tag(formated));
-					}
-
-					continue;
-				}
-
-				tagList.Add(found);
-			}
-
-			// Add rating
-			if (Options.Default.AddRating) {
-				string strRating = match.Rating.ToString().ToLower();
-
-				if (!String.IsNullOrWhiteSpace(strRating)) {
-					tagList.Add(new Tag(strRating, "rating"));
-				}
-			}
-
-			return new Result() {
-				KnownTags   = tagList,
-				UnknownTags = unknownTags,
-				PreviewUrl  = "http://iqdb.org" + match.PreviewUrl,
-				Source      = match.Source
-			};
 		}
 
 		/// <summary>
@@ -914,16 +896,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Reset the elements in the right panel (source, preview, etc).
-		/// </summary>
-		private void ResetRightPanel()
-		{
-			this.Label_Match.Content = "Match";
-			this.Image_Original.Source = null;
-			this.Image_Match.Source = null;
-		}
-
-		/// <summary>
 		/// Rewrite tags in a txt file without duplicates.
 		/// Also remove the tags if they are in the ignoreds list.
 		/// </summary>
@@ -1280,21 +1252,39 @@ namespace Hatate
 			this.ListBox_Tags.Items.Clear();
 			this.ListBox_UnknownTags.Items.Clear();
 
+			this.Label_Match.Content = "Match";
+			this.Image_Original.Source = null;
+			this.Image_Match.Source = null;
 			this.Button_Apply.IsEnabled = false;
 
 			if (this.ListBox_Files.SelectedIndex < 0) {
-				this.ResetRightPanel();
-
 				return;
 			}
 
 			Result result = this.GetResultFromItem(this.ListBox_Files.SelectedIndex);
 
 			if (result == null) {
-				this.ResetRightPanel();
-
 				return;
 			}
+
+			// Set the images
+			try {
+				if (result.ThumbPath != null) {
+					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
+				}
+
+				if (result.PreviewUrl != null) {
+					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
+				}
+			} catch (UriFormatException) { }
+
+			// The following need the result to be found
+			if (!result.Found) {
+				return;
+			}
+
+			// Set the source name
+			this.Label_Match.Content = result.Source.ToString();
 
 			// Sort in natural order
 			result.KnownTags.Sort();
@@ -1307,18 +1297,6 @@ namespace Hatate
 			foreach (Tag tag in result.UnknownTags) {
 				this.ListBox_UnknownTags.Items.Add(tag);
 			}
-
-			try {
-				if (result.ThumbPath != null) {
-					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
-				}
-
-				if (result.PreviewUrl != null) {
-					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
-				}
-			} catch (UriFormatException) { }
-
-			this.Label_Match.Content = result.Source.ToString();
 		}
 
 		/// <summary>
