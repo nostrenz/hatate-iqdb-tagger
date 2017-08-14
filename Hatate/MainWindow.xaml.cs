@@ -603,8 +603,14 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Set as not found";
+			item.Header = "Not found";
 			item.Tag = "notFound";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Reset result";
+			item.Tag = "resetResult";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -802,7 +808,17 @@ namespace Hatate
 				return null;
 			}
 
-			return this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(this.ListBox_Files.Items[index]) as ListBoxItem;
+			return this.GetListBoxItemByItem(this.ListBox_Files.Items[index]);
+		}
+
+		/// <summary>
+		/// Get a ListBoxItem from the Files ListBox using one of its items.
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		private ListBoxItem GetListBoxItemByItem(object item)
+		{
+			return this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
 		}
 
 		/// <summary>
@@ -852,6 +868,20 @@ namespace Hatate
 		{
 			while (from.SelectedItems.Count > 0) {
 				from.Items.Remove(from.SelectedItems[0]);
+			}
+		}
+
+		/// <summary>
+		/// Remove result and background color of all the selected files.
+		/// </summary>
+		private void ResetSelectedFilesResult()
+		{
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				ListBoxItem lbItem = this.GetListBoxItemByItem(this.ListBox_Files.SelectedItems[0]);
+
+				lbItem.Tag = null;
+				lbItem.Background = null;
+				lbItem.Foreground = null;
 			}
 		}
 
@@ -1357,6 +1387,9 @@ namespace Hatate
 				case "searchAgain":
 					this.SearchFile(this.ListBox_Files.SelectedIndex);
 				break;
+				case "resetResult":
+					this.ResetSelectedFilesResult();
+				break;
 			}
 		}
 
@@ -1375,10 +1408,11 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds);
-															// 3 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 3, hasSelecteds);
+															// 4 is a separator
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, singleSelected);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected);
 		}
 
 		/// <summary>
