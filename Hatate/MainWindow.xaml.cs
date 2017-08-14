@@ -1468,8 +1468,6 @@ namespace Hatate
 			this.LoadKnownTags();
 
 			// Re-filter tags for all the other files so when we add a new known tag it will be applied for all the other files
-			// Known bug: if will add the rating into the unknown tags for all the files except the selected one. This is due to
-			// the rating being added in the known tags but not being in the txt files when we filter.
 			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
 				// Don't redo what we've just done
 				if (i == index) {
@@ -1487,7 +1485,7 @@ namespace Hatate
 
 				if (otherResult.KnownTags != null) {
 					// Prevent the rating from being added as an unknown tag by removing it from the known tags
-					Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace.Equals("rating"));
+					Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace != null && t.Namespace.Equals("rating"));
 
 					if (ratingTag != null) {
 						otherResult.KnownTags.Remove(ratingTag);
