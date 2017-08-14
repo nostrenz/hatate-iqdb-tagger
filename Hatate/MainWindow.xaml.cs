@@ -230,7 +230,7 @@ namespace Hatate
 				}
 
 				// Already searched
-				if (this.HasResult(progress)) {
+				if (this.HasResult(progress) || this.FileRowIsRed(progress)) {
 					progress++;
 
 					continue;
@@ -354,6 +354,16 @@ namespace Hatate
 
 			lbItem.Background = brush;
 			lbItem.Foreground = Brushes.White;
+		}
+
+		/// <summary>
+		/// Check if a row in the Files listbox is colored in red, meaning no result were found.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private bool FileRowIsRed(int index)
+		{
+			return this.GetFilesListBoxItemByIndex(index).Background == Brushes.Red;
 		}
 
 		/// <summary>
