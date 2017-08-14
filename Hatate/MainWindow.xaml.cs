@@ -879,12 +879,12 @@ namespace Hatate
 		/// </summary>
 		private void ResetSelectedFilesResult()
 		{
-			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				ListBoxItem lbItem = this.GetListBoxItemByItem(this.ListBox_Files.SelectedItems[0]);
+			foreach (string item in this.ListBox_Files.SelectedItems) {
+				ListBoxItem lbItem = this.GetListBoxItemByItem(item);
 
 				lbItem.Tag = null;
 				lbItem.Background = null;
-				lbItem.Foreground = null;
+				lbItem.Foreground = this.GetBrushFromString("#FFD2D2D2");
 			}
 		}
 
