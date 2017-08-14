@@ -53,7 +53,7 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<GroupBox Header="Tags" HorizontalAlignment="Right" Width="231" Margin="0,0,0,2">
-				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="-2">
+				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_Tags_ContextMenuOpening">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>
@@ -63,7 +63,7 @@
 			</GroupBox>
 			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
 			<GroupBox Header="Unknown tags" HorizontalAlignment="Right" Margin="0,3,0,0" Width="231" Grid.Row="2">
-				<ListBox x:Name="ListBox_UnknownTags" SelectionMode="Extended" BorderThickness="0" Margin="-2">
+				<ListBox x:Name="ListBox_UnknownTags" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_UnknownTags_ContextMenuOpening">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Value}"/>

@@ -599,8 +599,6 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
-			context.Items.Add(new Separator());
-
 			item = new MenuItem();
 			item.Header = "Remove";
 			item.Tag = "removeFiles";
@@ -1077,6 +1075,14 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Set the IsEnabled accessor of a ContextMenuItem  for the Files listbox.
+		/// </summary>
+		private void SetContextMenuItemEnabled(ListBox listBox, int index, bool enabled)
+		{
+			((MenuItem)listBox.ContextMenu.Items[index]).IsEnabled = enabled;
+		}
+
 		#endregion Private
 
 		/*
@@ -1352,12 +1358,59 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void ListBox_Files_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
-			//this.ListBox_Files.ContextMenu.Visibility = (this.ListBox_Files.Items.Count > 0 ? Visibility.Visible : Visibility.Hidden);
+			int countSelected = this.ListBox_Files.SelectedItems.Count;
 
-			bool hasResult = this.HasResult(this.ListBox_Files.SelectedIndex);
+			bool hasSelecteds = (countSelected > 0);
+			bool singleSelected = (countSelected == 1);
 
-			((MenuItem)this.ListBox_Files.ContextMenu.Items[0]).IsEnabled = hasResult;
-			((MenuItem)this.ListBox_Files.ContextMenu.Items[1]).IsEnabled = hasResult;
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds);
+															// 3 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, singleSelected);
+		}
+
+		/// <summary>
+		/// Called when the Tags ListBox's context menu is oppened.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Tags_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		{
+			int countSelected = this.ListBox_Tags.SelectedItems.Count;
+
+			bool hasSelecteds = (countSelected > 0);
+			bool singleSelected = (countSelected == 1);
+
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 0, hasSelecteds);   // "Remove"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 1, hasSelecteds);   // "Remove and ignore"
+														   // 2 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, singleSelected); // "Copy to clipboard"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Search on Danbooru"
+		}
+
+		/// <summary>
+		/// Called when the UnknownTags ListBox's context menu is oppened.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_UnknownTags_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		{
+			int countSelected = this.ListBox_UnknownTags.SelectedItems.Count;
+
+			bool hasSelecteds = (countSelected > 0);
+			bool singleSelected = (countSelected == 1);
+
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 0, hasSelecteds);   // "Add as unnamespaced"
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 1, hasSelecteds);   // "Add as series"
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 2, hasSelecteds);   // "Add as character"
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 3, hasSelecteds);   // "Add as creator"
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 4, hasSelecteds);   // "Add as ignored"
+																  // 5 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 6, singleSelected); // "Copy to clipboard"
+			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 7, singleSelected); // "Search on Danbooru"
 		}
 
 		/// <summary>
