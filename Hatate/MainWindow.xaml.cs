@@ -1091,7 +1091,7 @@ namespace Hatate
 		/// Copy the selected item of a given listbox to the clipboard.
 		/// </summary>
 		/// <param name="from"></param>
-		private void CopySelectedItemToClipboard(ListBox from)
+		private void CopySelectedTagToClipboard(ListBox from)
 		{
 			if (from.SelectedItem != null) {
 				Tag item = from.SelectedItem as Tag;
@@ -1365,18 +1365,18 @@ namespace Hatate
 					this.IngnoreSelectItemsFromList(this.ListBox_Tags);
 				break;
 				case "copyFilePath":
-					this.CopySelectedItemToClipboard(this.ListBox_Files);
-				break;
+					Clipboard.SetText(this.ListBox_Files.SelectedItem.ToString());
+					break;
 				case "launchFile":
 					if (this.ListBox_Files.SelectedItem != null) {
 						this.StartProcess(this.ListBox_Files.SelectedItem.ToString());
 					}
 				break;
 				case "copyTag":
-					this.CopySelectedItemToClipboard(this.ListBox_Tags);
+					this.CopySelectedTagToClipboard(this.ListBox_Tags);
 				break;
 				case "copyUnknownTag":
-					this.CopySelectedItemToClipboard(this.ListBox_UnknownTags);
+					this.CopySelectedTagToClipboard(this.ListBox_UnknownTags);
 				break;
 				case "helpTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Tags);
