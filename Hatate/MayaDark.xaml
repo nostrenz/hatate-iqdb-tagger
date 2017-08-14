@@ -155,7 +155,6 @@
 
 	<!-- All controls -->
 	<Style TargetType="Control" x:Key="CommonStyle">
-		<Setter Property="Background" Value="#262626" />
 		<Setter Property="Foreground" Value="#D2D2D2" />
 		<Setter Property="FontFamily" Value="Tahoma" />
 		<Setter Property="FontSize" Value="11" />
