@@ -363,9 +363,8 @@ namespace Hatate
 		{
 			int remaining = this.ListBox_Files.Items.Count;
 			int remainSeconds = (Options.Default.Delay + lastSearchedInSeconds) * remaining;
-			int remainMinutes = remainSeconds / 60;
 
-			this.Label_Remaining.Content = "Remaining: " + remaining + " files (~ " + remainSeconds + " seconds / " + remainMinutes + " minutes)";
+			this.Label_Remaining.Content = "Remaining: " + remaining + " files (~ " + remainSeconds + " seconds / " + (remainSeconds / 60) + " minutes)";
 			this.Label_Results.Content = "Results: " + this.found + " found, " + this.notFound + " not";
 		}
 
