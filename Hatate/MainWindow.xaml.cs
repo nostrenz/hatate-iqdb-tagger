@@ -1342,9 +1342,11 @@ namespace Hatate
 				break;
 				case "removeTags":
 					this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_UnknownTags);
+					this.Button_Apply.IsEnabled = true;
 				break;
 				case "removeAndIgnore":
 					this.IngnoreSelectItemsFromList(this.ListBox_Tags);
+					this.Button_Apply.IsEnabled = true;
 				break;
 				case "copyFilePath":
 					Clipboard.SetText(this.ListBox_Files.SelectedItem.ToString());
