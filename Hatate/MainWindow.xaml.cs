@@ -256,31 +256,7 @@ namespace Hatate
 				return;
 			}
 
-			string filepath = this.ListBox_Files.Items[progress].ToString();
-			string filename = this.GetFilenameFromPath(filepath);
-
-			// Generate a smaller image for uploading
-			this.SetStatus("Generating thumbnail...");
-			string thumb = this.GenerateThumbnail(filepath, filename);
-
-			// Search the image on IQDB
-			this.SetStatus("Searching file on IQDB...");
-			await this.RunIqdbApi(progress, thumb, filename);
-
-			// The search produced not result, move the image to the notfound folder and remove the row
-			if (!this.HasResult(progress)) {
-				this.MoveToNotFoundFolder(filepath, filename);
-				this.RemoveFileListItemAt(progress);
-
-				this.notFound++;
-			} else {
-				this.UpdateFileRowColor(progress, this.CountKnownTagsForItem(progress) > 0 ? Brushes.LimeGreen : Brushes.Orange);
-
-				this.found++;
-			}
-
-			// Update counters (remaining, found, not found)
-			this.UpdateLabels();
+			await this.SearchFile(progress);
 
 			// This is the last search, end here
 			if (progress >= this.ListBox_Files.Items.Count - 1) {
@@ -303,6 +279,39 @@ namespace Hatate
 			this.timer.Interval = 1000;
 			this.timer.Tick += new EventHandler(Timer_Tick);
 			this.timer.Start();
+		}
+
+		/// <summary>
+		/// Search a single file using its index in the Files list.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private async Task SearchFile(int index)
+		{
+			string filepath = this.ListBox_Files.Items[index].ToString();
+			string filename = this.GetFilenameFromPath(filepath);
+
+			// Generate a smaller image for uploading
+			this.SetStatus("Generating thumbnail...");
+			string thumb = this.GenerateThumbnail(filepath, filename);
+
+			// Search the image on IQDB
+			this.SetStatus("Searching file on IQDB...");
+			await this.RunIqdbApi(index, thumb, filename);
+
+			// The search produced not result, move the image to the notfound folder and remove the row
+			if (!this.HasResult(index)) {
+				this.UpdateFileRowColor(index, Brushes.Red);
+
+				this.notFound++;
+			} else {
+				this.UpdateFileRowColor(index, this.CountKnownTagsForItem(index) > 0 ? Brushes.LimeGreen : Brushes.Orange);
+
+				this.found++;
+			}
+
+			// Update counters (remaining, found, not found)
+			this.UpdateLabels();
 		}
 
 		/// <summary>
@@ -333,14 +342,6 @@ namespace Hatate
 		private void RemoveFileListItem(object item)
 		{
 			this.ListBox_Files.Items.Remove(item);
-		}
-
-		/// <summary>
-		/// Remove a row from the Files list by its index.
-		/// </summary>
-		private void RemoveFileListItemAt(int index)
-		{
-			this.ListBox_Files.Items.RemoveAt(index);
 		}
 
 		/// <summary>
@@ -609,6 +610,12 @@ namespace Hatate
 			context.Items.Add(new Separator());
 
 			item = new MenuItem();
+			item.Header = "Search again";
+			item.Tag = "searchAgain";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
 			item.Header = "Copy path";
 			item.Tag = "copyFilePath";
 			item.Click += this.ContextMenu_MenuItem_Click;
@@ -751,17 +758,10 @@ namespace Hatate
 			while (this.ListBox_Files.SelectedItems.Count > 0) {
 				var selected = this.ListBox_Files.SelectedItems[0];
 				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
-				Result result = (Result)item.Tag;
 
-				// Remove the row
+				// Remove the row and move the file to the notfound folder
+				this.MoveToNotFoundFolder(selected.ToString());
 				this.RemoveFileListItem(selected);
-
-				if (result == null) {
-					continue;
-				}
-
-				// Move the file to the tagged folder and write tags
-				this.MoveToNotFoundFolder(selected.ToString(), this.GetFilenameFromPath(selected.ToString()));
 			}
 		}
 
@@ -769,9 +769,9 @@ namespace Hatate
 		/// Move a file to the "notfound" folder using its filename.
 		/// </summary>
 		/// <param name="filepath"></param>
-		private void MoveToNotFoundFolder(string filepath, string filename=null)
+		private void MoveToNotFoundFolder(string filepath)
 		{
-			File.Move(filepath, this.NotfoundDirPath + filename);
+			File.Move(filepath, this.NotfoundDirPath + this.GetFilenameFromPath(filepath));
 		}
 
 		/// <summary>
@@ -1338,6 +1338,9 @@ namespace Hatate
 				break;
 				case "helpUnknownTag":
 					this.OpenHelpForSelectedTag(this.ListBox_UnknownTags);
+				break;
+				case "searchAgain":
+					this.SearchFile(this.ListBox_Files.SelectedIndex);
 				break;
 			}
 		}
