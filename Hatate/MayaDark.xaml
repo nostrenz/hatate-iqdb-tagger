@@ -1637,7 +1637,16 @@
 				<Setter TargetName="ArrowPanel" Property="Visibility" Value="Collapsed" />
 			</Trigger>
 			<Trigger Property="Role" Value="TopLevelItem">
+				<Setter Property="Margin" Value="0,0,3,0" />
 				<Setter Property="Padding" Value="4,1,4,1" />
+				<Setter TargetName="SubMenuPopup" Property="Placement" Value="Bottom" />
+				<Setter TargetName="SubMenuPopup" Property="HorizontalOffset" Value="-1" />
+				<Setter TargetName="SubMenuPopup" Property="VerticalOffset" Value="1" />
+				<Setter TargetName="Col0" Property="MinWidth" Value="0" />
+				<Setter TargetName="Col3" Property="Width" Value="Auto" />
+				<Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+				<Setter TargetName="GlyphPanel" Property="Visibility" Value="Collapsed" />
+				<Setter TargetName="IGTHost" Property="Visibility" Value="Collapsed" />
 				<Setter TargetName="ArrowPanel" Property="Visibility" Value="Collapsed" />
 			</Trigger>
 			<Trigger Property="Role" Value="SubmenuHeader">
@@ -1665,7 +1674,6 @@
 			<MultiTrigger>
 				<MultiTrigger.Conditions>
 					<Condition Property="IsHighlighted" Value="True" />
-					<Condition Property="Role" Value="TopLevelHeader" />
 				</MultiTrigger.Conditions>
 				<Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BaseBrush}" />
 				<Setter TargetName="BorderTopLeft" Property="Visibility" Value="Visible" />
