@@ -745,7 +745,8 @@ namespace Hatate
 				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
 				Result result = (Result)item.Tag;
 
-				if (result == null) {
+				// No result or no tags to write
+				if (result == null || result.KnownTags.Count == 0) {
 					continue;
 				}
 
