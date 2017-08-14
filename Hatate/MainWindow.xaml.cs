@@ -1482,17 +1482,17 @@ namespace Hatate
 					continue;
 				}
 
-				// Prevent the rating from being added as an unknown tag by removing it from the known tags
-				Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace.Equals("rating"));
-				
-				if (ratingTag != null) {
-					otherResult.KnownTags.Remove(ratingTag);
-				}
-
 				// Build a list of tags to compare
 				List<string> list = new List<string>();
 
 				if (otherResult.KnownTags != null) {
+					// Prevent the rating from being added as an unknown tag by removing it from the known tags
+					Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace.Equals("rating"));
+
+					if (ratingTag != null) {
+						otherResult.KnownTags.Remove(ratingTag);
+					}
+
 					foreach (Tag tag in otherResult.KnownTags) {
 						list.Add(tag.Value);
 					}
