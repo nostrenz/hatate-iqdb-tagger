@@ -413,7 +413,7 @@ namespace Hatate
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
-		private bool CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, int index, string filename, string thumbPath)
+		private void CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, int index, string filename, string thumbPath)
 		{
 			foreach (IqdbApi.Models.Match match in matches) {
 				// Check minimum similarity and number of tags
@@ -436,10 +436,8 @@ namespace Hatate
 
 				this.GetFilesListBoxItemByIndex(index).Tag = result;
 
-				return true;
+				return;
 			}
-
-			return false;
 		}
 
 		/// <summary>
