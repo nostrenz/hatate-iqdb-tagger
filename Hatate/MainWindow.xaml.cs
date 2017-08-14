@@ -376,7 +376,7 @@ namespace Hatate
 				result.Source = match.Source;
 				result.Rating = match.Rating;
 
-				this.FilterTags(result, match.Tags);
+				this.FilterTags(result, match.Tags.ToList());
 
 				return;
 			}
@@ -386,8 +386,11 @@ namespace Hatate
 		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
 		/// </summary>
 		/// <returns></returns>
-		private void FilterTags(Result result, System.Collections.Immutable.ImmutableList<string> tags)
+		private void FilterTags(Result result, List<string> tags)
 		{
+			result.KnownTags = new List<Tag>();
+			result.UnknownTags = new List<Tag>();
+
 			// Write each tags
 			foreach (string tag in tags) {
 				// Format the tag
@@ -1461,6 +1464,46 @@ namespace Hatate
 
 			// Reload known tags
 			this.LoadKnownTags();
+
+			// Re-filter tags for all the other files so when we add a new known tag it will be applied for all the other files
+			// Known bug: if will add the rating into the unknown tags for all the files except the selected one. This is due to
+			// the rating being added in the known tags but not being in the txt files when we filter.
+			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
+				// Don't redo what we've just done
+				if (i == index) {
+					continue;
+				}
+
+				Result otherResult = this.GetResultFromItem(i);
+
+				if (otherResult == null || !result.Found) {
+					continue;
+				}
+
+				// Prevent the rating from being added as an unknown tag by removing it from the known tags
+				Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace.Equals("rating"));
+				
+				if (ratingTag != null) {
+					otherResult.KnownTags.Remove(ratingTag);
+				}
+
+				// Build a list of tags to compare
+				List<string> list = new List<string>();
+
+				if (otherResult.KnownTags != null) {
+					foreach (Tag tag in otherResult.KnownTags) {
+						list.Add(tag.Value);
+					}
+				}
+
+				if (otherResult.UnknownTags != null) {
+					foreach (Tag tag in otherResult.UnknownTags) {
+						list.Add(tag.Value);
+					}
+				}
+
+				this.FilterTags(otherResult, list);
+			}
 		}
 
 		/// <summary>
