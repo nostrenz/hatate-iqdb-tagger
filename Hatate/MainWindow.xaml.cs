@@ -301,10 +301,12 @@ namespace Hatate
 
 			// The search produced not result, move the image to the notfound folder and remove the row
 			if (!this.HasResult(index)) {
+				this.SetStatus("File not found.");
 				this.UpdateFileRowColor(index, Brushes.Red);
 
 				this.notFound++;
 			} else {
+				this.SetStatus("File found.");
 				this.UpdateFileRowColor(index, this.CountKnownTagsForItem(index) > 0 ? Brushes.LimeGreen : Brushes.Orange);
 
 				this.found++;
