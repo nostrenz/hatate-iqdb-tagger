@@ -291,6 +291,14 @@ namespace Hatate
 			Result result = new Result();
 
 			string filepath = this.ListBox_Files.Items[index].ToString();
+
+			// Remove non existant file
+			if (!File.Exists(filepath)) {
+				this.ListBox_Files.Items.RemoveAt(index);
+
+				return;
+			}
+
 			string filename = this.GetFilenameFromPath(filepath);
 
 			// Generate a smaller image for uploading
@@ -434,14 +442,6 @@ namespace Hatate
 			this.SetStatus("Finished.");
 			this.SetStartButton("Start", "#FF3CB21A");
 			this.ChangeStartButtonEnabledValue();
-		}
-
-		/// <summary>
-		/// Remove a row from the Files list.
-		/// </summary>
-		private void RemoveFileListItem(object item)
-		{
-			this.ListBox_Files.Items.Remove(item);
 		}
 
 		/// <summary>
@@ -744,7 +744,7 @@ namespace Hatate
 				this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
 
 				// Remove the row
-				this.RemoveFileListItem(selected);
+				this.ListBox_Files.Items.Remove(selected);
 			}
 		}
 
@@ -760,7 +760,7 @@ namespace Hatate
 
 				// Remove the row and move the file to the notfound folder
 				this.MoveToNotFoundFolder(selected.ToString());
-				this.RemoveFileListItem(selected);
+				this.ListBox_Files.Items.Remove(selected);
 			}
 		}
 
