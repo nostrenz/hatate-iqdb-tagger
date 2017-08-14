@@ -729,9 +729,6 @@ namespace Hatate
 				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
 				Result result = (Result)item.Tag;
 
-				// Remove the row
-				this.RemoveFileListItem(selected);
-
 				if (result == null) {
 					continue;
 				}
@@ -743,6 +740,9 @@ namespace Hatate
 				// Move the file to the tagged folder and write tags
 				File.Move(filepath, taggedDirPath + filename);
 				this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
+
+				// Remove the row
+				this.RemoveFileListItem(selected);
 			}
 		}
 
