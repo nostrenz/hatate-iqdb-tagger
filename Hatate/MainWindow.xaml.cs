@@ -184,6 +184,10 @@ namespace Hatate
 			string thumbsDir = this.ThumbsDirPath;
 			string output = thumbsDir + filename;
 
+			if (File.Exists(output)) {
+				return output;
+			}
+
 			Directory.CreateDirectory(thumbsDir);
 
 			System.Drawing.Image image = System.Drawing.Image.FromFile(filepath);
@@ -1121,26 +1125,6 @@ namespace Hatate
 			return list.Contains(tag);
 		}
 
-		/// <summary>
-		/// Create a BitmapImage that won't be locked on disk by the application.
-		/// </summary>
-		/// <param name="imgpath"></param>
-		/// <returns></returns>
-		private BitmapImage CreateUnlockedBitmap(string imgPath)
-		{
-			BitmapImage bitmap = new BitmapImage();
-
-			// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten) and allow the file to be reloaded in cache when we change the URI
-			bitmap.BeginInit();
-			bitmap.UriCachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache);
-			bitmap.CacheOption = BitmapCacheOption.OnLoad;
-			bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-			bitmap.UriSource = new Uri(imgPath, UriKind.RelativeOrAbsolute);
-			bitmap.EndInit();
-
-			return bitmap;
-		}
-
 		#endregion Private
 
 		/*
@@ -1293,7 +1277,7 @@ namespace Hatate
 			// Set the images
 			try {
 				if (result.ThumbPath != null) {
-					this.Image_Original.Source = this.CreateUnlockedBitmap(result.ThumbPath);
+					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
 				}
 
 				if (result.PreviewUrl != null) {
