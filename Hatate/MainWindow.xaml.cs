@@ -1098,6 +1098,49 @@ namespace Hatate
 			((MenuItem)listBox.ContextMenu.Items[index]).IsEnabled = enabled;
 		}
 
+		/// <summary>
+		/// Enable or disable the Start button depending if the list is empty or if the search loop is already running.
+		/// </summary>
+		private void ChangeStartButtonEnabledValue()
+		{
+			this.Button_Start.IsEnabled = this.ListBox_Files.Items.Count > 0;
+		}
+
+		/// <summary>
+		/// Check if a tag is in the given list.
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <param name="list"></param>
+		/// <returns></returns>
+		private bool IsTagInList(string tag, string[] list)
+		{
+			if (list == null) {
+				return false;
+			}
+
+			return list.Contains(tag);
+		}
+
+		/// <summary>
+		/// Create a BitmapImage that won't be locked on disk by the application.
+		/// </summary>
+		/// <param name="imgpath"></param>
+		/// <returns></returns>
+		private BitmapImage CreateUnlockedBitmap(string imgPath)
+		{
+			BitmapImage bitmap = new BitmapImage();
+
+			// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten) and allow the file to be reloaded in cache when we change the URI
+			bitmap.BeginInit();
+			bitmap.UriCachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache);
+			bitmap.CacheOption = BitmapCacheOption.OnLoad;
+			bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+			bitmap.UriSource = new Uri(imgPath, UriKind.RelativeOrAbsolute);
+			bitmap.EndInit();
+
+			return bitmap;
+		}
+
 		#endregion Private
 
 		/*
@@ -1163,29 +1206,6 @@ namespace Hatate
 			{
 				return new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
 			}
-		}
-
-		/// <summary>
-		/// Enable or disable the Start button depending if the list is empty or if the search loop is already running.
-		/// </summary>
-		private void ChangeStartButtonEnabledValue()
-		{
-			this.Button_Start.IsEnabled = this.ListBox_Files.Items.Count > 0;
-		}
-
-		/// <summary>
-		/// Check if a tag is in the given list.
-		/// </summary>
-		/// <param name="tag"></param>
-		/// <param name="list"></param>
-		/// <returns></returns>
-		private bool IsTagInList(string tag, string[] list)
-		{
-			if (list == null) {
-				return false;
-			}
-
-			return list.Contains(tag);
 		}
 
 		/// <summary>
@@ -1273,7 +1293,7 @@ namespace Hatate
 			// Set the images
 			try {
 				if (result.ThumbPath != null) {
-					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
+					this.Image_Original.Source = this.CreateUnlockedBitmap(result.ThumbPath);
 				}
 
 				if (result.PreviewUrl != null) {
