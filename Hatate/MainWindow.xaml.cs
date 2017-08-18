@@ -342,25 +342,32 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task RunIqdbApi(Result result)
 		{
-			using (var fs = new FileStream(result.ThumbPath, FileMode.Open)) {
-				IqdbApi.Models.SearchResult searchResult = null;
+			FileStream fs = null;
 
-				try {
-					searchResult = await new IqdbApi.IqdbApi().SearchFile(fs);
-				} catch (Exception) {
-					// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
-				}
+			try {
+				fs = new FileStream(result.ThumbPath, FileMode.Open);
+			} catch (IOException) {
+				return; // MAy happen if the file is in use
+			}
 
-				// No result found
-				if (searchResult == null || searchResult.Matches == null) {
-					return;
-				}
+			IqdbApi.Models.SearchResult searchResult = null;
 
+			try {
+				searchResult = await new IqdbApi.IqdbApi().SearchFile(fs);
+			} catch (Exception) {
+				// FormatException may happen in cas of an invalid HTML response where no tags can be parsed
+			}
+
+			// No result found
+			if (searchResult != null && searchResult.Matches != null) {
 				this.lastSearchedInSeconds = (int)searchResult.SearchedInSeconds;
 
 				// If found, move the image to the tagged folder
 				this.CheckMatches(searchResult.Matches, result);
 			}
+
+			fs.Close();
+			fs.Dispose();
 		}
 
 		/// <summary>
