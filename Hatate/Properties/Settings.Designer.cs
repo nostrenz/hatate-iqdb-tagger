@@ -250,5 +250,17 @@ namespace Hatate.Properties {
                 this["Randomize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoMove {
+            get {
+                return ((bool)(this["AutoMove"]));
+            }
+            set {
+                this["AutoMove"] = value;
+            }
+        }
     }
 }

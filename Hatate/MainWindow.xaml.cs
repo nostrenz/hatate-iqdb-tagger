@@ -294,7 +294,8 @@ namespace Hatate
 		{
 			Result result = new Result();
 
-			string filepath = this.ListBox_Files.Items[index].ToString();
+			var item = this.ListBox_Files.Items[index];
+			string filepath = item.ToString();
 
 			// Remove non existant file
 			if (!File.Exists(filepath)) {
@@ -313,18 +314,30 @@ namespace Hatate
 			this.SetStatus("Searching file on IQDB...");
 			await this.RunIqdbApi(result);
 
-			// Set row result
-			this.GetFilesListBoxItemByIndex(index).Tag = result;
+			// Attach result to the row
+			this.GetFilesListBoxItemFromItem(item).Tag = result;
 
 			// We have tags
 			if (result.Found) {
 				this.SetStatus("File found.");
-				this.UpdateFileRowColor(index, result.KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
+
+				// Move or update the color
+				if (Options.Default.AutoMove && result.UnknownTags.Count == 0) {
+					this.WriteTagsForItem(item);
+				} else {
+					this.UpdateFileItemColor(item, result.KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
+				}
 
 				this.found++;
 			} else { // No tags were found
 				this.SetStatus("File not found.");
-				this.UpdateFileRowColor(index, Brushes.Red);
+				
+				// Move or update the color
+				if (Options.Default.AutoMove) {
+					this.MoveRowToNotFoundFolder(item);
+				} else {
+					this.UpdateFileItemColor(item, Brushes.Red);
+				}
 
 				this.notFound++;
 			}
@@ -459,22 +472,12 @@ namespace Hatate
 		/// Update the color of a file row using its index.
 		/// </summary>
 		/// <param name="index"></param>
-		private void UpdateFileRowColor(int index, Brush brush)
+		private void UpdateFileItemColor(object item, Brush brush)
 		{
-			ListBoxItem lbItem = this.GetFilesListBoxItemByIndex(index);
+			ListBoxItem lbItem = this.GetFilesListBoxItemFromItem(item);
 
 			lbItem.Background = brush;
 			lbItem.Foreground = Brushes.White;
-		}
-
-		/// <summary>
-		/// Check if a row in the Files listbox is colored in red, meaning no result were found.
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		private bool FileRowIsRed(int index)
-		{
-			return this.GetFilesListBoxItemByIndex(index).Background == Brushes.Red;
 		}
 
 		/// <summary>
@@ -732,47 +735,39 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Move all the files selected in the Files list to the "tagged" folder and write their tags.
+		/// Move a given item's file to the tagged folder with the tags in a .txt file and remove the row.
 		/// </summary>
-		private void WriteTagsForSelectedItems()
+		/// <param name="item"></param>
+		private void WriteTagsForItem(object item)
 		{
-			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				var selected = this.ListBox_Files.SelectedItems[0];
-				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
-				Result result = (Result)item.Tag;
+			ListBoxItem listBoxItem = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
+			Result result = (Result)listBoxItem.Tag;
 
-				// No result or no tags to write
-				if (result == null || result.KnownTags.Count == 0) {
-					continue;
-				}
-
-				string filepath = selected.ToString();
-				string filename = this.GetFilenameFromPath(filepath);
-				string taggedDirPath = this.TaggedDirPath;
-
-				// Move the file to the tagged folder and write tags
-				File.Move(filepath, taggedDirPath + filename);
-				this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
-
-				// Remove the row
-				this.ListBox_Files.Items.Remove(selected);
+			// No result or no tags to write
+			if (result == null || result.KnownTags.Count == 0) {
+				return;
 			}
+
+			string filepath = item.ToString();
+			string filename = this.GetFilenameFromPath(filepath);
+			string taggedDirPath = this.TaggedDirPath;
+
+			// Move the file to the tagged folder and write tags
+			File.Move(filepath, taggedDirPath + filename);
+			this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
+
+			// Remove the row
+			this.ListBox_Files.Items.Remove(item);
 		}
 
 		/// <summary>
-		/// Move all the files selected in the Files list to the "notfound" folder.
+		/// Move a files to the not "notfound" folder and remove the row.
 		/// </summary>
-		/// <param name="filename"></param>
-		private void MoveSelectedItemsToNotFoundFolder()
+		/// <param name="index"></param>
+		private void MoveRowToNotFoundFolder(object item)
 		{
-			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				var selected = this.ListBox_Files.SelectedItems[0];
-				ListBoxItem item = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(selected) as ListBoxItem;
-
-				// Remove the row and move the file to the notfound folder
-				this.MoveToNotFoundFolder(selected.ToString());
-				this.ListBox_Files.Items.Remove(selected);
-			}
+			this.MoveToNotFoundFolder(item.ToString());
+			this.ListBox_Files.Items.Remove(item);
 		}
 
 		/// <summary>
@@ -795,25 +790,11 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Get a ListBoxItem from the Files ListBox using an index.
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		private ListBoxItem GetFilesListBoxItemByIndex(int index)
-		{
-			if (this.ListBox_Files.Items.Count < 1) {
-				return null;
-			}
-
-			return this.GetListBoxItemByItem(this.ListBox_Files.Items[index]);
-		}
-
-		/// <summary>
 		/// Get a ListBoxItem from the Files ListBox using one of its items.
 		/// </summary>
 		/// <param name="item"></param>
 		/// <returns></returns>
-		private ListBoxItem GetListBoxItemByItem(object item)
+		private ListBoxItem GetFilesListBoxItemFromItem(object item)
 		{
 			return this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
 		}
@@ -825,7 +806,11 @@ namespace Hatate
 		/// <returns></returns>
 		private Result GetResultFromItem(int index)
 		{
-			ListBoxItem listBoxItem = this.GetFilesListBoxItemByIndex(index);
+			if (this.ListBox_Files.Items.Count < 1) {
+				return null;
+			}
+
+			ListBoxItem listBoxItem = this.GetFilesListBoxItemFromItem(this.ListBox_Files.Items[index]);
 
 			return listBoxItem != null ? (Result)listBoxItem.Tag : null;
 		}
@@ -874,7 +859,7 @@ namespace Hatate
 		private void ResetSelectedFilesResult()
 		{
 			foreach (string item in this.ListBox_Files.SelectedItems) {
-				ListBoxItem lbItem = this.GetListBoxItemByItem(item);
+				ListBoxItem lbItem = this.GetFilesListBoxItemFromItem(item);
 
 				lbItem.Tag = null;
 				lbItem.Background = null;
@@ -1328,11 +1313,15 @@ namespace Hatate
 
 			switch (mi.Tag) {
 				case "writeTags":
-					this.WriteTagsForSelectedItems();
-				break;
+					while (this.ListBox_Files.SelectedItems.Count > 0) {
+						this.WriteTagsForItem(this.ListBox_Files.SelectedItems[0]);
+					}
+					break;
 				case "notFound":
-					this.MoveSelectedItemsToNotFoundFolder();
-				break;
+					while (this.ListBox_Files.SelectedItems.Count > 0) {
+						this.MoveRowToNotFoundFolder(this.ListBox_Files.SelectedItems[0]);
+					}
+					break;
 				case "addUnnamespaced":
 					this.MoveSelectedUnknownTagsToKnownTags(TXT_UNNAMESPACEDS);
 				break;
@@ -1352,10 +1341,12 @@ namespace Hatate
 					this.RemoveSelectedItemsFromList(this.ListBox_Files);
 				break;
 				case "removeTags":
+					// Will need to use WriteTagsToTxtWithout() here
 					this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_UnknownTags);
 					this.Button_Apply.IsEnabled = true;
 				break;
 				case "removeAndIgnore":
+					// Will need to use WriteTagsToTxtWithout() here
 					this.IngnoreSelectItemsFromList(this.ListBox_Tags);
 					this.Button_Apply.IsEnabled = true;
 				break;

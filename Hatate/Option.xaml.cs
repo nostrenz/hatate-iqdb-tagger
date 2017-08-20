@@ -28,6 +28,7 @@ namespace Hatate
 			this.Slider_Similarity.Value = Options.Default.Similarity;
 			this.Slider_Delay.Value = Options.Default.Delay;
 			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
+			this.CheckBox_AutoMove.IsChecked = Options.Default.AutoMove;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -78,6 +79,7 @@ namespace Hatate
 			Options.Default.Similarity = (byte)this.Slider_Similarity.Value;
 			Options.Default.Delay = (int)this.Slider_Delay.Value;
 			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
+			Options.Default.AutoMove = (bool)this.CheckBox_AutoMove.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
