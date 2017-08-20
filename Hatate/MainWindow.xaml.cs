@@ -747,12 +747,15 @@ namespace Hatate
 			}
 
 			string filepath = item.ToString();
-			string filename = this.GetFilenameFromPath(filepath);
-			string taggedDirPath = this.TaggedDirPath;
 
-			// Move the file to the tagged folder and write tags
-			File.Move(filepath, taggedDirPath + filename);
-			this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
+			if (File.Exists(filepath)) {
+				string filename = this.GetFilenameFromPath(filepath);
+				string taggedDirPath = this.TaggedDirPath;
+
+				// Move the file to the tagged folder and write tags
+				File.Move(filepath, taggedDirPath + filename);
+				this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
+			}
 
 			// Remove the row
 			this.ListBox_Files.Items.Remove(item);
@@ -764,17 +767,13 @@ namespace Hatate
 		/// <param name="index"></param>
 		private void MoveRowToNotFoundFolder(object item)
 		{
-			this.MoveToNotFoundFolder(item.ToString());
-			this.ListBox_Files.Items.Remove(item);
-		}
+			string filepath = item.ToString();
 
-		/// <summary>
-		/// Move a file to the "notfound" folder using its filename.
-		/// </summary>
-		/// <param name="filepath"></param>
-		private void MoveToNotFoundFolder(string filepath)
-		{
-			File.Move(filepath, this.NotfoundDirPath + this.GetFilenameFromPath(filepath));
+			if (File.Exists(filepath)) {
+				File.Move(filepath, this.NotfoundDirPath + this.GetFilenameFromPath(filepath));
+			}
+
+			this.ListBox_Files.Items.Remove(item);
 		}
 
 		/// <summary>
