@@ -179,10 +179,10 @@ namespace Hatate
 		/// <param name="filename"></param>
 		/// <param name="width"></param>
 		/// <returns></returns>
-		private string GenerateThumbnail(string filepath, string filename, int width = 150)
+		private string GenerateThumbnail(string filepath, int width=150)
 		{
 			string thumbsDir = this.ThumbsDirPath;
-			string output = thumbsDir + filename;
+			string output = thumbsDir + this.GetFilenameFromPath(filepath);
 
 			if (File.Exists(output)) {
 				return output;
@@ -304,11 +304,9 @@ namespace Hatate
 				return;
 			}
 
-			string filename = this.GetFilenameFromPath(filepath);
-
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
-			result.ThumbPath = this.GenerateThumbnail(filepath, filename);
+			result.ThumbPath = this.GenerateThumbnail(filepath);
 
 			// Search the image on IQDB
 			this.SetStatus("Searching file on IQDB...");
@@ -1269,6 +1267,11 @@ namespace Hatate
 			// Set the images
 			try {
 				if (result.ThumbPath != null) {
+					// Regenerate the thumbnail if it don't exists anymore
+					if (!File.Exists(result.ThumbPath)) {
+						result.ThumbPath = this.GenerateThumbnail(this.ListBox_Files.Items[this.ListBox_Files.SelectedIndex].ToString());
+					}
+
 					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
 				}
 
