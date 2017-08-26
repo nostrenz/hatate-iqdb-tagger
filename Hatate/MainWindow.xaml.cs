@@ -809,7 +809,7 @@ namespace Hatate
 		/// <returns></returns>
 		private Result GetResultFromItem(int index)
 		{
-			if (index < 1 || this.ListBox_Files.Items.Count < 1) {
+			if (index < 0 || this.ListBox_Files.Items.Count < 1) {
 				return null;
 			}
 
