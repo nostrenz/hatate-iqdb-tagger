@@ -4,7 +4,7 @@ using Brushes = System.Windows.Media.Brushes;
 
 namespace Hatate
 {
-	class Tag : IComparable
+	public class Tag : IComparable
 	{
 		public Tag(string value, string nameSpace=null)
 		{

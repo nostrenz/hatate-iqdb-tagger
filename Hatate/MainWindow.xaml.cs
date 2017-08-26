@@ -674,6 +674,12 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "Add new tag";
+			item.Tag = "addNew";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			this.ListBox_Tags.ContextMenu = context;
 		}
 
@@ -803,7 +809,7 @@ namespace Hatate
 		/// <returns></returns>
 		private Result GetResultFromItem(int index)
 		{
-			if (this.ListBox_Files.Items.Count < 1) {
+			if (index < 1 || this.ListBox_Files.Items.Count < 1) {
 				return null;
 			}
 
@@ -1114,6 +1120,38 @@ namespace Hatate
 			return list.Contains(tag);
 		}
 
+		/// <summary>
+		/// Open a window to input a new tag and save it for the selected file and into the known tags.
+		/// </summary>
+		private void AddNewTag()
+		{
+			NewTag newTag = new NewTag();
+			Tag tag = newTag.GetTag;
+
+			if (tag == null) {
+				return;
+			}
+
+			string txt = null;
+
+			switch (tag.Namespace) {
+				case "unnamespaced": txt = TXT_UNNAMESPACEDS; break;
+				case "series": txt = TXT_UNNAMESPACEDS; break;
+				case "character": txt = TXT_UNNAMESPACEDS; break;
+				case "creator": txt = TXT_UNNAMESPACEDS; break;
+			}
+
+			// Write the new tag to the txt
+			using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
+				file.WriteLine(tag.Value);
+			}
+
+			// Append the new tag to the list
+			this.ListBox_Tags.Items.Add(tag);
+
+			this.Button_Apply.IsEnabled = true;
+		}
+
 		#endregion Private
 
 		/*
@@ -1378,6 +1416,9 @@ namespace Hatate
 				case "resetResult":
 					this.ResetSelectedFilesResult();
 				break;
+				case "addNew":
+					this.AddNewTag();
+				break;
 			}
 		}
 
@@ -1420,6 +1461,7 @@ namespace Hatate
 														   // 2 is a separator
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, singleSelected); // "Copy to clipboard"
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Search on Danbooru"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, this.HasResult(this.ListBox_Files.SelectedIndex)); // "Add new tag"
 		}
 
 		/// <summary>
