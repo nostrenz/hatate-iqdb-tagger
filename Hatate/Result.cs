@@ -7,6 +7,12 @@ namespace Hatate
 	/// </summary>
 	class Result
 	{
+		public Result()
+		{
+			this.KnownTags = new List<Tag>();
+			this.UnknownTags = new List<Tag>();
+		}
+
 		public List<Tag> KnownTags { get; set; }
 
 		public List<Tag> UnknownTags { get; set; }

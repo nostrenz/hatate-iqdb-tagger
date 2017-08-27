@@ -88,8 +88,16 @@ namespace Hatate
 				return;
 			}
 
+			// Ask for tags if enabled
+			List<Tag> tags = null;
+
+			if (Options.Default.AskTags) {
+				NewTags newTags = new NewTags();
+				tags = newTags.Tags;
+			}
+
 			foreach (string filename in dlg.FileNames) {
-				this.AddFileToList(filename);
+				this.AddFileToList(filename, tags);
 			}
 
 			this.UpdateLabels();
@@ -161,8 +169,16 @@ namespace Hatate
 			this.ListBox_Tags.Items.Clear();
 			this.ListBox_UnknownTags.Items.Clear();
 
+			// Ask for tags if enabled
+			List<Tag> tags = null;
+
+			if (Options.Default.AskTags) {
+				NewTags newTags = new NewTags();
+				tags = newTags.Tags;
+			}
+
 			foreach (string file in files) {
-				this.AddFileToList(file);
+				this.AddFileToList(file, tags);
 			}
 
 			int count = files.Length;
@@ -292,8 +308,6 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task SearchFile(int index)
 		{
-			Result result = new Result();
-
 			var item = this.ListBox_Files.Items[index];
 			string filepath = item.ToString();
 
@@ -303,6 +317,8 @@ namespace Hatate
 
 				return;
 			}
+
+			Result result = this.GetResultFromIndex(index);
 
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
@@ -418,9 +434,6 @@ namespace Hatate
 		/// <returns></returns>
 		private void FilterTags(Result result, List<string> tags)
 		{
-			result.KnownTags = new List<Tag>();
-			result.UnknownTags = new List<Tag>();
-
 			// Write each tags
 			foreach (string tag in tags) {
 				// Format the tag
@@ -789,7 +802,7 @@ namespace Hatate
 		/// <returns></returns>
 		private bool HasResult(int index)
 		{
-			return this.GetResultFromItem(index) != null;
+			return this.GetResultFromIndex(index) != null;
 		}
 
 		/// <summary>
@@ -803,11 +816,21 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Get a ListBoxItem from the Files ListBox using an index.
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		private ListBoxItem GetFilesListBoxItemFromIndex(int index)
+		{
+			return this.ListBox_Files.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
+		}
+
+		/// <summary>
 		/// Get the result object attached to an item in the Files ListBox.
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		private Result GetResultFromItem(int index)
+		private Result GetResultFromIndex(int index)
 		{
 			if (index < 0 || this.ListBox_Files.Items.Count < 1) {
 				return null;
@@ -1004,7 +1027,7 @@ namespace Hatate
 		/// <summary>
 		/// Add a file to the list if it's not already in it or not in the tagged or notfound folder.
 		/// </summary>
-		private void AddFileToList(string filepath)
+		private void AddFileToList(string filepath, List<Tag> tags=null)
 		{
 			string filename = this.GetFilenameFromPath(filepath);
 
@@ -1015,6 +1038,19 @@ namespace Hatate
 			}
 
 			this.ListBox_Files.Items.Add(filepath);
+
+			Result result = new Result();
+
+			// Add tags to the result
+			if (tags != null && tags.Count > 0) {
+				foreach (Tag tag in tags) {
+					result.KnownTags.Add(tag);
+				}
+			}
+
+			// Attach result to the row
+			int count = this.ListBox_Files.Items.Count;
+			this.GetFilesListBoxItemFromIndex(count-1).Tag = result;
 		}
 
 		/// <summary>
@@ -1125,29 +1161,30 @@ namespace Hatate
 		/// </summary>
 		private void AddNewTag()
 		{
-			NewTag newTag = new NewTag();
-			Tag tag = newTag.GetTag;
+			NewTags newTags = new NewTags();
+			List<Tag> tags = newTags.Tags;
 
-			if (tag == null) {
+			if (tags == null) {
 				return;
 			}
 
-			string txt = null;
+			foreach (Tag tag in tags) {
+				string txt = TXT_UNNAMESPACEDS;
 
-			switch (tag.Namespace) {
-				case "unnamespaced": txt = TXT_UNNAMESPACEDS; break;
-				case "series": txt = TXT_UNNAMESPACEDS; break;
-				case "character": txt = TXT_UNNAMESPACEDS; break;
-				case "creator": txt = TXT_UNNAMESPACEDS; break;
+				switch (tag.Namespace) {
+					case "series": txt = TXT_UNNAMESPACEDS; break;
+					case "character": txt = TXT_UNNAMESPACEDS; break;
+					case "creator": txt = TXT_UNNAMESPACEDS; break;
+				}
+
+				// Write the new tag to the txt
+				using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
+					file.WriteLine(tag.Value);
+				}
+
+				// Append the new tag to the list
+				this.ListBox_Tags.Items.Add(tag);
 			}
-
-			// Write the new tag to the txt
-			using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
-				file.WriteLine(tag.Value);
-			}
-
-			// Append the new tag to the list
-			this.ListBox_Tags.Items.Add(tag);
 
 			this.Button_Apply.IsEnabled = true;
 		}
@@ -1295,7 +1332,7 @@ namespace Hatate
 				return;
 			}
 
-			Result result = this.GetResultFromItem(this.ListBox_Files.SelectedIndex);
+			Result result = this.GetResultFromIndex(this.ListBox_Files.SelectedIndex);
 
 			if (result == null) {
 				return;
@@ -1317,6 +1354,13 @@ namespace Hatate
 				}
 			} catch (UriFormatException) { }
 
+			// Add known tags to the list
+			result.KnownTags.Sort();
+
+			foreach (Tag tag in result.KnownTags) {
+				this.ListBox_Tags.Items.Add(tag);
+			}
+
 			// The following need the result to be found
 			if (!result.Found) {
 				return;
@@ -1325,13 +1369,8 @@ namespace Hatate
 			// Set the source name
 			this.Label_Match.Content = result.Source.ToString();
 
-			// Sort in natural order
-			result.KnownTags.Sort();
+			// Add unknown tags to the list
 			result.UnknownTags.Sort();
-
-			foreach (Tag tag in result.KnownTags) {
-				this.ListBox_Tags.Items.Add(tag);
-			}
 
 			foreach (Tag tag in result.UnknownTags) {
 				this.ListBox_UnknownTags.Items.Add(tag);
@@ -1461,7 +1500,7 @@ namespace Hatate
 														   // 2 is a separator
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, singleSelected); // "Copy to clipboard"
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Search on Danbooru"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, this.HasResult(this.ListBox_Files.SelectedIndex)); // "Add new tag"
+			//this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, this.HasResult(this.ListBox_Files.SelectedIndex)); // "Add new tag"
 		}
 
 		/// <summary>
@@ -1497,7 +1536,7 @@ namespace Hatate
 			this.Button_Apply.IsEnabled = false;
 
 			int index = this.ListBox_Files.SelectedIndex;
-			Result result = this.GetResultFromItem(index);
+			Result result = this.GetResultFromIndex(index);
 
 			result.KnownTags.Clear();
 			result.UnknownTags.Clear();
@@ -1520,7 +1559,7 @@ namespace Hatate
 					continue;
 				}
 
-				Result otherResult = this.GetResultFromItem(i);
+				Result otherResult = this.GetResultFromIndex(i);
 
 				if (otherResult == null || !result.Found) {
 					continue;
@@ -1529,7 +1568,7 @@ namespace Hatate
 				// Build a list of tags to compare
 				List<string> list = new List<string>();
 
-				if (otherResult.KnownTags != null) {
+				if (otherResult.KnownTags.Count > 0) {
 					// Prevent the rating from being added as an unknown tag by removing it from the known tags
 					Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace != null && t.Namespace.Equals("rating"));
 
@@ -1645,10 +1684,18 @@ namespace Hatate
 				return;
 			}
 
+			// Ask for tags if enabled
+			List<Tag> tags = null;
+
+			if (Options.Default.AskTags) {
+				NewTags newTags = new NewTags();
+				tags = newTags.Tags;
+			}
+
 			// Add images to the list
 			foreach (string file in files) {
 				if (this.IsCorrespondingToFilter(file, ImagesFilesExtensions)) {
-					this.AddFileToList(file);
+					this.AddFileToList(file, tags);
 				}
 			}
 

@@ -29,6 +29,7 @@ namespace Hatate
 			this.Slider_Delay.Value = Options.Default.Delay;
 			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
 			this.CheckBox_AutoMove.IsChecked = Options.Default.AutoMove;
+			this.CheckBox_AskTags.IsChecked = Options.Default.AskTags;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -80,6 +81,7 @@ namespace Hatate
 			Options.Default.Delay = (int)this.Slider_Delay.Value;
 			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
 			Options.Default.AutoMove = (bool)this.CheckBox_AutoMove.IsChecked;
+			Options.Default.AskTags = (bool)this.CheckBox_AskTags.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;

@@ -1,0 +1,28 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hatate"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="Hatate.NewTags"
+        mc:Ignorable="d"
+        Title="Add tags" Height="281" Width="308" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+	<Grid Background="{DynamicResource WindowBackground}">
+		<TextBox x:Name="TextBox_Value" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="272"/>
+		<ComboBox x:Name="ComboBox_Namespace" Margin="10,38,0,0" VerticalAlignment="Top" SelectedIndex="0" HorizontalAlignment="Left" Width="227">
+			<System:String>unnamespaced</System:String>
+			<System:String>series</System:String>
+			<System:String>character</System:String>
+			<System:String>creator</System:String>
+		</ComboBox>
+		<Button Content="Ok" Margin="10,207,0,0" Height="25" Click="Button_Ok_Click" HorizontalAlignment="Left" Width="272" VerticalAlignment="Top"/>
+		<ListBox x:Name="ListBox_Tags" Height="139" Margin="10,63,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="272">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Button Content="Add" Margin="242,38,0,0" VerticalAlignment="Top" Height="20" Click="Button_Add_Click" HorizontalAlignment="Left" Width="40"/>
+	</Grid>
+</Window>

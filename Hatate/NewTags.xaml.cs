@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Hatate
 {
 	/// <summary>
-	/// Interaction logic for NewTag.xaml
+	/// Interaction logic for NewTags.xaml
 	/// </summary>
-	public partial class NewTag : Window
+	public partial class NewTags : Window
 	{
-		public NewTag()
+		public NewTags()
 		{
 			InitializeComponent();
 
@@ -36,23 +36,16 @@ namespace Hatate
 
 		#region Accessor
 
-		public Tag GetTag
+		public List<Tag> Tags
 		{
-			get
-			{
-				string value = this.TextBox_Value.Text.Trim();
+			get {
+				List<Tag> tags = new List<Tag>();
 
-				if (String.IsNullOrEmpty(value)) {
-					return null;
+				foreach (Tag item in this.ListBox_Tags.Items) {
+					tags.Add(item);
 				}
 
-				string nameSpace = this.ComboBox_Namespace.SelectedValue.ToString();
-
-				if (nameSpace == "unnamespaced") {
-					nameSpace = null;
-				}
-
-				return new Tag(value, nameSpace);
+				return tags;
 			}
 		}
 
@@ -67,6 +60,23 @@ namespace Hatate
 		#region Event
 
 		private void Button_Add_Click(object sender, RoutedEventArgs e)
+		{
+			string value = this.TextBox_Value.Text.Trim();
+
+			if (String.IsNullOrEmpty(value)) {
+				return;
+			}
+
+			string nameSpace = this.ComboBox_Namespace.SelectedValue.ToString();
+
+			if (nameSpace == "unnamespaced") {
+				nameSpace = null;
+			}
+
+			this.ListBox_Tags.Items.Add(new Tag(value, nameSpace));
+		}
+
+		private void Button_Ok_Click(object sender, RoutedEventArgs e)
 		{
 			this.Close();
 		}

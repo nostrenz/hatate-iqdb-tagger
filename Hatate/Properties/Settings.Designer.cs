@@ -262,5 +262,17 @@ namespace Hatate.Properties {
                 this["AutoMove"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AskTags {
+            get {
+                return ((bool)(this["AskTags"]));
+            }
+            set {
+                this["AskTags"] = value;
+            }
+        }
     }
 }
