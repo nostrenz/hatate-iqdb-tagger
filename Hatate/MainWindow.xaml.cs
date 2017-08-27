@@ -89,12 +89,7 @@ namespace Hatate
 			}
 
 			// Ask for tags if enabled
-			List<Tag> tags = null;
-
-			if (Options.Default.AskTags) {
-				NewTags newTags = new NewTags();
-				tags = newTags.Tags;
-			}
+			List<Tag> tags = this.AskForNewTags();
 
 			foreach (string filename in dlg.FileNames) {
 				this.AddFileToList(filename, tags);
@@ -170,12 +165,7 @@ namespace Hatate
 			this.ListBox_UnknownTags.Items.Clear();
 
 			// Ask for tags if enabled
-			List<Tag> tags = null;
-
-			if (Options.Default.AskTags) {
-				NewTags newTags = new NewTags();
-				tags = newTags.Tags;
-			}
+			List<Tag> tags = this.AskForNewTags();
 
 			foreach (string file in files) {
 				this.AddFileToList(file, tags);
@@ -558,10 +548,27 @@ namespace Hatate
 		/// </summary>
 		/// <param name="filepath"></param>
 		/// <param name="tags"></param>
-		private void WriteTagsToTxt(string filepath, List<Tag> tags, bool append = false)
+		private void WriteTagsToTxt(string filepath, List<Tag> tags, bool append=false)
 		{
 			using (StreamWriter file = new StreamWriter(filepath, append)) {
 				foreach (Tag tag in tags) {
+					file.WriteLine(tag.Value);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Write a list of Tag objects to the txt files.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <param name="tags"></param>
+		/// <param name="append"></param>
+		private void WriteTagsToTxt(List<Tag> tags)
+		{
+			foreach (Tag tag in tags) {
+				string txt = this.GetTxtFromNamespace(tag.Namespace);
+
+				using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
 					file.WriteLine(tag.Value);
 				}
 			}
@@ -1166,23 +1173,16 @@ namespace Hatate
 		/// <summary>
 		/// Open a window to input a new tag and save it for the selected file and into the known tags.
 		/// </summary>
-		private void AddNewTag()
+		private void AddNewTags()
 		{
-			NewTags newTags = new NewTags();
-			List<Tag> tags = newTags.Tags;
+			List<Tag> tags = this.AskForNewTags();
 
-			if (tags == null) {
+			if (tags.Count == 0) {
 				return;
 			}
 
 			foreach (Tag tag in tags) {
-				string txt = TXT_UNNAMESPACEDS;
-
-				switch (tag.Namespace) {
-					case "series": txt = TXT_UNNAMESPACEDS; break;
-					case "character": txt = TXT_UNNAMESPACEDS; break;
-					case "creator": txt = TXT_UNNAMESPACEDS; break;
-				}
+				string txt = this.GetTxtFromNamespace(tag.Namespace);
 
 				// Write the new tag to the txt
 				using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
@@ -1196,6 +1196,43 @@ namespace Hatate
 			}
 
 			this.Button_Apply.IsEnabled = true;
+		}
+
+		/// <summary>
+		/// Get path of one of the txt files depending on a namespace.
+		/// </summary>
+		/// <param name="nameSpace"></param>
+		/// <returns></returns>
+		private string GetTxtFromNamespace(string nameSpace)
+		{
+			if (String.IsNullOrEmpty(nameSpace)) {
+				return TXT_UNNAMESPACEDS;
+			}
+
+			switch (nameSpace) {
+				case "series": return TXT_UNNAMESPACEDS;
+				case "character": return TXT_UNNAMESPACEDS;
+				case "creator": return TXT_UNNAMESPACEDS;
+			}
+
+			return TXT_UNNAMESPACEDS;
+		}
+
+		/// <summary>
+		/// Open a window asking for new tags, write them to the txt files then return them.
+		/// </summary>
+		private List<Tag> AskForNewTags()
+		{
+			List<Tag> tags = new List<Tag>();
+
+			if (Options.Default.AskTags) {
+				NewTags newTags = new NewTags();
+				tags = newTags.Tags;
+
+				this.WriteTagsToTxt(tags);
+			}
+
+			return tags;
 		}
 
 		#endregion Private
@@ -1465,7 +1502,7 @@ namespace Hatate
 					this.ResetSelectedFilesResult();
 				break;
 				case "addNew":
-					this.AddNewTag();
+					this.AddNewTags();
 				break;
 			}
 		}
@@ -1694,12 +1731,7 @@ namespace Hatate
 			}
 
 			// Ask for tags if enabled
-			List<Tag> tags = null;
-
-			if (Options.Default.AskTags) {
-				NewTags newTags = new NewTags();
-				tags = newTags.Tags;
-			}
+			List<Tag> tags = this.AskForNewTags();
 
 			// Add images to the list
 			foreach (string file in files) {
