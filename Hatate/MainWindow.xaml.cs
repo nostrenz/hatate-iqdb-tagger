@@ -445,7 +445,7 @@ namespace Hatate
 						Tag formatedTag = new Tag(formated);
 
 						if (!result.UnknownTags.Contains(formatedTag)) {
-							result.UnknownTags.Add(found);
+							result.UnknownTags.Add(formatedTag);
 						}
 					}
 
