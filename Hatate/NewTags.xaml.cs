@@ -85,6 +85,7 @@ namespace Hatate
 			}
 
 			this.TextBox_Value.Clear();
+			this.TextBox_Value.Focus();
 		}
 
 		/// <summary>
