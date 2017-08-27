@@ -434,6 +434,9 @@ namespace Hatate
 		/// <returns></returns>
 		private void FilterTags(Result result, List<string> tags)
 		{
+			result.KnownTags.Clear();
+			result.UnknownTags.Clear();
+
 			// Write each tags
 			foreach (string tag in tags) {
 				// Format the tag
