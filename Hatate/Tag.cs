@@ -12,6 +12,14 @@ namespace Hatate
 			this.Namespace = nameSpace;
 		}
 
+		/*
+		============================================
+		Public
+		============================================
+		*/
+
+		#region Public
+
 		/// <summary>
 		/// This method allow comparison functions to be used on a List<Tag> like Sort().
 		/// Tag's value will be sorted alphabeticaly but namespaced tags will be put before the others.
@@ -31,6 +39,33 @@ namespace Hatate
 
 			return string.Compare(this.Value, tag.Value);
 		}
+
+		/// <summary>
+		/// Allows to asset equality between two Tag objects.
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
+		public override bool Equals(object obj)
+		{
+			var item = obj as Tag;
+
+			if (item == null) {
+				return false;
+			}
+
+			return this.Namespaced.Equals(item.Namespaced);
+		}
+
+		/// <summary>
+		/// Allows to asset equality between two Tag objects.
+		/// </summary>
+		/// <returns></returns>
+		public override int GetHashCode()
+		{
+			return this.Namespaced.GetHashCode();
+		}
+
+		#endregion Public
 
 		/*
 		============================================

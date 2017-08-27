@@ -458,7 +458,9 @@ namespace Hatate
 					continue;
 				}
 
-				result.KnownTags.Add(found);
+				if (!result.KnownTags.Contains(found)) {
+					result.KnownTags.Add(found);
+				}
 			}
 
 			// Add rating
@@ -802,7 +804,9 @@ namespace Hatate
 		/// <returns></returns>
 		private bool HasFoundResult(int index)
 		{
-			return this.GetResultFromIndex(index).Found;
+			Result result = this.GetResultFromIndex(index);
+
+			return result != null && result.Found;
 		}
 
 		/// <summary>
@@ -1183,7 +1187,9 @@ namespace Hatate
 				}
 
 				// Append the new tag to the list
-				this.ListBox_Tags.Items.Add(tag);
+				if (!this.ListBox_Tags.Items.Contains(tag)) {
+					this.ListBox_Tags.Items.Add(tag);
+				}
 			}
 
 			this.Button_Apply.IsEnabled = true;
@@ -1500,7 +1506,7 @@ namespace Hatate
 														   // 2 is a separator
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, singleSelected); // "Copy to clipboard"
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Search on Danbooru"
-			//this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, this.HasResult(this.ListBox_Files.SelectedIndex)); // "Add new tag"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, this.HasFoundResult(this.ListBox_Files.SelectedIndex)); // "Add new tag"
 		}
 
 		/// <summary>

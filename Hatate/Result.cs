@@ -13,6 +13,14 @@ namespace Hatate
 			this.UnknownTags = new List<Tag>();
 		}
 
+		/*
+		============================================
+		Accessor
+		============================================
+		*/
+
+		#region Accessor
+
 		public List<Tag> KnownTags { get; set; }
 
 		public List<Tag> UnknownTags { get; set; }
@@ -57,5 +65,7 @@ namespace Hatate
 		{
 			get { return this.KnownTags.Count > 0; }
 		}
+
+		#endregion Accessor
 	}
 }

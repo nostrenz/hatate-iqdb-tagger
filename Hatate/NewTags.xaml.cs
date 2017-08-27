@@ -58,7 +58,12 @@ namespace Hatate
 		*/
 
 		#region Event
-
+		
+		/// <summary>
+		/// Called when clicking on the Add button, add a tag to the list.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Button_Add_Click(object sender, RoutedEventArgs e)
 		{
 			string value = this.TextBox_Value.Text.Trim();
@@ -73,9 +78,20 @@ namespace Hatate
 				nameSpace = null;
 			}
 
-			this.ListBox_Tags.Items.Add(new Tag(value, nameSpace));
+			Tag tag = new Tag(value, nameSpace);
+
+			if (!this.ListBox_Tags.Items.Contains(tag)) {
+				this.ListBox_Tags.Items.Add(tag);
+			}
+
+			this.TextBox_Value.Clear();
 		}
 
+		/// <summary>
+		/// Called when clicking on the Ok button, close the window.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Button_Ok_Click(object sender, RoutedEventArgs e)
 		{
 			this.Close();
