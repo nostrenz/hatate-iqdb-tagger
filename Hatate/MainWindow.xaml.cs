@@ -250,7 +250,7 @@ namespace Hatate
 				}
 
 				// Already searched
-				if (this.HasResult(progress)) {
+				if (this.HasFoundResult(progress)) {
 					progress++;
 
 					continue;
@@ -800,9 +800,9 @@ namespace Hatate
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		private bool HasResult(int index)
+		private bool HasFoundResult(int index)
 		{
-			return this.GetResultFromIndex(index) != null;
+			return this.GetResultFromIndex(index).Found;
 		}
 
 		/// <summary>
@@ -1746,7 +1746,7 @@ namespace Hatate
 
 			// Count results
 			for (int i=0; i<this.ListBox_Files.Items.Count; i++) {
-				if (this.HasResult(i)) count++;
+				if (this.HasFoundResult(i)) count++;
 			}
 
 			if (count > 0) {
