@@ -26,20 +26,36 @@ namespace Hatate
 		public IqdbApi.Enums.Rating Rating { get; set; }
 
 		/// <summary>
-		/// Result is found if it has at least one tag.
+		/// Result is greenlighted if found and has at least one tag.
 		/// </summary>
-		public bool Found
+		public bool Greenlight
 		{
 			get
 			{
-				// We have known tags
-				if (this.KnownTags != null && this.KnownTags.Count > 0) {
-					return true;
+				// Not found
+				if (!this.Found) {
+					return false;
 				}
 
-				// No known tags, return true if we have at least one unknown tag
-				return (this.UnknownTags != null && this.UnknownTags.Count > 0);
+				// Found, check the tags
+				return this.HasKnownTags || this.UnknownTags.Count > 0;
 			}
+		}
+
+		/// <summary>
+		/// A non-null preview URL means that the image was found on IQDB.
+		/// </summary>
+		public bool Found
+		{
+			get { return this.PreviewUrl != null; }
+		}
+
+		/// <summary>
+		/// Check if we have known tags.
+		/// </summary>
+		public bool HasKnownTags
+		{
+			get { return this.KnownTags.Count > 0; }
 		}
 	}
 }

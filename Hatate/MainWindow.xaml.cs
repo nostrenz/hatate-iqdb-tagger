@@ -332,14 +332,14 @@ namespace Hatate
 			this.GetFilesListBoxItemFromItem(item).Tag = result;
 
 			// We have tags
-			if (result.Found) {
+			if (result.Greenlight) {
 				this.SetStatus("File found.");
 
 				// Move or update the color
 				if (Options.Default.AutoMove && result.UnknownTags.Count == 0) {
 					this.WriteTagsForItem(item);
 				} else {
-					this.UpdateFileItemColor(item, result.KnownTags.Count > 0 ? Brushes.LimeGreen : Brushes.Orange);
+					this.UpdateFileItemColor(item, result.HasKnownTags ? Brushes.LimeGreen : Brushes.Orange);
 				}
 
 				this.found++;
@@ -389,7 +389,7 @@ namespace Hatate
 			if (searchResult != null && searchResult.Matches != null) {
 				this.lastSearchedInSeconds = (int)searchResult.SearchedInSeconds;
 
-				// If found, move the image to the tagged folder
+				// If found, check for matching results
 				this.CheckMatches(searchResult.Matches, result);
 			}
 
@@ -1362,7 +1362,7 @@ namespace Hatate
 			}
 
 			// The following need the result to be found
-			if (!result.Found) {
+			if (!result.Greenlight) {
 				return;
 			}
 
@@ -1568,7 +1568,7 @@ namespace Hatate
 				// Build a list of tags to compare
 				List<string> list = new List<string>();
 
-				if (otherResult.KnownTags.Count > 0) {
+				if (otherResult.HasKnownTags) {
 					// Prevent the rating from being added as an unknown tag by removing it from the known tags
 					Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace != null && t.Namespace.Equals("rating"));
 
