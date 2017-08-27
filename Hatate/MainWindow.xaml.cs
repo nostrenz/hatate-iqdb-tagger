@@ -424,9 +424,6 @@ namespace Hatate
 		/// <returns></returns>
 		private void FilterTags(Result result, List<string> tags)
 		{
-			result.KnownTags.Clear();
-			result.UnknownTags.Clear();
-
 			// Write each tags
 			foreach (string tag in tags) {
 				// Format the tag
@@ -445,7 +442,11 @@ namespace Hatate
 				// Tag not found in the known tags
 				if (found == null) {
 					if (Options.Default.KnownTags && !this.IsTagInList(formated, this.ignoreds)) {
-						result.UnknownTags.Add(new Tag(formated));
+						Tag formatedTag = new Tag(formated);
+
+						if (!result.UnknownTags.Contains(formatedTag)) {
+							result.UnknownTags.Add(found);
+						}
 					}
 
 					continue;
