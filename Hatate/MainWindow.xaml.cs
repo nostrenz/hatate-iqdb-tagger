@@ -870,17 +870,17 @@ namespace Hatate
 		/// <param name="to"></param>
 		private void MoveSelectedItemsToList(ListBox from, ListBox to, string nameSpace=null)
 		{
-			// Copy items to the destination list
-			foreach (Tag item in from.SelectedItems) {
+			while (from.SelectedItems.Count > 0) {
+				Tag tag = (Tag)from.SelectedItems[0];
+
+				from.Items.Remove(tag);
+
 				if (nameSpace != null) {
-					item.Namespace = nameSpace;
+					tag.Namespace = nameSpace;
 				}
 
-				to.Items.Add(item);
+				to.Items.Add(tag);
 			}
-
-			// Remove from list
-			this.RemoveSelectedItemsFromList(from);
 		}
 
 		/// <summary>
