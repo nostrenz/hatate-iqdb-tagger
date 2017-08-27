@@ -424,6 +424,8 @@ namespace Hatate
 		/// <returns></returns>
 		private void FilterTags(Result result, List<string> tags)
 		{
+			result.UnknownTags.Clear();
+
 			// Write each tags
 			foreach (string tag in tags) {
 				// Format the tag
@@ -438,10 +440,11 @@ namespace Hatate
 				}
 
 				Tag found = this.FindTag(formated);
+				bool isIgnored = this.IsTagInList(formated, this.ignoreds);
 
 				// Tag not found in the known tags
 				if (found == null) {
-					if (Options.Default.KnownTags && !this.IsTagInList(formated, this.ignoreds)) {
+					if (Options.Default.KnownTags && !isIgnored) {
 						Tag formatedTag = new Tag(formated);
 
 						if (!result.UnknownTags.Contains(formatedTag)) {
@@ -452,7 +455,7 @@ namespace Hatate
 					continue;
 				}
 
-				if (!result.KnownTags.Contains(found)) {
+				if (!isIgnored && !result.KnownTags.Contains(found)) {
 					result.KnownTags.Add(found);
 				}
 			}
@@ -918,6 +921,8 @@ namespace Hatate
 					file.WriteLine(item.Value);
 				}
 			}
+
+			this.LoadKnownTags();
 		}
 
 		/// <summary>
