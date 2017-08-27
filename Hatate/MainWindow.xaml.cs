@@ -457,9 +457,9 @@ namespace Hatate
 			}
 
 			// Add rating
-			string rating = result.Rating.ToString().ToLower();
+			if (Options.Default.AddRating && result.Rating != IqdbApi.Enums.Rating.Unrated) {
+				string rating = result.Rating.ToString().ToLower();
 
-			if (Options.Default.AddRating && !String.IsNullOrWhiteSpace(rating)) {
 				result.KnownTags.Add(new Tag(rating, "rating"));
 			}
 		}
