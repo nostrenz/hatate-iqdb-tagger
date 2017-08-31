@@ -63,7 +63,7 @@ namespace Hatate
 			this.CreateTagsListContextMenu();
 			this.CreateUnknownTagsListContextMenu();
 
-			// Prevent closing the window is we have some search results left
+			// Prevent closing the window if we have some search results left
 			this.Closing += new System.ComponentModel.CancelEventHandler(CustomClosing);
 		}
 
