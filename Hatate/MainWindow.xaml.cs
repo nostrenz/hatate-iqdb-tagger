@@ -239,8 +239,10 @@ namespace Hatate
 					return -1;
 				}
 
+				Result result = this.GetResultFromIndex(progress);
+
 				// Already searched
-				if (this.HasFoundResult(progress)) {
+				if (result != null && result.Searched) {
 					progress++;
 
 					continue;
@@ -309,6 +311,7 @@ namespace Hatate
 			}
 
 			Result result = this.GetResultFromIndex(index);
+			result.Searched = true;
 
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
@@ -364,7 +367,7 @@ namespace Hatate
 			try {
 				fs = new FileStream(result.ThumbPath, FileMode.Open);
 			} catch (IOException) {
-				return; // MAy happen if the file is in use
+				return; // May happen if the file is in use
 			}
 
 			IqdbApi.Models.SearchResult searchResult = null;
@@ -1335,8 +1338,8 @@ namespace Hatate
 		{
 			// Start searching
 			if (!this.IsRunning && this.ListBox_Files.Items.Count > 0) {
-				this.NextSearch();
 				this.SetStartButton("Stop", "#FFE82B0D");
+				this.NextSearch();
 			} else { // Stop the search
 				this.timer.Stop();
 

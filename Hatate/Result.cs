@@ -21,6 +21,8 @@ namespace Hatate
 
 		#region Accessor
 
+		public bool Searched { get; set; }
+
 		public List<Tag> KnownTags { get; set; }
 
 		public List<Tag> UnknownTags { get; set; }
