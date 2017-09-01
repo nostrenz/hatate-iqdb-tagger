@@ -582,18 +582,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Add a single tag into a text file.
-		/// </summary>
-		/// <param name="filepath"></param>
-		/// <param name="tag"></param>
-		private void AppendTagToTxt(string filepath, string tag)
-		{
-			using (StreamWriter file = new StreamWriter(filepath, true)) {
-				file.WriteLine(tag);
-			}
-		}
-
-		/// <summary>
 		/// Find a tag in one of the known tags list.
 		/// </summary>
 		/// <param name="tag"></param>
