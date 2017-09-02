@@ -305,12 +305,12 @@ namespace Hatate
 
 			// Remove non existant file
 			if (!File.Exists(filepath)) {
-				this.ListBox_Files.Items.RemoveAt(index);
+				this.ListBox_Files.Items.Remove(item);
 
 				return;
 			}
 
-			Result result = this.GetResultFromIndex(index);
+			Result result = this.GetResultFromItem(item);
 			result.Searched = true;
 
 			// Generate a smaller image for uploading
@@ -841,11 +841,23 @@ namespace Hatate
 		/// <returns></returns>
 		private Result GetResultFromIndex(int index)
 		{
-			if (index < 0 || this.ListBox_Files.Items.Count < 1) {
+			if (index < 0) {
 				return null;
 			}
 
-			ListBoxItem listBoxItem = this.GetFilesListBoxItemFromItem(this.ListBox_Files.Items[index]);
+			return this.GetResultFromItem(this.ListBox_Files.Items[index]);
+		}
+
+		/// <summary>
+		/// Get the result object attached to an item from the Files ListBox.
+		/// </summary>
+		private Result GetResultFromItem(object item)
+		{
+			if (this.ListBox_Files.Items.Count < 1) {
+				return null;
+			}
+
+			ListBoxItem listBoxItem = this.GetFilesListBoxItemFromItem(item);
 
 			return listBoxItem != null ? (Result)listBoxItem.Tag : null;
 		}
