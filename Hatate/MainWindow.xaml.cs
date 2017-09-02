@@ -1244,6 +1244,35 @@ namespace Hatate
 			return tags;
 		}
 
+		/// <summary>
+		/// Move all the selected files to the "notfound" folder.
+		/// </summary>
+		private void MoveAllSelectedsToNotFound()
+		{
+			bool asked = false;
+
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				var item = this.ListBox_Files.SelectedItems[0];
+				Result result = this.GetResultFromItem(item);
+
+				// Warn when trying to move to notfound with a result
+				if (!asked && result != null && result.Greenlight) {
+					asked = true;
+
+					System.Windows.Forms.DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
+						"Some of the selected files were found with tags, do you want to continue moving to the notfound folder?",
+						"Attention", System.Windows.Forms.MessageBoxButtons.YesNo
+					);
+
+					if (dialogResult == System.Windows.Forms.DialogResult.No) {
+						return;
+					}
+				}
+
+				this.MoveRowToNotFoundFolder(item);
+			}
+		}
+
 		#endregion Private
 
 		/*
@@ -1450,12 +1479,10 @@ namespace Hatate
 					while (this.ListBox_Files.SelectedItems.Count > 0) {
 						this.WriteTagsForItem(this.ListBox_Files.SelectedItems[0]);
 					}
-					break;
+				break;
 				case "notFound":
-					while (this.ListBox_Files.SelectedItems.Count > 0) {
-						this.MoveRowToNotFoundFolder(this.ListBox_Files.SelectedItems[0]);
-					}
-					break;
+					this.MoveAllSelectedsToNotFound();
+				break;
 				case "addUnnamespaced":
 					this.MoveSelectedUnknownTagsToKnownTags(TXT_UNNAMESPACEDS);
 				break;
