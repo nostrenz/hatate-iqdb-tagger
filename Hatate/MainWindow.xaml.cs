@@ -1436,7 +1436,9 @@ namespace Hatate
 				if (result.PreviewUrl != null) {
 					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
 				}
-			} catch (UriFormatException) { }
+			} catch (Exception) {
+				// UriFormatException may happen if the uri is incorrect
+			}
 
 			// Add known tags to the list
 			result.KnownTags.Sort();
