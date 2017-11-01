@@ -1184,7 +1184,7 @@ namespace Hatate
 		/// </summary>
 		private void AddNewTags()
 		{
-			List<Tag> tags = this.AskForNewTags();
+			List<Tag> tags = this.AskForNewTags(true);
 
 			if (tags.Count == 0) {
 				return;
@@ -1230,11 +1230,12 @@ namespace Hatate
 		/// <summary>
 		/// Open a window asking for new tags, write them to the txt files then return them.
 		/// </summary>
-		private List<Tag> AskForNewTags()
+		/// <param name="bypassOption">If true, open the ask tag window even if the AskTags option is disabled</param>
+		private List<Tag> AskForNewTags(bool bypassOption=false)
 		{
 			List<Tag> tags = new List<Tag>();
 
-			if (Options.Default.AskTags) {
+			if (bypassOption || Options.Default.AskTags) {
 				NewTags newTags = new NewTags();
 				tags = newTags.Tags;
 
