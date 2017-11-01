@@ -34,6 +34,6 @@
 		</GroupBox>
 		<CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" HorizontalAlignment="Left" Margin="10,154,0,0" VerticalAlignment="Top"/>
 		<CheckBox x:Name="CheckBox_AutoMove" Content="Automatically move files when no user action is needed" HorizontalAlignment="Left" Margin="10,172,0,0" VerticalAlignment="Top" Height="14"/>
-		<CheckBox x:Name="CheckBox_AskTags" Content="Add for tags when adding files to the list" HorizontalAlignment="Left" Margin="10,191,0,0" VerticalAlignment="Top"/>
+		<CheckBox x:Name="CheckBox_AskTags" Content="Ask for tags when adding files to the list" HorizontalAlignment="Left" Margin="10,191,0,0" VerticalAlignment="Top"/>
 	</Grid>
 </Window>
