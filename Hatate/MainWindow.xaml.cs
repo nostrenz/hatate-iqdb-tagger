@@ -1052,6 +1052,11 @@ namespace Hatate
 		/// </summary>
 		private void AddFileToList(string filepath, List<Tag> tags=null)
 		{
+			// Windows does not support longer file paths, causing a PathTooLongException
+			if (filepath.Length >= 260) {
+				return;
+			}
+
 			string filename = this.GetFilenameFromPath(filepath);
 
 			if (this.ListBox_Files.Items.Contains(filepath)
