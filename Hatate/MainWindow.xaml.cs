@@ -794,9 +794,15 @@ namespace Hatate
 		private void MoveRowToNotFoundFolder(object item)
 		{
 			string filepath = item.ToString();
+			string destination = this.NotfoundDirPath + this.GetFilenameFromPath(filepath);
+
+			// Windows does not support longer file paths, causing a PathTooLongException
+			if (destination.Length >= 260) {
+				return;
+			}
 
 			if (File.Exists(filepath)) {
-				File.Move(filepath, this.NotfoundDirPath + this.GetFilenameFromPath(filepath));
+				File.Move(filepath, destination);
 			}
 
 			this.ListBox_Files.Items.Remove(item);
