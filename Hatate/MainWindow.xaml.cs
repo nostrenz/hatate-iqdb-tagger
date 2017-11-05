@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using Directory = System.IO.Directory;
 using Options = Hatate.Properties.Settings;
 using ContextMenu = System.Windows.Controls.ContextMenu;
@@ -26,6 +27,8 @@ namespace Hatate
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		const int MAX_PATH_LENGTH = 260;
+
 		const string DIR_TAGS      = @"\tags\";
 		const string DIR_THUMBS    = @"\thumbs\";
 		const string DIR_IMGS      = @"\imgs\";
@@ -759,6 +762,65 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Get path to move a file to while taking into account the 260 chars limit.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <param name="folder"></param>
+		/// <param name="filename"></param>
+		/// <param name="reserveTxt">If true, will reserve 4 more chars into the path for adding ".txt" to it latter</param>
+		/// <returns></returns>
+		private string GetDestinationPath(string filepath, string folder, string filename, bool reserveTxt=false)
+		{
+			string destination = folder + filename;
+			int length = destination.Length;
+
+			if (reserveTxt) {
+				length += 4;
+			}
+
+			if (length <= MAX_PATH_LENGTH) {
+				return destination;
+			}
+
+			// Create a filename to have a path under 260 chars
+			string md5 = this.CalculateMd5(filepath);
+			string extension = this.Extension(filename);
+
+			// Check if the MD5 allows to have a short enough path
+			int maxMd5Length = MAX_PATH_LENGTH - (folder.Length + extension.Length);
+			int md5Length = md5.Length;
+
+			if (reserveTxt) {
+				maxMd5Length -= 4;
+			}
+
+			// Shrink the MD5 for the path to not exceed 260 chars
+			if (md5Length > maxMd5Length) {
+				int exceed = md5Length - maxMd5Length;
+
+				md5 = md5.Substring(exceed, md5Length - exceed);
+			}
+
+			return folder + md5 + extension;
+		}
+
+		/// <summary>
+		/// Calculate a file's MD5 hash.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <returns></returns>
+		private string CalculateMd5(string filepath)
+		{
+			using (var md5 = MD5.Create()) {
+				using (var stream = File.OpenRead(filepath)) {
+					var hash = md5.ComputeHash(stream);
+
+					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+				}
+			}
+		}
+
+		/// <summary>
 		/// Move a given item's file to the tagged folder with the tags in a .txt file and remove the row.
 		/// </summary>
 		/// <param name="item"></param>
@@ -775,12 +837,10 @@ namespace Hatate
 			string filepath = item.ToString();
 
 			if (File.Exists(filepath)) {
-				string filename = this.GetFilenameFromPath(filepath);
-				string taggedDirPath = this.TaggedDirPath;
-
 				// Move the file to the tagged folder and write tags
-				File.Move(filepath, taggedDirPath + filename);
-				this.WriteTagsToTxt(taggedDirPath + filename + ".txt", result.KnownTags);
+				string destination = this.MoveFile(filepath, this.TaggedDirPath, true);
+
+				this.WriteTagsToTxt(destination + ".txt", result.KnownTags);
 			}
 
 			// Remove the row
@@ -794,18 +854,26 @@ namespace Hatate
 		private void MoveRowToNotFoundFolder(object item)
 		{
 			string filepath = item.ToString();
-			string destination = this.NotfoundDirPath + this.GetFilenameFromPath(filepath);
 
-			// Windows does not support longer file paths, causing a PathTooLongException
-			if (destination.Length >= 260) {
+			if (!File.Exists(filepath)) {
 				return;
 			}
 
-			if (File.Exists(filepath)) {
-				File.Move(filepath, destination);
-			}
-
+			this.MoveFile(filepath, this.NotfoundDirPath);
 			this.ListBox_Files.Items.Remove(item);
+		}
+
+		/// <summary>
+		/// Move a file into another directory and return its new filepath.
+		/// </summary>
+		/// <returns></returns>
+		private string MoveFile(string filepath, string targetFolder, bool reserveTxt=false)
+		{
+			string destination = this.GetDestinationPath(filepath, targetFolder, this.GetFilenameFromPath(filepath), reserveTxt);
+
+			File.Move(filepath, destination);
+
+			return destination;
 		}
 
 		/// <summary>
@@ -1059,7 +1127,7 @@ namespace Hatate
 		private void AddFileToList(string filepath, List<Tag> tags=null)
 		{
 			// Windows does not support longer file paths, causing a PathTooLongException
-			if (filepath.Length >= 260) {
+			if (filepath.Length > MAX_PATH_LENGTH) {
 				return;
 			}
 
