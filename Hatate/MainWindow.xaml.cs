@@ -199,7 +199,15 @@ namespace Hatate
 
 			Directory.CreateDirectory(thumbsDir);
 
-			System.Drawing.Image image = System.Drawing.Image.FromFile(filepath);
+			System.Drawing.Image image = null;
+
+			try {
+				image = System.Drawing.Image.FromFile(filepath);
+			} catch (OutOfMemoryException) {
+				// Cannot generate thumbnail, we will upload the original file
+				return filepath;
+			}
+
 			int srcWidth = image.Width;
 			int srcHeight = image.Height;
 			Decimal sizeRatio = ((Decimal)srcHeight / srcWidth);
@@ -215,7 +223,10 @@ namespace Hatate
 			try {
 				bmp.Save(output, ImageFormat.Jpeg);
 			} catch (Exception e) {
-				Console.WriteLine("Error during thumbnail creation: " + e.Message);
+				Console.WriteLine("Cannot save thumbnail" + e.Message);
+
+				// Cannot save thumbnail, we will upload the original file
+				output = filepath;
 			}
 
 			// Liberate resources
