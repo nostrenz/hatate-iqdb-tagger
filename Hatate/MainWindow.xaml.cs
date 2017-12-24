@@ -573,7 +573,7 @@ namespace Hatate
 		{
 			using (StreamWriter file = new StreamWriter(filepath, append)) {
 				foreach (Tag tag in tags) {
-					file.WriteLine(tag.Value);
+					file.WriteLine(tag.Namespaced);
 				}
 			}
 		}
@@ -590,7 +590,7 @@ namespace Hatate
 				string txt = this.GetTxtFromNamespace(tag.Namespace);
 
 				using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
-					file.WriteLine(tag.Value);
+					file.WriteLine(tag.Namespaced);
 				}
 			}
 		}
