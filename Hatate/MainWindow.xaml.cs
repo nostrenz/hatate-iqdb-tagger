@@ -1364,6 +1364,19 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Replace a line in a text file.
+		/// </summary>
+		/// <param name="filepath"></param>
+		/// <param name="line"></param>
+		/// <param name="replace"></param>
+		private void ReplaceLineInFile(string filepath, string line, string replace)
+		{
+			string text = File.ReadAllText(filepath);
+			text = text.Replace(line, replace);
+			File.WriteAllText(filepath, text);
+		}
+
 		#endregion Private
 
 		/*
@@ -1929,6 +1942,44 @@ namespace Hatate
 
 				e.Cancel = (result == MessageBoxResult.No);
 			}
+		}
+
+		/// <summary>
+		/// Check all the .txt files in the imgs/tagged/ folder and namespace in them all the known tags.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_RenamespaceTagged_Click(object sender, RoutedEventArgs e)
+		{
+			this.LoadKnownTags();
+
+			// Get all the .txt files in the tagged folder
+			string[] files = "*.txt".Split('|').SelectMany(filter => Directory.GetFiles(this.TaggedDirPath, filter, SearchOption.TopDirectoryOnly)).ToArray();
+			int total = files.Length;
+			int progress = 0;
+
+			this.SetStatus("Renamespacing " + total + " files...");
+
+			foreach (string file in files) {
+				progress++;
+
+				foreach (string line in File.ReadAllLines(file)) {
+					// Already namespaced
+					if (line.StartsWith("series:") || line.StartsWith("character:") || line.StartsWith("creator:")) {
+						continue;
+					}
+
+					if (this.series.Contains(line)) {
+						this.ReplaceLineInFile(file, line, "series:" + line);
+					} else if (this.characters.Contains(line)) {
+						this.ReplaceLineInFile(file, line, "character:" + line);
+					} else if (this.creators.Contains(line)) {
+						this.ReplaceLineInFile(file, line, "creator:" + line);
+					}
+				}
+			}
+
+			this.SetStatus(total + " files Renamespaced.");
 		}
 
 		#endregion Event
