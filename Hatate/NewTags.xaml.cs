@@ -42,7 +42,7 @@ namespace Hatate
 		/// <summary>
 		/// Add a tag to the list.
 		/// </summary>
-		private void AddTag()
+		private void AddTag(string nameSpace)
 		{
 			this.TextBox_Value.Focus();
 
@@ -51,8 +51,6 @@ namespace Hatate
 			if (String.IsNullOrEmpty(value)) {
 				return;
 			}
-
-			string nameSpace = this.ComboBox_Namespace.SelectedValue.ToString();
 
 			if (nameSpace == "unnamespaced") {
 				nameSpace = null;
@@ -97,26 +95,16 @@ namespace Hatate
 		*/
 
 		#region Event
-		
-		/// <summary>
-		/// Called when clicking on the Add button, add a tag to the list.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void Button_Add_Click(object sender, RoutedEventArgs e)
-		{
-			this.AddTag();
-		}
 
 		/// <summary>
-		///  Add tag when pressing Enter (same as clicking on the Add button).
+		///  Add unnamespaced tag when pressing Enter (same as clicking on the Add button).
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void TextBox_Value_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter) {
-				this.AddTag();
+				this.AddTag("unnamespaced");
 			}
 		}
 
@@ -132,14 +120,6 @@ namespace Hatate
 			if (mi == null) {
 				return;
 			}
-
-			/*switch (mi.Tag) {
-				case "remove":
-					while (this.ListBox_Tags.SelectedItems.Count > 0) {
-						this.ListBox_Tags.Items.Remove(this.ListBox_Tags.SelectedItems[0]);
-					}
-				break;
-			}*/
 
 			while (this.ListBox_Tags.SelectedItems.Count > 0) {
 				this.ListBox_Tags.Items.Remove(this.ListBox_Tags.SelectedItems[0]);
@@ -157,5 +137,45 @@ namespace Hatate
 		}
 
 		#endregion Event
+
+		/// <summary>
+		/// Add the entered text as an unnamespaced tag.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_AddAsUnnamespaced(object sender, RoutedEventArgs e)
+		{
+			this.AddTag("unnamespaced");
+		}
+
+		/// <summary>
+		/// Add the entered text as a series tag.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_AddAsSeries(object sender, RoutedEventArgs e)
+		{
+			this.AddTag("series");
+		}
+
+		/// <summary>
+		/// Add the entered text as a character tag.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_AddAsCharacter(object sender, RoutedEventArgs e)
+		{
+			this.AddTag("character");
+		}
+
+		/// <summary>
+		/// Add the entered text as a creator tag.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_AddAsCreator(object sender, RoutedEventArgs e)
+		{
+			this.AddTag("creator");
+		}
 	}
 }
