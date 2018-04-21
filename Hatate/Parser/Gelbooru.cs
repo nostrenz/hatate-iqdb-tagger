@@ -12,11 +12,17 @@
 		{
 			Supremes.Nodes.Element tagList = doc.Select("#tag-list > div").First;
 
+			// Get tags
 			this.AddTags(tagList, "copyright", "series");
 			this.AddTags(tagList, "character", "character");
 			this.AddTags(tagList, "artist", "creator");
 			this.AddTags(tagList, "general");
 			this.AddTags(tagList, "metadata", "meta");
+
+			// Get rating
+			if (Properties.Settings.Default.AddRating) {
+				this.GetRating(doc, "#tag-list li");
+			}
 
 			return true;
 		}

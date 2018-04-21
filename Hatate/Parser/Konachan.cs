@@ -10,6 +10,29 @@
 
 		override protected bool Parse(Supremes.Nodes.Document doc)
 		{
+			// Get tags
+			this.GetTags(doc);
+
+			// Get rating
+			if (Properties.Settings.Default.AddRating) {
+				this.GetRating(doc, "#stats li");
+			}
+
+			return true;
+		}
+
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		/// <summary>
+		/// Get tags from the document.
+		/// </summary>
+		/// <param name="doc"></param>
+		private void GetTags(Supremes.Nodes.Document doc)
+		{
 			Supremes.Nodes.Elements searchTags = doc.Select("#tag-sidebar li.tag-link");
 
 			foreach (Supremes.Nodes.Element searchTag in searchTags) {
@@ -23,15 +46,13 @@
 				string type = searchTag.Attr("data-type");
 
 				switch (type) {
-					case "copyright": tag.Namespace = "series";    break;
+					case "copyright": tag.Namespace = "series"; break;
 					case "character": tag.Namespace = "character"; break;
-					case "artist":    tag.Namespace = "creator";   break;
+					case "artist": tag.Namespace = "creator"; break;
 				}
 
 				this.tags.Add(tag);
 			}
-
-			return true;
 		}
 	}
 }

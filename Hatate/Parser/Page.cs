@@ -6,6 +6,8 @@ namespace Hatate.Parser
 	// Base class for the booru parsers.
 	abstract class Page
 	{
+		const string RATING = "Rating: ";
+
 		protected List<Tag> tags = new List<Tag>();
 
 		/*
@@ -54,6 +56,40 @@ namespace Hatate.Parser
 		/// <param name="doc"></param>
 		/// <returns></returns>
 		abstract protected bool Parse(Supremes.Nodes.Document doc);
+
+		/// <summary>
+		/// Add a new tag to the list.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="nameSpace"></param>
+		protected void AddTag(string value, string nameSpace=null)
+		{
+			this.tags.Add(new Tag(value, nameSpace));
+		}
+
+		/// <summary>
+		/// Try to get the rating to add it as a tag.
+		/// </summary>
+		/// <param name="doc"></param>
+		protected void GetRating(Supremes.Nodes.Element doc, string selector)
+		{
+			Supremes.Nodes.Element nextLi = doc.Select(selector).First.NextElementSibling;
+
+			while (nextLi != null) {
+				string text = nextLi.Text;
+				nextLi = nextLi.NextElementSibling;
+
+				if (!text.StartsWith(RATING)) {
+					continue;
+				}
+
+				string rating = text.Replace(RATING, "");
+
+				if (!string.IsNullOrEmpty(rating)) {
+					this.AddTag(rating.ToLower(), "rating");
+				}
+			}
+		}
 
 		/*
 		============================================

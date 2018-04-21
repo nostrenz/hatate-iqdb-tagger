@@ -88,6 +88,7 @@
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="Parser\Konachan.cs" />
     <Compile Include="Parser\Page.cs" />
+    <Compile Include="Parser\Yandere.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="MayaDark.xaml">
