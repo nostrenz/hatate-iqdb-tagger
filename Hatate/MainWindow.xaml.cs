@@ -464,6 +464,9 @@ namespace Hatate
 				case IqdbApi.Enums.Source.Gelbooru:
 					booru = new Parser.Gelbooru();
 				break;
+				case IqdbApi.Enums.Source.Konachan:
+					booru = new Parser.Konachan();
+				break;
 				default: return false;
 			}
 

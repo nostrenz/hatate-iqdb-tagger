@@ -86,6 +86,7 @@
     <Compile Include="Parser\Danbooru.cs" />
     <Compile Include="Parser\Gelbooru.cs" />
     <Compile Include="Parser\IParser.cs" />
+    <Compile Include="Parser\Konachan.cs" />
     <Compile Include="Parser\Page.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Tag.cs" />

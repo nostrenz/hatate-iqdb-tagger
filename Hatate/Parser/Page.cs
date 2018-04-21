@@ -6,7 +6,6 @@ namespace Hatate.Parser
 	// Base class for the booru parsers.
 	abstract class Page
 	{
-		// Retrieved values
 		protected List<Tag> tags = new List<Tag>();
 
 		/*
@@ -45,7 +44,7 @@ namespace Hatate.Parser
 
 		/*
 		============================================
-		Private
+		Protected
 		============================================
 		*/
 
