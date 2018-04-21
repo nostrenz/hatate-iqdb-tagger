@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -466,6 +466,9 @@ namespace Hatate
 				break;
 				case IqdbApi.Enums.Source.Konachan:
 					booru = new Parser.Konachan();
+				break;
+				case IqdbApi.Enums.Source.Yandere:
+					booru = new Parser.Yandere();
 				break;
 				default: return false;
 			}
