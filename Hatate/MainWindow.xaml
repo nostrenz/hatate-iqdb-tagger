@@ -28,10 +28,10 @@
 			<Label x:Name="Label_Status" Content="Status"/>
 		</StatusBar>
 		<Border BorderThickness="1" Height="74" Margin="0,18,118,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
-			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Original_MouseDown"/>
 		</Border>
 		<Border BorderThickness="1" Height="74" Margin="0,18,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
-			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Match_MouseDown"/>
 		</Border>
 		<Button x:Name="Button_Apply" Content="Apply" Margin="0,0,0,95" Click="Button_Apply_Click" HorizontalAlignment="Right" Width="231" Height="27" VerticalAlignment="Bottom" IsEnabled="False" Background="#FFF57F08" Foreground="White" BorderBrush="{x:Null}">
 			<Button.Style>

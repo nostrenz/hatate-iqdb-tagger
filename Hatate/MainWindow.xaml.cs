@@ -193,6 +193,7 @@ namespace Hatate
 			string thumbsDir = this.ThumbsDirPath;
 			string output = thumbsDir + this.GetFilenameFromPath(filepath);
 
+			// It already exists
 			if (File.Exists(output)) {
 				return output;
 			}
@@ -380,7 +381,9 @@ namespace Hatate
 
 			try {
 				fs = new FileStream(result.ThumbPath, FileMode.Open);
-			} catch (IOException) {
+			} catch (IOException e) {
+				Console.WriteLine("CATCH! :: " + e.Message);
+
 				return; // May happen if the file is in use
 			}
 
@@ -425,9 +428,10 @@ namespace Hatate
 					continue;
 				}
 
-				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
 				result.Source = match.Source;
 				result.Rating = match.Rating;
+				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
+				result.Url = match.Url;
 
 				this.FilterTags(result, match.Tags.ToList());
 
@@ -1377,6 +1381,23 @@ namespace Hatate
 			File.WriteAllText(filepath, text);
 		}
 
+		/// <summary>
+		/// Create a non-locked BitmapImage from a file path.
+		/// </summary>
+		/// <param name="filepath"></param>
+		private BitmapImage CreateBitmapImage(string filepath)
+		{
+			BitmapImage bitmap = new BitmapImage();
+
+			// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten)
+			bitmap.BeginInit();
+			bitmap.UriSource = new Uri(filepath);
+			bitmap.CacheOption = BitmapCacheOption.OnLoad;
+			bitmap.EndInit();
+
+			return bitmap;
+		}
+
 		#endregion Private
 
 		/*
@@ -1450,6 +1471,14 @@ namespace Hatate
 		private bool IsRunning
 		{
 			get { return this.timer != null && this.timer.Enabled; }
+		}
+
+		/// <summary>
+		/// Get the full filepath for the selected item in the files list.
+		/// </summary>
+		private string SelectedFilepath
+		{
+			get { return this.ListBox_Files.Items[this.ListBox_Files.SelectedIndex].ToString(); }
 		}
 
 		#endregion Accessor
@@ -1526,22 +1555,17 @@ namespace Hatate
 				return;
 			}
 
-			// Set the images
-			try {
-				if (result.ThumbPath != null) {
-					// Regenerate the thumbnail if it don't exists anymore
-					if (!File.Exists(result.ThumbPath)) {
-						result.ThumbPath = this.GenerateThumbnail(this.ListBox_Files.Items[this.ListBox_Files.SelectedIndex].ToString());
-					}
+			// Generate and set the thumbnail
+			result.ThumbPath = this.GenerateThumbnail(this.SelectedFilepath);
+			this.Image_Original.Source = this.CreateBitmapImage(result.ThumbPath);
 
-					this.Image_Original.Source = new BitmapImage(new Uri(result.ThumbPath));
-				}
-
-				if (result.PreviewUrl != null) {
+			// Set the image
+			if (result.PreviewUrl != null) {
+				try {
 					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
+				} catch (Exception) {
+					// UriFormatException may happen if the uri is incorrect
 				}
-			} catch (Exception) {
-				// UriFormatException may happen if the uri is incorrect
 			}
 
 			// Add known tags to the list
@@ -1980,6 +2004,36 @@ namespace Hatate
 			}
 
 			this.SetStatus(total + " files Renamespaced.");
+		}
+
+		/// <summary>
+		/// Called by clicking on the Original image, open the image in the default viewer.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Image_Original_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			string filepath = this.SelectedFilepath;
+
+			if (File.Exists(filepath)) {
+				Process.Start(filepath);
+			}
+		}
+
+		/// <summary>
+		/// Called by clicking on the Match image, open the booru page for the matching image.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Image_Match_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Result result = this.GetResultFromIndex(this.ListBox_Files.SelectedIndex);
+
+			if (result == null || String.IsNullOrEmpty(result.Url)) {
+				return;
+			}
+
+			Process.Start("http:" + result.Url);
 		}
 
 		#endregion Event

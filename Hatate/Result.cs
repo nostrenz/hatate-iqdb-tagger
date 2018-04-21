@@ -31,6 +31,8 @@ namespace Hatate
 
 		public string PreviewUrl { get; set; }
 
+		public string Url { get; set; }
+
 		public IqdbApi.Enums.Source Source { get; set; }
 
 		public IqdbApi.Enums.Rating Rating { get; set; }
