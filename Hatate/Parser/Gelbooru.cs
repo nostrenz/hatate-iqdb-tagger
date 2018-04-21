@@ -1,6 +1,6 @@
 ﻿namespace Hatate.Parser
 {
-	class Danbooru : Page, IParser
+	class Gelbooru : Page, IParser
 	{
 		/*
 		============================================
@@ -10,13 +10,13 @@
 
 		override protected bool Parse(Supremes.Nodes.Document doc)
 		{
-			Supremes.Nodes.Element tagList = doc.Select("#tag-list").First;
+			Supremes.Nodes.Element tagList = doc.Select("#tag-list > div").First;
 
 			this.AddTags(tagList, "copyright", "series");
 			this.AddTags(tagList, "character", "character");
 			this.AddTags(tagList, "artist", "creator");
 			this.AddTags(tagList, "general");
-			this.AddTags(tagList, "meta", "meta");
+			this.AddTags(tagList, "metadata", "meta");
 
 			return true;
 		}
@@ -27,11 +27,15 @@
 		/// <param name="tagList"></param>
 		/// <param name="type"></param>
 		/// <param name="nameSpace"></param>
-		private void AddTags(Supremes.Nodes.Element tagList, string category, string nameSpace=null)
+		private void AddTags(Supremes.Nodes.Element tagList, string category, string nameSpace = null)
 		{
-			Supremes.Nodes.Elements searchTags = tagList.Select("ul." + category + "-tag-list a.search-tag");
-			
+			Supremes.Nodes.Elements searchTags = tagList.Select("li.tag-type-" + category + " > a");
+
 			foreach (Supremes.Nodes.Element searchTag in searchTags) {
+				if (searchTag.Text == "?") {
+					continue;
+				}
+
 				this.tags.Add(new Tag(searchTag.Text, nameSpace));
 			}
 		}

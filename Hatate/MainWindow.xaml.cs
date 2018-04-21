@@ -428,14 +428,21 @@ namespace Hatate
 					continue;
 				}
 
+				// Match found
 				result.Source = match.Source;
 				result.Rating = match.Rating;
 				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
 				result.Url = match.Url;
 
-				if (Options.Default.ParseBooru) { // Parse the booru page to obtain tags
-					this.ParseBooruPage(result);
-				} else { // Just use the tags from IqdbApi
+				bool parsedBooru = false;
+
+				// Try to parse the booru page if enabled
+				if (Options.Default.ParseBooru) {
+					parsedBooru = this.ParseBooruPage(result);
+				}
+
+				// Just use the tags from IqdbApi if page parsing is disabled or no result from it
+				if (!parsedBooru) {
 					this.FilterTags(result, match.Tags.ToList());
 				}
 
@@ -446,16 +453,27 @@ namespace Hatate
 		/// <summary>
 		/// Parse a booru page to obtain namespaced tags.
 		/// </summary>
-		private void ParseBooruPage(Result result)
+		private bool ParseBooruPage(Result result)
 		{
-			if (result.Source == IqdbApi.Enums.Source.Danbooru) {
-				Parser.Danbooru booru = new Parser.Danbooru();
-				bool success = booru.FromUrl("https:" + result.Url);
+			Parser.IParser booru = null;
 
-				if (success) {
-					result.KnownTags = booru.Tags;
-				}
+			switch (result.Source) {
+				case IqdbApi.Enums.Source.Danbooru:
+					booru = new Parser.Danbooru();
+				break;
+				case IqdbApi.Enums.Source.Gelbooru:
+					booru = new Parser.Gelbooru();
+				break;
+				default: return false;
 			}
+
+			bool success = booru.FromUrl("https:" + result.Url);
+
+			if (success) {
+				result.KnownTags = booru.Tags;
+			}
+
+			return success;
 		}
 
 		/// <summary>
