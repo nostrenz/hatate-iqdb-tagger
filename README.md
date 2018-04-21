@@ -4,6 +4,8 @@ Search and tag images using IQDB.
 ## Dependencies
 * **IqdbApi** by _ImoutoChan_:
 [GitHub](https://github.com/ImoutoChan/IqdbApi)
+* **dcsoup** by _matarillo_:
+[GitHub](https://github.com/matarillo/dcsoup)
 
 ## What does it do?
 
