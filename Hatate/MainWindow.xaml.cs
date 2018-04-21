@@ -433,9 +433,28 @@ namespace Hatate
 				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
 				result.Url = match.Url;
 
-				this.FilterTags(result, match.Tags.ToList());
+				if (Options.Default.ParseBooru) { // Parse the booru page to obtain tags
+					this.ParseBooruPage(result);
+				} else { // Just use the tags from IqdbApi
+					this.FilterTags(result, match.Tags.ToList());
+				}
 
 				return;
+			}
+		}
+
+		/// <summary>
+		/// Parse a booru page to obtain namespaced tags.
+		/// </summary>
+		private void ParseBooruPage(Result result)
+		{
+			if (result.Source == IqdbApi.Enums.Source.Danbooru) {
+				Parser.Danbooru booru = new Parser.Danbooru();
+				bool success = booru.FromUrl("https:" + result.Url);
+
+				if (success) {
+					result.KnownTags = booru.Tags;
+				}
 			}
 		}
 
@@ -2033,7 +2052,7 @@ namespace Hatate
 				return;
 			}
 
-			Process.Start("http:" + result.Url);
+			Process.Start("https:" + result.Url);
 		}
 
 		#endregion Event

@@ -30,6 +30,7 @@ namespace Hatate
 			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
 			this.CheckBox_AutoMove.IsChecked = Options.Default.AutoMove;
 			this.CheckBox_AskTags.IsChecked = Options.Default.AskTags;
+			this.CheckBox_ParseBooru.IsChecked = Options.Default.ParseBooru;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -82,6 +83,7 @@ namespace Hatate
 			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
 			Options.Default.AutoMove = (bool)this.CheckBox_AutoMove.IsChecked;
 			Options.Default.AskTags = (bool)this.CheckBox_AskTags.IsChecked;
+			Options.Default.ParseBooru = (bool)this.CheckBox_ParseBooru.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;

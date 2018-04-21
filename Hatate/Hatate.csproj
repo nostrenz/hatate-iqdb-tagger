@@ -43,6 +43,9 @@
     <Reference Include="IqdbApi, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IqdbApi.1.2.1\lib\netstandard1.1\IqdbApi.dll</HintPath>
     </Reference>
+    <Reference Include="Supremes, Version=1.0.0.6474, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dcsoup.1.0.0\lib\net45\Supremes.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
@@ -80,6 +83,7 @@
     <Compile Include="NewTags.xaml.cs">
       <DependentUpon>NewTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Parser\Danbooru.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="MayaDark.xaml">

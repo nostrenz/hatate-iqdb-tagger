@@ -274,5 +274,17 @@ namespace Hatate.Properties {
                 this["AskTags"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ParseBooru {
+            get {
+                return ((bool)(this["ParseBooru"]));
+            }
+            set {
+                this["ParseBooru"] = value;
+            }
+        }
     }
 }
