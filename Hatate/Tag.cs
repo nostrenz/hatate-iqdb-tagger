@@ -127,6 +127,7 @@ namespace Hatate
 					case "series": return Brushes.DeepPink;
 					case "character": return Brushes.LimeGreen;
 					case "creator": return Brushes.Brown;
+					case "meta": return Brushes.DarkOrange;
 					case "rating": return Brushes.LightSlateGray;
 					default: return Brushes.CadetBlue;
 				}
