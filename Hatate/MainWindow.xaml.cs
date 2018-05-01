@@ -829,15 +829,19 @@ namespace Hatate
 		/// <returns></returns>
 		private string GetDestinationPath(string filepath, string folder, string filename, bool reserveTxt=false)
 		{
-			string destination = folder + filename;
-			int length = destination.Length;
+			// We want to rename the file using the MD5 only when needed
+			if (!Properties.Settings.Default.RenameMd5) {
+				string destination = folder + filename;
+				int length = destination.Length;
 
-			if (reserveTxt) {
-				length += 4;
-			}
+				if (reserveTxt) {
+					length += 4;
+				}
 
-			if (length <= MAX_PATH_LENGTH) {
-				return destination;
+				// Keep the original file name only if not too long and not already existing
+				if (length <= MAX_PATH_LENGTH && !File.Exists(destination)) {
+					return destination;
+				}
 			}
 
 			// Create a filename to have a path under 260 chars

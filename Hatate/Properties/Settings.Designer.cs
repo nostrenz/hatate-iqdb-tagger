@@ -286,5 +286,17 @@ namespace Hatate.Properties {
                 this["ParseBooru"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RenameMd5 {
+            get {
+                return ((bool)(this["RenameMd5"]));
+            }
+            set {
+                this["RenameMd5"] = value;
+            }
+        }
     }
 }

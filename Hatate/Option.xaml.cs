@@ -31,6 +31,7 @@ namespace Hatate
 			this.CheckBox_AutoMove.IsChecked = Options.Default.AutoMove;
 			this.CheckBox_AskTags.IsChecked = Options.Default.AskTags;
 			this.CheckBox_ParseBooru.IsChecked = Options.Default.ParseBooru;
+			this.CheckBox_RenameMd5.IsChecked = Options.Default.RenameMd5;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -84,6 +85,7 @@ namespace Hatate
 			Options.Default.AutoMove = (bool)this.CheckBox_AutoMove.IsChecked;
 			Options.Default.AskTags = (bool)this.CheckBox_AskTags.IsChecked;
 			Options.Default.ParseBooru = (bool)this.CheckBox_ParseBooru.IsChecked;
+			Options.Default.RenameMd5 = (bool)this.CheckBox_RenameMd5.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
