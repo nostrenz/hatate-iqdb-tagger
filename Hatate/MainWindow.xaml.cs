@@ -891,8 +891,10 @@ namespace Hatate
 			ListBoxItem listBoxItem = this.ListBox_Files.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
 			Result result = (Result)listBoxItem.Tag;
 
-			// No result or no tags to write
+			// No result or no tags to write, remove the item from the selection
 			if (result == null || result.KnownTags.Count == 0) {
+				this.ListBox_Files.SelectedItems.Remove(item);
+
 				return;
 			}
 
