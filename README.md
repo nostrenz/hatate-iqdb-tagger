@@ -86,6 +86,11 @@ Those tags will be added to the known tag list for each imported files.
 Will parse the image's booru page to retrieve namespaces tags.
 If not checked the unnamespaced tags from IQDB will be used.
 
+### Always rename move files using MD5
+
+Usually when a file is moved to the `tagged` or `not found` folder it will keep its original name unless the resulting path is too long or a file with the same name already exists in the destination folder, in that case the file will be renamed by calculating its MD5.
+If this option is checked, all the moved files will be renamed taht way.
+
 ### Sources
 
 Only the results from the checked sources will be kept when searching.
