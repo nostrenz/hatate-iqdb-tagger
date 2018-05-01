@@ -904,7 +904,9 @@ namespace Hatate
 				// Move the file to the tagged folder and write tags
 				string destination = this.MoveFile(filepath, this.TaggedDirPath, true);
 
-				this.WriteTagsToTxt(destination + ".txt", result.KnownTags);
+				if (destination != null) {
+					this.WriteTagsToTxt(destination + ".txt", result.KnownTags);
+				}
 			}
 
 			// Remove the row
@@ -935,7 +937,13 @@ namespace Hatate
 		{
 			string destination = this.GetDestinationPath(filepath, targetFolder, this.GetFilenameFromPath(filepath), reserveTxt);
 
-			File.Move(filepath, destination);
+			try {
+				File.Move(filepath, destination);
+			} catch (Exception e) {
+				MessageBox.Show("Unable to move file\n" + filepath + "\n\n" + e.Message);
+
+				return null;
+			}
 
 			return destination;
 		}
