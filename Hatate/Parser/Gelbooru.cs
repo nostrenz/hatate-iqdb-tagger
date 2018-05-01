@@ -12,6 +12,10 @@
 		{
 			Supremes.Nodes.Element tagList = doc.Select("#tag-list > div").First;
 
+			if (tagList == null) {
+				return false;
+			}
+
 			// Get tags
 			this.AddTags(tagList, "copyright", "series");
 			this.AddTags(tagList, "character", "character");
@@ -39,7 +43,7 @@
 		/// <param name="tagList"></param>
 		/// <param name="type"></param>
 		/// <param name="nameSpace"></param>
-		private void AddTags(Supremes.Nodes.Element tagList, string category, string nameSpace = null)
+		private void AddTags(Supremes.Nodes.Element tagList, string category, string nameSpace=null)
 		{
 			Supremes.Nodes.Elements searchTags = tagList.Select("li.tag-type-" + category + " > a");
 

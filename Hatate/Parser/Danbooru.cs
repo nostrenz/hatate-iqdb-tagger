@@ -12,6 +12,10 @@
 		{
 			Supremes.Nodes.Element tagList = doc.Select("#tag-list").First;
 
+			if (tagList == null) {
+				return false;
+			}
+
 			// Get tags
 			this.AddTags(tagList, "copyright", "series");
 			this.AddTags(tagList, "character", "character");
