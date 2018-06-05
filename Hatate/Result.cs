@@ -9,8 +9,8 @@ namespace Hatate
 	{
 		public Result()
 		{
-			this.KnownTags = new List<Tag>();
-			this.UnknownTags = new List<Tag>();
+			this.Tags = new List<Tag>();
+			this.Ignoreds = new List<Tag>();
 		}
 
 		/*
@@ -23,9 +23,9 @@ namespace Hatate
 
 		public bool Searched { get; set; }
 
-		public List<Tag> KnownTags { get; set; }
+		public List<Tag> Tags { get; set; }
 
-		public List<Tag> UnknownTags { get; set; }
+		public List<Tag> Ignoreds { get; set; }
 
 		public string ThumbPath { get; set; }
 
@@ -50,7 +50,7 @@ namespace Hatate
 				}
 
 				// Found, check the tags
-				return this.HasKnownTags || this.UnknownTags.Count > 0;
+				return this.HasTags || this.Ignoreds.Count > 0;
 			}
 		}
 
@@ -65,9 +65,9 @@ namespace Hatate
 		/// <summary>
 		/// Check if we have known tags.
 		/// </summary>
-		public bool HasKnownTags
+		public bool HasTags
 		{
-			get { return this.KnownTags.Count > 0; }
+			get { return this.Tags.Count > 0; }
 		}
 
 		#endregion Accessor

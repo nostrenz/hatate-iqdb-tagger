@@ -20,7 +20,6 @@ namespace Hatate
 				Combo_MatchType.Items.Add(item);
 			}
 			
-			this.CheckBox_KnownTags.IsChecked = Options.Default.KnownTags;
 			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
 			this.CheckBox_MatchType.IsChecked = Options.Default.CheckMatchType;
 			this.Combo_MatchType.SelectedItem = Options.Default.MatchType;
@@ -30,7 +29,6 @@ namespace Hatate
 			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
 			this.CheckBox_AutoMove.IsChecked = Options.Default.AutoMove;
 			this.CheckBox_AskTags.IsChecked = Options.Default.AskTags;
-			this.CheckBox_ParseBooru.IsChecked = Options.Default.ParseBooru;
 			this.CheckBox_RenameMd5.IsChecked = Options.Default.RenameMd5;
 
 			// Sources
@@ -74,7 +72,6 @@ namespace Hatate
 
 		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
-			Options.Default.KnownTags = (bool)this.CheckBox_KnownTags.IsChecked;
 			Options.Default.AddRating = (bool)this.CheckBox_AddRating.IsChecked;
 			Options.Default.CheckMatchType = (bool)this.CheckBox_MatchType.IsChecked;
 			Options.Default.MatchType = (IqdbApi.Enums.MatchType)this.Combo_MatchType.SelectedItem;
@@ -84,7 +81,6 @@ namespace Hatate
 			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
 			Options.Default.AutoMove = (bool)this.CheckBox_AutoMove.IsChecked;
 			Options.Default.AskTags = (bool)this.CheckBox_AskTags.IsChecked;
-			Options.Default.ParseBooru = (bool)this.CheckBox_ParseBooru.IsChecked;
 			Options.Default.RenameMd5 = (bool)this.CheckBox_RenameMd5.IsChecked;
 
 			// Sources

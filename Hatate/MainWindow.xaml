@@ -16,7 +16,6 @@
 				<MenuItem x:Name="MenuItem_AddFolder" Header="Add folder" Click="MenuItem_AddFolder_Click"/>
 				<MenuItem x:Name="MenuItem_OpenAppFolder" Header="Open app folder" Click="MenuItem_OpenAppFolder_Click"/>
 				<MenuItem Header="Reload known tags" Click="MenuItem_ReloadKnownTags_Click"/>
-				<MenuItem Header="Renamespace tagged files" Click="MenuItem_RenamespaceTagged_Click"/>
 			</MenuItem>
 			<MenuItem Header="Maintenance" Height="18" >
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
@@ -63,8 +62,8 @@
 				</ListBox>
 			</GroupBox>
 			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-			<GroupBox Header="Unknown tags" HorizontalAlignment="Right" Margin="0,3,0,0" Width="231" Grid.Row="2">
-				<ListBox x:Name="ListBox_UnknownTags" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_UnknownTags_ContextMenuOpening">
+			<GroupBox Header="Ignoreds" HorizontalAlignment="Right" Margin="0,3,0,0" Width="231" Grid.Row="2">
+				<ListBox x:Name="ListBox_Ignoreds" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_UnknownTags_ContextMenuOpening">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Value}"/>

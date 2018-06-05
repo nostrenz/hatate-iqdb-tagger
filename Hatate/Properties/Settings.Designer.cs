@@ -37,18 +37,6 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool KnownTags {
-            get {
-                return ((bool)(this["KnownTags"]));
-            }
-            set {
-                this["KnownTags"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int TagsCount {
             get {
@@ -272,18 +260,6 @@ namespace Hatate.Properties {
             }
             set {
                 this["AskTags"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ParseBooru {
-            get {
-                return ((bool)(this["ParseBooru"]));
-            }
-            set {
-                this["ParseBooru"] = value;
             }
         }
         

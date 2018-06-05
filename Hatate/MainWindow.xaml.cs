@@ -35,17 +35,9 @@ namespace Hatate
 		const string DIR_NOT_FOUND = @"notfound\";
 		const string DIR_TAGGED    = @"tagged\";
 
-		const string TXT_UNNAMESPACEDS = "unnamespaceds.txt";
-		const string TXT_SERIES        = "series.txt";
-		const string TXT_CHARACTERS    = "characters.txt";
-		const string TXT_CREATORS      = "creators.txt";
-		const string TXT_IGNOREDS      = "ignoreds.txt";
+		const string TXT_IGNOREDS = "ignoreds.txt";
 
 		// Tags list
-		private string[] unnamespaceds;
-		private string[] series;
-		private string[] characters;
-		private string[] creators;
 		private string[] ignoreds;
 
 		private int lastSearchedInSeconds = 0;
@@ -58,9 +50,7 @@ namespace Hatate
 		{
 			InitializeComponent();
 
-			if (Options.Default.KnownTags) {
-				this.LoadKnownTags();
-			}
+			this.LoadIgnoredTags();
 
 			this.CreateFilesListContextMenu();
 			this.CreateTagsListContextMenu();
@@ -125,29 +115,9 @@ namespace Hatate
 		/// <summary>
 		/// Load known tags from text files.
 		/// </summary>
-		private void LoadKnownTags()
+		private void LoadIgnoredTags()
 		{
-			string unnamespaced = this.GetTxtPath(TXT_UNNAMESPACEDS);
-			string series = this.GetTxtPath(TXT_SERIES);
-			string character = this.GetTxtPath(TXT_CHARACTERS);
-			string creator = this.GetTxtPath(TXT_CREATORS);
 			string ignored = this.GetTxtPath(TXT_IGNOREDS);
-
-			if (File.Exists(unnamespaced)) {
-				this.unnamespaceds = File.ReadAllLines(unnamespaced);
-			}
-
-			if (File.Exists(series)) {
-				this.series = File.ReadAllLines(series);
-			}
-
-			if (File.Exists(character)) {
-				this.characters = File.ReadAllLines(character);
-			}
-
-			if (File.Exists(creator)) {
-				this.creators = File.ReadAllLines(creator);
-			}
 
 			if (File.Exists(ignored)) {
 				this.ignoreds = File.ReadAllLines(ignored);
@@ -165,7 +135,7 @@ namespace Hatate
 
 			this.ListBox_Files.Items.Clear();
 			this.ListBox_Tags.Items.Clear();
-			this.ListBox_UnknownTags.Items.Clear();
+			this.ListBox_Ignoreds.Items.Clear();
 
 			// Ask for tags if enabled
 			List<Tag> tags = this.AskForNewTags();
@@ -347,7 +317,7 @@ namespace Hatate
 				if (Options.Default.AutoMove && result.UnknownTags.Count == 0) {
 					this.WriteTagsForItem(item);
 				} else {
-					this.UpdateFileItemColor(item, result.HasKnownTags ? Brushes.LimeGreen : Brushes.Orange);
+					this.UpdateFileItemColor(item, result.HasTags ? Brushes.LimeGreen : Brushes.Orange);
 				}
 
 				this.found++;
@@ -434,12 +404,8 @@ namespace Hatate
 				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
 				result.Url = match.Url;
 
+				//bool parsedBooru = this.ParseBooruPage(result);
 				bool parsedBooru = false;
-
-				// Try to parse the booru page if enabled
-				if (Options.Default.ParseBooru) {
-					parsedBooru = this.ParseBooruPage(result);
-				}
 
 				// Just use the tags from IqdbApi if page parsing is disabled or no result from it
 				if (!parsedBooru) {
@@ -476,7 +442,7 @@ namespace Hatate
 			bool success = booru.FromUrl("https:" + result.Url);
 
 			if (success) {
-				result.KnownTags = booru.Tags;
+				result.Tags = booru.Tags;
 			}
 
 			return success;
@@ -503,12 +469,12 @@ namespace Hatate
 					continue;
 				}
 
-				Tag found = this.FindTag(formated);
+				Tag found = new Tag(formated);
 				bool isIgnored = this.IsTagInList(formated, this.ignoreds);
 
 				// Tag not found in the known tags
 				if (found == null) {
-					if (Options.Default.KnownTags && !isIgnored) {
+					if (!isIgnored) {
 						Tag formatedTag = new Tag(formated);
 
 						if (!result.UnknownTags.Contains(formatedTag)) {
@@ -519,8 +485,8 @@ namespace Hatate
 					continue;
 				}
 
-				if (!isIgnored && !result.KnownTags.Contains(found)) {
-					result.KnownTags.Add(found);
+				if (!isIgnored && !result.Tags.Contains(found)) {
+					result.Tags.Add(found);
 				}
 			}
 
@@ -528,7 +494,7 @@ namespace Hatate
 			if (Options.Default.AddRating && result.Rating != IqdbApi.Enums.Rating.Unrated) {
 				string rating = result.Rating.ToString().ToLower();
 
-				result.KnownTags.Add(new Tag(rating, "rating"));
+				result.Tags.Add(new Tag(rating, "rating"));
 			}
 		}
 
@@ -631,7 +597,7 @@ namespace Hatate
 		/// <param name="filepath"></param>
 		/// <param name="tags"></param>
 		/// <param name="append"></param>
-		private void WriteTagsToTxt(List<Tag> tags)
+		/*private void WriteTagsToTxt(List<Tag> tags)
 		{
 			foreach (Tag tag in tags) {
 				string txt = this.GetTxtFromNamespace(tag.Namespace);
@@ -640,31 +606,7 @@ namespace Hatate
 					file.WriteLine(tag.Namespaced);
 				}
 			}
-		}
-
-		/// <summary>
-		/// Find a tag in one of the known tags list.
-		/// </summary>
-		/// <param name="tag"></param>
-		/// <returns></returns>
-		private Tag FindTag(string tag)
-		{
-			if (!Options.Default.KnownTags) {
-				return new Tag(tag);
-			}
-
-			if (this.IsTagInList(tag, this.unnamespaceds)) {
-				return new Tag(tag);
-			} else if (this.IsTagInList(tag, this.series)) {
-				return new Tag(tag, "series");
-			} else if (this.IsTagInList(tag, this.characters)) {
-				return new Tag(tag, "character");
-			} else if (this.IsTagInList(tag, this.creators)) {
-				return new Tag(tag, "creator");
-			}
-
-			return null;
-		}
+		}*/
 
 		/// <summary>
 		/// Create the context menu for the Files ListBox.
@@ -816,7 +758,7 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
-			this.ListBox_UnknownTags.ContextMenu = context;
+			this.ListBox_Ignoreds.ContextMenu = context;
 		}
 
 		/// <summary>
@@ -892,7 +834,7 @@ namespace Hatate
 			Result result = (Result)listBoxItem.Tag;
 
 			// No result or no tags to write, remove the item from the selection
-			if (result == null || result.KnownTags.Count == 0) {
+			if (result == null || result.Tags.Count == 0) {
 				this.ListBox_Files.SelectedItems.Remove(item);
 
 				return;
@@ -905,7 +847,7 @@ namespace Hatate
 				string destination = this.MoveFile(filepath, this.TaggedDirPath, true);
 
 				if (destination != null) {
-					this.WriteTagsToTxt(destination + ".txt", result.KnownTags);
+					this.WriteTagsToTxt(destination + ".txt", result.Tags);
 				}
 			}
 
@@ -1071,7 +1013,7 @@ namespace Hatate
 				}
 			}
 
-			this.LoadKnownTags();
+			this.LoadIgnoredTags();
 		}
 
 		/// <summary>
@@ -1079,12 +1021,12 @@ namespace Hatate
 		/// </summary>
 		private void MoveSelectedUnknownTagsToKnownTags(string txt, string nameSpace=null)
 		{
-			if (this.ListBox_UnknownTags.Items.Count < 1) {
+			if (this.ListBox_Ignoreds.Items.Count < 1) {
 				return;
 			}
 
-			this.WriteSelectedItemsToTxt(this.GetTxtPath(txt), this.ListBox_UnknownTags);
-			this.MoveSelectedItemsToList(this.ListBox_UnknownTags, this.ListBox_Tags, nameSpace);
+			this.WriteSelectedItemsToTxt(this.GetTxtPath(txt), this.ListBox_Ignoreds);
+			this.MoveSelectedItemsToList(this.ListBox_Ignoreds, this.ListBox_Tags, nameSpace);
 
 			this.Button_Apply.IsEnabled = true;
 		}
@@ -1218,7 +1160,7 @@ namespace Hatate
 			// Add tags to the result
 			if (tags != null && tags.Count > 0) {
 				foreach (Tag tag in tags) {
-					result.KnownTags.Add(tag);
+					result.Tags.Add(tag);
 				}
 			}
 
@@ -1342,13 +1284,6 @@ namespace Hatate
 			}
 
 			foreach (Tag tag in tags) {
-				string txt = this.GetTxtFromNamespace(tag.Namespace);
-
-				// Write the new tag to the txt
-				using (StreamWriter file = new StreamWriter(this.GetTxtPath(txt), true)) {
-					file.WriteLine(tag.Value);
-				}
-
 				// Append the new tag to the list
 				if (!this.ListBox_Tags.Items.Contains(tag)) {
 					this.ListBox_Tags.Items.Add(tag);
@@ -1356,26 +1291,6 @@ namespace Hatate
 			}
 
 			this.Button_Apply.IsEnabled = true;
-		}
-
-		/// <summary>
-		/// Get path of one of the txt files depending on a namespace.
-		/// </summary>
-		/// <param name="nameSpace"></param>
-		/// <returns></returns>
-		private string GetTxtFromNamespace(string nameSpace)
-		{
-			if (String.IsNullOrEmpty(nameSpace)) {
-				return TXT_UNNAMESPACEDS;
-			}
-
-			switch (nameSpace) {
-				case "series": return TXT_UNNAMESPACEDS;
-				case "character": return TXT_UNNAMESPACEDS;
-				case "creator": return TXT_UNNAMESPACEDS;
-			}
-
-			return TXT_UNNAMESPACEDS;
 		}
 
 		/// <summary>
@@ -1389,8 +1304,6 @@ namespace Hatate
 			if (bypassOption || Options.Default.AskTags) {
 				NewTags newTags = new NewTags();
 				tags = newTags.Tags;
-
-				this.WriteTagsToTxt(tags);
 			}
 
 			return tags;
@@ -1584,7 +1497,7 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_ReloadKnownTags_Click(object sender, RoutedEventArgs e)
 		{
-			this.LoadKnownTags();
+			this.LoadIgnoredTags();
 		}
 
 		/// <summary>
@@ -1595,7 +1508,7 @@ namespace Hatate
 		private void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			this.ListBox_Tags.Items.Clear();
-			this.ListBox_UnknownTags.Items.Clear();
+			this.ListBox_Ignoreds.Items.Clear();
 
 			this.Label_Match.Content = "Match";
 			this.Image_Original.Source = null;
@@ -1626,9 +1539,9 @@ namespace Hatate
 			}
 
 			// Add known tags to the list
-			result.KnownTags.Sort();
+			result.Tags.Sort();
 
-			foreach (Tag tag in result.KnownTags) {
+			foreach (Tag tag in result.Tags) {
 				this.ListBox_Tags.Items.Add(tag);
 			}
 
@@ -1644,7 +1557,7 @@ namespace Hatate
 			result.UnknownTags.Sort();
 
 			foreach (Tag tag in result.UnknownTags) {
-				this.ListBox_UnknownTags.Items.Add(tag);
+				this.ListBox_Ignoreds.Items.Add(tag);
 			}
 		}
 
@@ -1670,27 +1583,15 @@ namespace Hatate
 				case "notFound":
 					this.MoveAllSelectedsToNotFound();
 				break;
-				case "addUnnamespaced":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_UNNAMESPACEDS);
-				break;
-				case "addSeries":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_SERIES, "series");
-				break;
-				case "addCharacter":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_CHARACTERS, "character");
-				break;
-				case "addCreator":
-					this.MoveSelectedUnknownTagsToKnownTags(TXT_CREATORS, "creator");
-				break;
 				case "addIgnored":
-					this.IngnoreSelectItemsFromList(this.ListBox_UnknownTags);
+					this.IngnoreSelectItemsFromList(this.ListBox_Ignoreds);
 				break;
 				case "removeFiles":
 					this.RemoveSelectedItemsFromList(this.ListBox_Files);
 				break;
 				case "removeTags":
 					// Will need to use WriteTagsToTxtWithout() here
-					this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_UnknownTags);
+					this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_Ignoreds);
 					this.Button_Apply.IsEnabled = true;
 				break;
 				case "removeAndIgnore":
@@ -1710,13 +1611,13 @@ namespace Hatate
 					this.CopySelectedTagToClipboard(this.ListBox_Tags);
 				break;
 				case "copyUnknownTag":
-					this.CopySelectedTagToClipboard(this.ListBox_UnknownTags);
+					this.CopySelectedTagToClipboard(this.ListBox_Ignoreds);
 				break;
 				case "helpTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Tags);
 				break;
 				case "helpUnknownTag":
-					this.OpenHelpForSelectedTag(this.ListBox_UnknownTags);
+					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
 				case "searchAgain":
 					this.SearchFile(this.ListBox_Files.SelectedIndex);
@@ -1779,19 +1680,19 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void ListBox_UnknownTags_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
-			int countSelected = this.ListBox_UnknownTags.SelectedItems.Count;
+			int countSelected = this.ListBox_Ignoreds.SelectedItems.Count;
 
 			bool hasSelecteds = (countSelected > 0);
 			bool singleSelected = (countSelected == 1);
 
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 0, hasSelecteds);   // "Add as unnamespaced"
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 1, hasSelecteds);   // "Add as series"
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 2, hasSelecteds);   // "Add as character"
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 3, hasSelecteds);   // "Add as creator"
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 4, hasSelecteds);   // "Add as ignored"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 0, hasSelecteds);   // "Add as unnamespaced"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 1, hasSelecteds);   // "Add as series"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 2, hasSelecteds);   // "Add as character"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 3, hasSelecteds);   // "Add as creator"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 4, hasSelecteds);   // "Add as ignored"
 																  // 5 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 6, singleSelected); // "Copy to clipboard"
-			this.SetContextMenuItemEnabled(this.ListBox_UnknownTags, 7, singleSelected); // "Search on Danbooru"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 6, singleSelected); // "Copy to clipboard"
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 7, singleSelected); // "Search on Danbooru"
 		}
 
 		/// <summary>
@@ -1807,19 +1708,19 @@ namespace Hatate
 			int index = this.ListBox_Files.SelectedIndex;
 			Result result = this.GetResultFromIndex(index);
 
-			result.KnownTags.Clear();
-			result.UnknownTags.Clear();
+			result.Tags.Clear();
+			result.Ignoreds.Clear();
 
 			foreach (Tag item in this.ListBox_Tags.Items) {
-				result.KnownTags.Add(item);
+				result.Tags.Add(item);
 			}
 
-			foreach (Tag item in this.ListBox_UnknownTags.Items) {
+			foreach (Tag item in this.ListBox_Ignoreds.Items) {
 				result.UnknownTags.Add(item);
 			}
 
 			// Reload known tags
-			this.LoadKnownTags();
+			this.LoadIgnoredTags();
 
 			// Re-filter tags for all the other files so when we add a new known tag it will be applied for all the other files
 			for (int i = 0; i < this.ListBox_Files.Items.Count; i++) {
@@ -1837,15 +1738,15 @@ namespace Hatate
 				// Build a list of tags to compare
 				List<string> list = new List<string>();
 
-				if (otherResult.HasKnownTags) {
+				if (otherResult.HasTags) {
 					// Prevent the rating from being added as an unknown tag by removing it from the known tags
-					Tag ratingTag = otherResult.KnownTags.Find(t => t.Namespace != null && t.Namespace.Equals("rating"));
+					Tag ratingTag = otherResult.Tags.Find(t => t.Namespace != null && t.Namespace.Equals("rating"));
 
 					if (ratingTag != null) {
-						otherResult.KnownTags.Remove(ratingTag);
+						otherResult.Tags.Remove(ratingTag);
 					}
 
-					foreach (Tag tag in otherResult.KnownTags) {
+					foreach (Tag tag in otherResult.Tags) {
 						list.Add(tag.Value);
 					}
 				}
@@ -1894,18 +1795,14 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_CleanLists_Click(object sender, RoutedEventArgs e)
 		{
-			this.LoadKnownTags();
+			this.LoadIgnoredTags();
 			this.SetStatus("Cleaning known tag lists...");
 
 			int unecessary = 0;
 
-			unecessary += this.CleanKnownTagList(TXT_UNNAMESPACEDS, this.unnamespaceds);
-			unecessary += this.CleanKnownTagList(TXT_SERIES, this.series);
-			unecessary += this.CleanKnownTagList(TXT_CHARACTERS, this.characters);
-			unecessary += this.CleanKnownTagList(TXT_CREATORS, this.creators);
 			unecessary += this.CleanKnownTagList(TXT_IGNOREDS, this.ignoreds, false);
 
-			this.LoadKnownTags();
+			this.LoadIgnoredTags();
 			this.SetStatus(unecessary + " unecessary tags removed from the lists.");
 		}
 
@@ -2023,44 +1920,6 @@ namespace Hatate
 
 				e.Cancel = (result == MessageBoxResult.No);
 			}
-		}
-
-		/// <summary>
-		/// Check all the .txt files in the imgs/tagged/ folder and namespace in them all the known tags.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_RenamespaceTagged_Click(object sender, RoutedEventArgs e)
-		{
-			this.LoadKnownTags();
-
-			// Get all the .txt files in the tagged folder
-			string[] files = "*.txt".Split('|').SelectMany(filter => Directory.GetFiles(this.TaggedDirPath, filter, SearchOption.TopDirectoryOnly)).ToArray();
-			int total = files.Length;
-			int progress = 0;
-
-			this.SetStatus("Renamespacing " + total + " files...");
-
-			foreach (string file in files) {
-				progress++;
-
-				foreach (string line in File.ReadAllLines(file)) {
-					// Already namespaced
-					if (line.StartsWith("series:") || line.StartsWith("character:") || line.StartsWith("creator:")) {
-						continue;
-					}
-
-					if (this.series.Contains(line)) {
-						this.ReplaceLineInFile(file, line, "series:" + line);
-					} else if (this.characters.Contains(line)) {
-						this.ReplaceLineInFile(file, line, "character:" + line);
-					} else if (this.creators.Contains(line)) {
-						this.ReplaceLineInFile(file, line, "creator:" + line);
-					}
-				}
-			}
-
-			this.SetStatus(total + " files Renamespaced.");
 		}
 
 		/// <summary>
