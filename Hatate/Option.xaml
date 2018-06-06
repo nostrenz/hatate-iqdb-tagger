@@ -24,10 +24,10 @@
 				<CheckBox x:Name="CheckBox_Source_Konachan" Content="Konachan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,50,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Yandere" Content="Yandere" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,90,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Gelbooru" Content="Gelbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,30,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,110,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,110,0,0" IsEnabled="False"/>
 				<CheckBox x:Name="CheckBox_Source_Eshuushuu" Content="Eshuushuu" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,30,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" IsEnabled="False"/>
+				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0" IsEnabled="False"/>
 				<CheckBox x:Name="CheckBox_Source_AnimePictures" Content="AnimePictures" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,10,0,0"/>
 			</Grid>
 		</GroupBox>

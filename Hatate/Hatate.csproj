@@ -83,12 +83,17 @@
     <Compile Include="NewTags.xaml.cs">
       <DependentUpon>NewTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Parser\AnimePictures.cs" />
     <Compile Include="Parser\Danbooru.cs" />
+    <Compile Include="Parser\Eshuushuu.cs" />
     <Compile Include="Parser\Gelbooru.cs" />
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="Parser\Konachan.cs" />
     <Compile Include="Parser\Page.cs" />
+    <Compile Include="Parser\SankakuChannel.cs" />
+    <Compile Include="Parser\TheAnimeGallery.cs" />
     <Compile Include="Parser\Yandere.cs" />
+    <Compile Include="Parser\Zerochan.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="MayaDark.xaml">

@@ -16,7 +16,6 @@ using Options = Hatate.Properties.Settings;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Brush = System.Windows.Media.Brush;
-using Brushes = System.Windows.Media.Brushes;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Timer = System.Windows.Forms.Timer;
 
@@ -38,7 +37,7 @@ namespace Hatate
 		const string TXT_IGNOREDS = "ignoreds.txt";
 
 		// Tags list
-		private string[] ignoreds;
+		private List<string> ignoreds;
 
 		private int lastSearchedInSeconds = 0;
 		private int found = 0;
@@ -105,7 +104,7 @@ namespace Hatate
 				}
 
 				// Add files to the list
-				this.GetImagesFromFolder(fbd.SelectedPath + @"\");
+				this.GetImagesFromFolder(fbd.SelectedPath);
 			}
 
 			this.UpdateLabels();
@@ -120,7 +119,7 @@ namespace Hatate
 			string ignored = this.GetTxtPath(TXT_IGNOREDS);
 
 			if (File.Exists(ignored)) {
-				this.ignoreds = File.ReadAllLines(ignored);
+				this.ignoreds = new List<string>(File.ReadAllLines(ignored));
 			}
 
 			this.SetStatus("Tags loaded.");
@@ -132,10 +131,6 @@ namespace Hatate
 		private void GetImagesFromFolder(string path)
 		{
 			string[] files = "*.jpg|*.jpeg|*.png|*.bmp".Split('|').SelectMany(filter => Directory.GetFiles(path, filter, SearchOption.TopDirectoryOnly)).ToArray();
-
-			this.ListBox_Files.Items.Clear();
-			this.ListBox_Tags.Items.Clear();
-			this.ListBox_Ignoreds.Items.Clear();
 
 			// Ask for tags if enabled
 			List<Tag> tags = this.AskForNewTags();
@@ -294,9 +289,6 @@ namespace Hatate
 				return;
 			}
 
-			//Result result = this.GetResultFromItem(item);
-			result.Searched = true;
-
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
 			result.ThumbPath = this.GenerateThumbnail(result.ImagePath);
@@ -305,12 +297,14 @@ namespace Hatate
 			this.SetStatus("Searching file on IQDB...");
 			await this.RunIqdbApi(result);
 
+			result.Searched = true;
+
 			// We have tags
 			if (result.Greenlight) {
 				this.SetStatus("File found.");
 
 				// Move or update the color
-				if (Options.Default.AutoMove && result.Ignoreds.Count == 0) {
+				if (Options.Default.AutoMove && result.HasTags) {
 					this.WriteTagsForResult(result);
 				}
 
@@ -394,13 +388,34 @@ namespace Hatate
 				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
 				result.Url = match.Url;
 
-				//bool parsedBooru = this.ParseBooruPage(result);
-				bool parsedBooru = false;
+				bool success = this.ParseBooruPage(result);
 
-				// Just use the tags from IqdbApi if page parsing is disabled or no result from it
-				if (!parsedBooru) {
-					this.FilterTags(result, match.Tags.ToList());
+				// Failed to parse the booru page 
+				if (!success) {
+					continue;
 				}
+
+				// Check ignored tags
+				for (int i=result.Tags.Count-1; i>=0; i--) {
+					Tag tag = result.Tags[i];
+					bool isIgnored = this.IsTagInIgnoreds(tag);
+
+					if (isIgnored && !result.Ignoreds.Contains(tag)) {
+						result.Ignoreds.Add(tag);
+						result.Tags.Remove(tag);
+					}
+				}
+
+				// Add rating if not already in tags
+				if (Options.Default.AddRating
+				&& result.Rating != IqdbApi.Enums.Rating.Unrated
+				&& !result.Tags.Exists(t => t.Namespace == "rating"
+				)) {
+					result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating"));
+				}
+
+				this.ListBox_Tags.Items.Refresh();
+				this.ListBox_Ignoreds.Items.Refresh();
 
 				return;
 			}
@@ -412,6 +427,7 @@ namespace Hatate
 		private bool ParseBooruPage(Result result)
 		{
 			Parser.IParser booru = null;
+			string urlPrefix = "https";
 
 			switch (result.Source) {
 				case IqdbApi.Enums.Source.Danbooru:
@@ -426,59 +442,32 @@ namespace Hatate
 				case IqdbApi.Enums.Source.Yandere:
 					booru = new Parser.Yandere();
 				break;
+				case IqdbApi.Enums.Source.SankakuChannel:
+					booru = new Parser.SankakuChannel();
+				break;
+				case IqdbApi.Enums.Source.Eshuushuu:
+					booru = new Parser.Eshuushuu();
+					urlPrefix = "http";
+				break;
+				case IqdbApi.Enums.Source.TheAnimeGallery:
+					booru = new Parser.TheAnimeGallery();
+				break;
+				case IqdbApi.Enums.Source.Zerochan:
+					booru = new Parser.Zerochan();
+				break;
+				case IqdbApi.Enums.Source.AnimePictures:
+					booru = new Parser.AnimePictures();
+				break;
 				default: return false;
 			}
 
-			bool success = booru.FromUrl("https:" + result.Url);
+			bool success = booru.FromUrl(urlPrefix + ":" + result.Url);
 
 			if (success) {
 				result.Tags = booru.Tags;
 			}
 
 			return success;
-		}
-
-		/// <summary>
-		/// Takes the tag list and keep only the ones that are valid and are present in the text files if enabled.
-		/// </summary>
-		/// <returns></returns>
-		private void FilterTags(Result result, List<string> tags)
-		{
-			result.Ignoreds.Clear();
-
-			// Write each tags
-			foreach (string tag in tags) {
-				// Format the tag
-				string formated = tag;
-
-				formated = formated.Replace("_", " ");
-				formated = formated.Replace(",", "");
-				formated = formated.ToLower().Trim();
-
-				if (String.IsNullOrWhiteSpace(formated)) {
-					continue;
-				}
-
-				Tag tagObject = new Tag(formated);
-				bool isIgnored = this.IsTagInList(formated, this.ignoreds);
-
-				if (isIgnored) {
-					if (!result.Ignoreds.Contains(tagObject)) {
-						result.Ignoreds.Add(tagObject);
-					}
-				}
-
-				if (!isIgnored && !result.Tags.Contains(tagObject)) {
-					result.Tags.Add(tagObject);
-				}
-			}
-
-			// Add rating
-			if (Options.Default.AddRating && result.Rating != IqdbApi.Enums.Rating.Unrated) {
-				string rating = result.Rating.ToString().ToLower();
-
-				result.Tags.Add(new Tag(rating, "rating"));
-			}
 		}
 
 		/// <summary>
@@ -594,6 +583,12 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "Add tags";
+			item.Tag = "AddTagsForSelectedResults";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			context.Items.Add(new Separator());
 
 			item = new MenuItem();
@@ -637,6 +632,12 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
+			item = new MenuItem();
+			item.Header = "Add tags";
+			item.Tag = "addTagsForSelectedResult";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
 			context.Items.Add(new Separator());
 
 			item = new MenuItem();
@@ -648,12 +649,6 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Search on Danbooru";
 			item.Tag = "helpTag";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Add new tag";
-			item.Tag = "addNew";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -760,14 +755,14 @@ namespace Hatate
 		/// <param name="item"></param>
 		private void WriteTagsForResult(Result result)
 		{
-			// No result or no tags to write, remove the item from the selection
-			if (result == null || result.Tags.Count == 0) {
+			// No searched result, remove the item from the selection
+			if (result == null || !result.Searched) {
 				this.ListBox_Files.SelectedItems.Remove(result);
 
 				return;
 			}
 
-			if (File.Exists(result.ImagePath)) {
+			if (result.Tags.Count > 0 && File.Exists(result.ImagePath)) {
 				// Move the file to the tagged folder and write tags
 				string destination = this.MoveFile(result.ImagePath, this.TaggedDirPath, true);
 
@@ -776,24 +771,50 @@ namespace Hatate
 				}
 			}
 
+			// Write the ignored tags to txt
+			if (result.Ignoreds.Count > 0) {
+				this.WriteIgnoredsTags(result.Ignoreds);
+			}
+
 			// Remove the row
 			this.ListBox_Files.Items.Remove(result);
 		}
+
+
+		/// <summary>
+		/// Add the ignoreds tags from a result to the txt list.
+		/// </summary>
+		/// <param name="ignoredTags"></param>
+		private void WriteIgnoredsTags(List<Tag> ignoredTags)
+		{
+			StreamWriter file = new StreamWriter(this.GetTxtPath(TXT_IGNOREDS), true);
+
+			foreach (Tag tag in ignoredTags) {
+				string namespaced = tag.Namespaced;
+
+				// Tag isn't already in the txt list, add it
+				if (!this.ignoreds.Contains(namespaced)) {
+					this.ignoreds.Add(namespaced);
+					file.WriteLine(namespaced);
+				}
+			}
+
+			file.Close();
+		}
+
 
 		/// <summary>
 		/// Move a files to the not "notfound" folder and remove the row.
 		/// </summary>
 		/// <param name="index"></param>
-		private void MoveRowToNotFoundFolder(object item)
+		private void MoveRowToNotFoundFolder(Result result)
 		{
-			string filepath = item.ToString();
-
-			if (!File.Exists(filepath)) {
+			if (!File.Exists(result.ImagePath)) {
 				return;
 			}
 
-			this.MoveFile(filepath, this.NotfoundDirPath);
-			this.ListBox_Files.Items.Remove(item);
+			this.MoveFile(result.ImagePath, this.NotfoundDirPath);
+			this.ListBox_Files.Items.Remove(result);
 		}
 
 		/// <summary>
@@ -860,32 +881,27 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Move an item from a list to another one.
+		/// Remove all the selected files from the Files listbox.
 		/// </summary>
-		/// <param name="from"></param>
-		/// <param name="to"></param>
-		private void MoveSelectedItemsToList(ListBox from, ListBox to, string nameSpace=null)
+		private void RemoveSelectedFiles()
 		{
-			while (from.SelectedItems.Count > 0) {
-				Tag tag = (Tag)from.SelectedItems[0];
-
-				from.Items.Remove(tag);
-
-				if (nameSpace != null) {
-					tag.Namespace = nameSpace;
-				}
-
-				to.Items.Add(tag);
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				this.ListBox_Files.Items.Remove(this.ListBox_Files.SelectedItems[0]);
 			}
 		}
 
 		/// <summary>
-		/// Remove all the selected items from a given list.
+		/// Remove all the selected tags from the Tags listbox.
 		/// </summary>
-		private void RemoveSelectedItemsFromList(ListBox from)
+		private void RemoveSelectedTags()
 		{
-			while (from.SelectedItems.Count > 0) {
-				from.Items.Remove(from.SelectedItems[0]);
+			Result result = this.SelectedResult;
+
+			while (this.ListBox_Tags.SelectedItems.Count > 0) {
+				Tag tag = (Tag)this.ListBox_Tags.SelectedItems[0];
+
+				result.Tags.Remove(tag);
+				this.ListBox_Tags.Items.Refresh();
 			}
 		}
 
@@ -921,27 +937,13 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Add an unknown tags to the tag list.
-		/// </summary>
-		private void MoveSelectedUnknownTagsToKnownTags(string txt, string nameSpace=null)
-		{
-			if (this.ListBox_Ignoreds.Items.Count < 1) {
-				return;
-			}
-
-			this.WriteSelectedItemsToTxt(this.GetTxtPath(txt), this.ListBox_Ignoreds);
-			this.MoveSelectedItemsToList(this.ListBox_Ignoreds, this.ListBox_Tags, nameSpace);
-		}
-
-		/// <summary>
 		/// Rewrite tags in a txt file without duplicates.
-		/// Also remove the tags if they are in the ignoreds list.
 		/// </summary>
 		/// <param name="txt"></param>
 		/// <param name="tags"></param>
-		private int CleanKnownTagList(string txt, string[] tags, bool excludeIgnored=true)
+		private int CleanIgnoredsTxt()
 		{
-			string path = this.GetTxtPath(txt);
+			string path = this.GetTxtPath(TXT_IGNOREDS);
 
 			if (!File.Exists(path)) {
 				return 0;
@@ -950,37 +952,17 @@ namespace Hatate
 			List<string> copies = new List<string>();
 			int unecessary = 0;
 
-			foreach (string tag in tags) {
-				if (copies.Contains(tag) || (excludeIgnored && this.IsTagInList(tag, this.ignoreds))) {
-					unecessary++;
-				} else {
+			foreach (string tag in this.ignoreds) {
+				if (!copies.Contains(tag)) {
 					copies.Add(tag);
+				} else {
+					unecessary++;
 				}
 			}
 
 			this.WriteTagsToTxt(path, copies, false);
 
 			return unecessary;
-		}
-
-		/// <summary>
-		/// Write tags in a txt file without the ones in the exclude list.
-		/// </summary>
-		private void WriteTagsToTxtWithout(string txt, string[] tags, List<string> excludes)
-		{
-			if (!File.Exists(App.appDir + txt)) {
-				return;
-			}
-
-			List<string> includes = new List<string>();
-
-			foreach (string tag in tags) {
-				if (!excludes.Contains(tag)) {
-					includes.Add(tag);
-				}
-			}
-
-			this.WriteTagsToTxt(App.appDir + txt, includes, false);
 		}
 
 		/// <summary>
@@ -1048,14 +1030,14 @@ namespace Hatate
 			}
 
 			string filename = this.GetFilenameFromPath(filepath);
+			Result result = new Result(filepath);
 
-			if (this.ListBox_Files.Items.Contains(filepath)
+			if (//this.ListBox_Files.Items.Contains(result)
+			this.ListBox_Files.Items.Cast<Result>().Any(r => r.ImagePath == filepath)
 			|| File.Exists(this.TaggedDirPath + filename)
 			|| File.Exists(this.NotfoundDirPath + filename)) {
 				return;
 			}
-
-			Result result = new Result(filepath);
 
 			// Add tags to the result
 			if (tags != null && tags.Count > 0) {
@@ -1081,19 +1063,16 @@ namespace Hatate
 		/// </summary>
 		private void IngnoreSelectItems()
 		{
-			this.WriteSelectedItemsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ListBox_Ignoreds);
-
-			//this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_Ignoreds);
 			Result result = this.SelectedResult;
 
 			while (this.ListBox_Tags.SelectedItems.Count > 0) {
 				Tag tag = (Tag)this.ListBox_Tags.SelectedItems[0];
 
-				this.ListBox_Tags.Items.Remove(tag);
 				result.Tags.Remove(tag);
-
-				this.ListBox_Ignoreds.Items.Add(tag);
 				result.Ignoreds.Add(tag);
+
+				this.ListBox_Tags.Items.Refresh();
+				this.ListBox_Ignoreds.Items.Refresh();
 			}
 		}
 
@@ -1104,7 +1083,24 @@ namespace Hatate
 		private void UningnoreSelectItems()
 		{
 			// We'll need to remove the tags from the ignoreds txt
-			this.MoveSelectedItemsToList(this.ListBox_Ignoreds, this.ListBox_Tags);
+			//this.MoveSelectedItemsToList(this.ListBox_Ignoreds, this.ListBox_Tags);
+
+			Result result = this.SelectedResult;
+
+			while (this.ListBox_Ignoreds.SelectedItems.Count > 0) {
+				Tag tag = (Tag)this.ListBox_Tags.SelectedItems[0];
+
+				this.ignoreds.Remove(tag.Namespaced);
+
+				result.Ignoreds.Remove(tag);
+				result.Tags.Add(tag);
+
+				this.ListBox_Tags.Items.Refresh();
+				this.ListBox_Ignoreds.Items.Refresh();
+			}
+
+			// Rewrite the ignoreds tags list since we removed some items from it
+			this.WriteTagsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ignoreds, false);
 		}
 
 		/// <summary>
@@ -1178,24 +1174,20 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Check if a tag is in the given list.
+		/// Same as IsTagInList() but useq a Tag object.
 		/// </summary>
 		/// <param name="tag"></param>
 		/// <param name="list"></param>
 		/// <returns></returns>
-		private bool IsTagInList(string tag, string[] list)
+		private bool IsTagInIgnoreds(Tag tag)
 		{
-			if (list == null) {
-				return false;
-			}
-
-			return list.Contains(tag);
+			return this.ignoreds.Contains(tag.Namespaced);
 		}
 
 		/// <summary>
 		/// Open a window to input a new tag and save it for the selected file and into the known tags.
 		/// </summary>
-		private void AddNewTags()
+		private void AddTagsForSelectedResult()
 		{
 			List<Tag> tags = this.AskForNewTags(true);
 
@@ -1203,10 +1195,40 @@ namespace Hatate
 				return;
 			}
 
+			Result result = this.SelectedResult;
+
+			this.AddTagsToResult(tags, result);
+
+			this.ListBox_Tags.Items.Refresh();
+		}
+
+		/// <summary>
+		/// Add tags for all the selected results.
+		/// </summary>
+		private void AddTagsForSelectedResults()
+		{
+			List<Tag> tags = this.AskForNewTags(true);
+
+			if (tags.Count == 0) {
+				return;
+			}
+
+			foreach (Result result in this.ListBox_Files.SelectedItems) {
+				this.AddTagsToResult(tags, result);
+			}
+
+			this.ListBox_Tags.Items.Refresh();
+		}
+
+		/// <summary>
+		/// Add new tags into a result's tags list while preventing duplicates.
+		/// </summary>
+		private void AddTagsToResult(List<Tag> tags, Result result)
+		{
 			foreach (Tag tag in tags) {
 				// Append the new tag to the list
-				if (!this.ListBox_Tags.Items.Contains(tag)) {
-					this.ListBox_Tags.Items.Add(tag);
+				if (!result.Tags.Contains(tag)) {
+					result.Tags.Add(tag);
 				}
 			}
 		}
@@ -1230,7 +1252,7 @@ namespace Hatate
 		/// <summary>
 		/// Move all the selected files to the "notfound" folder.
 		/// </summary>
-		private void MoveAllSelectedsToNotFound()
+		private void MoveSelectedFilesToNotFound()
 		{
 			bool asked = false;
 
@@ -1256,19 +1278,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Replace a line in a text file.
-		/// </summary>
-		/// <param name="filepath"></param>
-		/// <param name="line"></param>
-		/// <param name="replace"></param>
-		private void ReplaceLineInFile(string filepath, string line, string replace)
-		{
-			string text = File.ReadAllText(filepath);
-			text = text.Replace(line, replace);
-			File.WriteAllText(filepath, text);
-		}
-
-		/// <summary>
 		/// Create a non-locked BitmapImage from a file path.
 		/// </summary>
 		/// <param name="filepath"></param>
@@ -1283,6 +1292,20 @@ namespace Hatate
 			bitmap.EndInit();
 
 			return bitmap;
+		}
+
+		/// <summary>
+		/// Set a tag list as items source for a listbox.
+		/// </summary>
+		/// <param name="listBox"></param>
+		/// <param name="tags"></param>
+		private void SetListBoxItemsSource(ListBox listBox, List<Tag> tags)
+		{
+			if (listBox.ItemsSource == null) {
+				listBox.Items.Clear();
+			}
+
+			listBox.ItemsSource = tags;
 		}
 
 		#endregion Private
@@ -1413,7 +1436,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MenuItem_ReloadKnownTags_Click(object sender, RoutedEventArgs e)
+		private void MenuItem_ReloadIgnoredTags_Click(object sender, RoutedEventArgs e)
 		{
 			this.LoadIgnoredTags();
 		}
@@ -1425,9 +1448,6 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			this.ListBox_Tags.Items.Clear();
-			this.ListBox_Ignoreds.Items.Clear();
-
 			this.Label_Match.Content = "Match";
 			this.Image_Original.Source = null;
 			this.Image_Match.Source = null;
@@ -1459,13 +1479,8 @@ namespace Hatate
 			result.Tags.Sort();
 			result.Ignoreds.Sort();
 
-			foreach (Tag tag in result.Tags) {
-				this.ListBox_Tags.Items.Add(tag);
-			}
-
-			foreach (Tag tag in result.Ignoreds) {
-				this.ListBox_Ignoreds.Items.Add(tag);
-			}
+			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
+			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
 
 			// The following need the result to be found
 			if (!result.Greenlight) {
@@ -1497,16 +1512,16 @@ namespace Hatate
 				}
 				break;
 				case "notFound":
-					this.MoveAllSelectedsToNotFound();
+					this.MoveSelectedFilesToNotFound();
 				break;
 				case "unignore":
 					this.UningnoreSelectItems();
 				break;
 				case "removeFiles":
-					this.RemoveSelectedItemsFromList(this.ListBox_Files);
+					this.RemoveSelectedFiles();
 				break;
 				case "removeTags":
-					this.MoveSelectedItemsToList(this.ListBox_Tags, this.ListBox_Ignoreds);
+					this.RemoveSelectedTags();
 				break;
 				case "ignore":
 					this.IngnoreSelectItems();
@@ -1537,8 +1552,11 @@ namespace Hatate
 				case "resetResult":
 					this.ResetSelectedFilesResult();
 				break;
-				case "addNew":
-					this.AddNewTags();
+				case "addTagsForSelectedResult":
+					this.AddTagsForSelectedResult();
+				break;
+				case "addTagsForSelectedResults":
+					this.AddTagsForSelectedResults();
 				break;
 			}
 		}
@@ -1559,10 +1577,11 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 3, hasSelecteds);
-															// 4 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds);
+															// 5 is a separator
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, singleSelected);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, singleSelected);
 		}
 
 		/// <summary>
@@ -1579,10 +1598,10 @@ namespace Hatate
 
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 0, hasSelecteds);   // "Remove"
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 1, hasSelecteds);   // "Remove and ignore"
-														   // 2 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, singleSelected); // "Copy to clipboard"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Search on Danbooru"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, this.HasFoundResult(this.ListBox_Files.SelectedIndex)); // "Add new tag"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 2, this.ListBox_Files.SelectedItems.Count > 0); // "Add tags"
+														   // 3 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Copy to clipboard"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, singleSelected); // "Search on Danbooru"
 		}
 
 		/// <summary>
@@ -1642,7 +1661,7 @@ namespace Hatate
 
 			int unecessary = 0;
 
-			unecessary += this.CleanKnownTagList(TXT_IGNOREDS, this.ignoreds, false);
+			unecessary += this.CleanIgnoredsTxt();
 
 			this.LoadIgnoredTags();
 			this.SetStatus(unecessary + " unecessary tags removed from the lists.");

@@ -36,10 +36,10 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Source_SankakuChannel" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Source_Eshuushuu" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Source_TheAnimeGallery" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -48,7 +48,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Source_AnimePictures" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="AddRating" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

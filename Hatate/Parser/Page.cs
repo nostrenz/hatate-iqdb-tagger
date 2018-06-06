@@ -8,6 +8,7 @@ namespace Hatate.Parser
 	{
 		const string RATING = "Rating: ";
 
+		private string url;
 		protected List<Tag> tags = new List<Tag>();
 
 		/*
@@ -18,6 +19,7 @@ namespace Hatate.Parser
 
 		public bool FromUrl(string url)
 		{
+			this.url = url;
 			Supremes.Nodes.Document doc = null;
 
 			// Search for the anime
@@ -99,10 +101,12 @@ namespace Hatate.Parser
 
 		public List<Tag> Tags
 		{
-			get
-			{
-				return this.tags;
-			}
+			get { return this.tags; }
+		}
+
+		protected string Url
+		{
+			get { return this.url; }
 		}
 	}
 }

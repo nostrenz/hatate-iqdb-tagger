@@ -7,7 +7,7 @@ namespace Hatate
 	/// <summary>
 	/// Represent the result of a searched image.
 	/// </summary>
-	class Result
+	public class Result : System.IEquatable<Result>
 	{
 		public Result(string imagePath)
 		{
@@ -19,6 +19,31 @@ namespace Hatate
 
 		/*
 		============================================
+		Public
+		============================================
+		*/
+
+		/// <summary>
+		/// Two Result objects are considered equals if thay have the same ImagePath.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public bool Equals(Result other)
+		{
+			return this.ImagePath == other.ImagePath;
+		}
+
+		/// <summary>
+		/// Used when determining equality between two objects.
+		/// </summary>
+		/// <returns></returns>
+		public override int GetHashCode()
+		{
+			return this.ImagePath.GetHashCode();
+		}
+
+		/*
+		============================================
 		Accessor
 		============================================
 		*/
@@ -26,21 +51,13 @@ namespace Hatate
 		#region Accessor
 
 		public string ImagePath { get; set; }
-
 		public bool Searched { get; set; }
-
 		public List<Tag> Tags { get; set; }
-
 		public List<Tag> Ignoreds { get; set; }
-
 		public string ThumbPath { get; set; }
-
 		public string PreviewUrl { get; set; }
-
 		public string Url { get; set; }
-
 		public IqdbApi.Enums.Source Source { get; set; }
-
 		public IqdbApi.Enums.Rating Rating { get; set; }
 
 		/// <summary>

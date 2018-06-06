@@ -21,7 +21,7 @@
 				<MenuItem x:Name="MenuItem_AddFiles" Header="Add files" Click="MenuItem_AddFiles_Click"/>
 				<MenuItem x:Name="MenuItem_AddFolder" Header="Add folder" Click="MenuItem_AddFolder_Click"/>
 				<MenuItem x:Name="MenuItem_OpenAppFolder" Header="Open app folder" Click="MenuItem_OpenAppFolder_Click"/>
-				<MenuItem Header="Reload known tags" Click="MenuItem_ReloadKnownTags_Click"/>
+				<MenuItem Header="Reload ignored tags" Click="MenuItem_ReloadIgnoredTags_Click"/>
 			</MenuItem>
 			<MenuItem Header="Maintenance" Height="18" >
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>

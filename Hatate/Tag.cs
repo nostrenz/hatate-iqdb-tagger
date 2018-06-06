@@ -75,15 +75,8 @@ namespace Hatate
 
 		#region Accessor
 
-		public string Value
-		{
-			get; set;
-		}
-
-		public string Namespace
-		{
-			get; set;
-		}
+		public string Value { get; set; }
+		public string Namespace { get; set; }
 
 		/// <summary>
 		/// Return in format "namespace:value".
