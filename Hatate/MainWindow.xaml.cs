@@ -1082,13 +1082,10 @@ namespace Hatate
 		/// <param name="from"></param>
 		private void UningnoreSelectItems()
 		{
-			// We'll need to remove the tags from the ignoreds txt
-			//this.MoveSelectedItemsToList(this.ListBox_Ignoreds, this.ListBox_Tags);
-
 			Result result = this.SelectedResult;
 
 			while (this.ListBox_Ignoreds.SelectedItems.Count > 0) {
-				Tag tag = (Tag)this.ListBox_Tags.SelectedItems[0];
+				Tag tag = (Tag)this.ListBox_Ignoreds.SelectedItems[0];
 
 				this.ignoreds.Remove(tag.Namespaced);
 
