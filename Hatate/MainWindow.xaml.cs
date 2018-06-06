@@ -585,7 +585,7 @@ namespace Hatate
 
 			item = new MenuItem();
 			item.Header = "Add tags";
-			item.Tag = "AddTagsForSelectedResults";
+			item.Tag = "addTagsForSelectedResults";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
