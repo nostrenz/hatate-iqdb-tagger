@@ -6,7 +6,13 @@
         mc:Ignorable="d"
         Title="Hatate - iqdb images tagger" Height="475" Width="610" MinWidth="610" MinHeight="475">
 	<Grid Background="{DynamicResource WindowBackground}">
-		<ListBox x:Name="ListBox_Files" Margin="0,18,236,95" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True"/>
+		<ListBox x:Name="ListBox_Files" Margin="0,18,236,95" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding ImagePath}" Foreground="{Binding Foreground}"/>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
 		<Label x:Name="Label_Remaining" Content="Remaining" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,64"/>
 		<Label x:Name="Label_Results" Content="Results" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,33"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20" Margin="0,0,0,33"/>
@@ -27,26 +33,14 @@
 			<Label x:Name="Label_Status" Content="Status"/>
 		</StatusBar>
 		<Border BorderThickness="1" Height="74" Margin="0,18,118,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
-			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Original_MouseDown"/>
+			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Original_MouseDown" Cursor="Hand"/>
 		</Border>
 		<Border BorderThickness="1" Height="74" Margin="0,18,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
-			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Match_MouseDown"/>
+			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Match_MouseDown" Cursor="Hand"/>
 		</Border>
-		<Button x:Name="Button_Apply" Content="Apply" Margin="0,0,0,95" Click="Button_Apply_Click" HorizontalAlignment="Right" Width="231" Height="27" VerticalAlignment="Bottom" IsEnabled="False" Background="#FFF57F08" Foreground="White" BorderBrush="{x:Null}">
-			<Button.Style>
-				<Style TargetType="Button">
-					<Style.Triggers>
-						<Trigger Property="IsEnabled" Value="False">
-							<Setter Property="Background" Value="{DynamicResource HeaderBackground}" />
-							<Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
-						</Trigger>
-					</Style.Triggers>
-				</Style>
-			</Button.Style>
-		</Button>
 		<Label Content="Original" Margin="0,92,118,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0"/>
 		<Label x:Name="Label_Match" Content="Match" Margin="0,92,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0"/>
-		<Grid Margin="0,113,0,127" HorizontalAlignment="Right" Width="231">
+		<Grid Margin="0,113,0,95" HorizontalAlignment="Right" Width="231">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
 				<RowDefinition Height="5" />
@@ -66,7 +60,7 @@
 				<ListBox x:Name="ListBox_Ignoreds" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_UnknownTags_ContextMenuOpening">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
-							<TextBlock Text="{Binding Value}"/>
+							<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
 				</ListBox>

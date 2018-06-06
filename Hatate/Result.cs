@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Brush = System.Windows.Media.Brush;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace Hatate
 {
@@ -7,8 +9,10 @@ namespace Hatate
 	/// </summary>
 	class Result
 	{
-		public Result()
+		public Result(string imagePath)
 		{
+			this.ImagePath = imagePath;
+
 			this.Tags = new List<Tag>();
 			this.Ignoreds = new List<Tag>();
 		}
@@ -20,6 +24,8 @@ namespace Hatate
 		*/
 
 		#region Accessor
+
+		public string ImagePath { get; set; }
 
 		public bool Searched { get; set; }
 
@@ -68,6 +74,25 @@ namespace Hatate
 		public bool HasTags
 		{
 			get { return this.Tags.Count > 0; }
+		}
+
+		/// <summary>
+		/// Text color in the Files listbox.
+		/// </summary>
+		public Brush Foreground
+		{
+			get
+			{
+				if (!this.Searched) {
+					return (Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFD2D2D2");
+				}
+
+				if (!this.Found) {
+					return Brushes.Red;
+				}
+
+				return (this.HasTags ? Brushes.LimeGreen : Brushes.Orange);
+			}
 		}
 
 		#endregion Accessor
