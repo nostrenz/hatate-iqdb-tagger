@@ -920,6 +920,17 @@ namespace Hatate
 				result.Tags.Clear();
 				result.Ignoreds.Clear();
 			}
+
+			this.RefreshListboxes();
+		}
+
+		/// <summary>
+		/// Refresh the tags and ignored listboxes to update their content from the selected result.
+		/// </summary>
+		private void RefreshListboxes()
+		{
+			this.ListBox_Tags.Items.Refresh();
+			this.ListBox_Ignoreds.Items.Refresh();
 		}
 
 		/// <summary>
@@ -1071,8 +1082,7 @@ namespace Hatate
 				result.Tags.Remove(tag);
 				result.Ignoreds.Add(tag);
 
-				this.ListBox_Tags.Items.Refresh();
-				this.ListBox_Ignoreds.Items.Refresh();
+				this.RefreshListboxes();
 			}
 		}
 
@@ -1092,8 +1102,7 @@ namespace Hatate
 				result.Ignoreds.Remove(tag);
 				result.Tags.Add(tag);
 
-				this.ListBox_Tags.Items.Refresh();
-				this.ListBox_Ignoreds.Items.Refresh();
+				this.RefreshListboxes();
 			}
 
 			// Rewrite the ignoreds tags list since we removed some items from it
@@ -1574,8 +1583,13 @@ namespace Hatate
 			bool hasSelecteds = (countSelected > 0);
 			bool singleSelected = (countSelected == 1);
 
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds);
+			bool searched = true;
+			if (singleSelected) {
+				searched = this.SelectedResult.Searched;
+			}
+
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds && searched);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds && searched);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 3, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds);
