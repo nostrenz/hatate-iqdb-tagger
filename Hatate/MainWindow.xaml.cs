@@ -45,6 +45,10 @@ namespace Hatate
 		private int delay = 0;
 		private Timer timer;
 
+		// List of accepted image extentions
+		private string[]  imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
+
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -170,7 +174,7 @@ namespace Hatate
 			try {
 				image = System.Drawing.Image.FromFile(filepath);
 			} catch (OutOfMemoryException) {
-				// Cannot generate thumbnail, we will upload the original file
+				// Cannot open file, we will upload the original file
 				return filepath;
 			}
 
@@ -208,15 +212,15 @@ namespace Hatate
 		{
 			int progress = 0;
 
-			// Will run until the list is empty or every files in it has been searched
-			// NOTE: progress is incremented each time the loop doesn't reach the end where it is reset to 0
+			// Will run until the list is empty or every files in it had been searched
+			// NOTE: progress is incremented each time the loop doesn't reach the end where it's reset to 0
 			while (this.ListBox_Files.Items.Count > 0) {
 				// No more files
 				if (progress >= this.ListBox_Files.Items.Count) {
 					return -1;
 				}
 
-				Result result = (Result)this.ListBox_Files.Items[progress];
+				Result result = this.GetResultAt(progress);
 
 				// Already searched
 				if (result != null && result.Searched) {
@@ -280,7 +284,7 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task SearchFile(int index)
 		{
-			Result result = (Result)this.ListBox_Files.Items[index];
+			Result result = this.GetResultAt(index);
 
 			// Remove non existant file
 			if (!File.Exists(result.ImagePath)) {
@@ -843,7 +847,7 @@ namespace Hatate
 		/// <returns></returns>
 		private bool HasFoundResult(int index)
 		{
-			Result result = (Result)this.ListBox_Files.Items[index];
+			Result result = this.GetResultAt(index);
 
 			return result != null && result.Found;
 		}
@@ -1263,7 +1267,7 @@ namespace Hatate
 			bool asked = false;
 
 			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				Result result = (Result)this.ListBox_Files.SelectedItems[0];
+				Result result = this.GetSelectedResultAt(0);
 
 				// Warn when trying to move to notfound with a result
 				if (!asked && result != null && result.Greenlight) {
@@ -1371,17 +1375,6 @@ namespace Hatate
 				}
 
 				return path;
-			}
-		}
-
-		/// <summary>
-		/// List of accepted image extentions.
-		/// </summary>
-		private string[] ImagesFilesExtensions
-		{
-			get
-			{
-				return new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
 			}
 		}
 
@@ -1582,8 +1575,8 @@ namespace Hatate
 
 			bool hasSelecteds = (countSelected > 0);
 			bool singleSelected = (countSelected == 1);
-
 			bool searched = true;
+
 			if (singleSelected) {
 				searched = this.SelectedResult.Searched;
 			}
@@ -1731,7 +1724,7 @@ namespace Hatate
 
 			// Add images to the list
 			foreach (string file in files) {
-				if (this.IsCorrespondingToFilter(file, ImagesFilesExtensions)) {
+				if (this.IsCorrespondingToFilter(file, imagesFilesExtensions)) {
 					this.AddFileToList(file, tags);
 				}
 			}
