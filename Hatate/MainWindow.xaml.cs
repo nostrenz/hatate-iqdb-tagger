@@ -28,7 +28,6 @@ namespace Hatate
 	{
 		const int MAX_PATH_LENGTH = 260;
 
-		const string DIR_TAGS      = @"\tags\";
 		const string DIR_THUMBS    = @"\thumbs\";
 		const string DIR_IMGS      = @"\imgs\";
 		const string DIR_NOT_FOUND = @"notfound\";
@@ -120,10 +119,10 @@ namespace Hatate
 		/// </summary>
 		private void LoadIgnoredTags()
 		{
-			string ignored = this.GetTxtPath(TXT_IGNOREDS);
+			string txtPath = this.IgnoredsTxtPath;
 
-			if (File.Exists(ignored)) {
-				this.ignoreds = new List<string>(File.ReadAllLines(ignored));
+			if (File.Exists(txtPath)) {
+				this.ignoreds = new List<string>(File.ReadAllLines(txtPath));
 			}
 
 			this.SetStatus("Tags loaded.");
@@ -288,7 +287,7 @@ namespace Hatate
 
 			// Remove non existant file
 			if (!File.Exists(result.ImagePath)) {
-				this.ListBox_Files.Items.Remove(result);
+				this.RemoveResultFromFilesListbox(result);
 
 				return;
 			}
@@ -780,8 +779,7 @@ namespace Hatate
 				this.WriteIgnoredsTags(result.Ignoreds);
 			}
 
-			// Remove the row
-			this.ListBox_Files.Items.Remove(result);
+			this.RemoveResultFromFilesListbox(result);
 		}
 
 
@@ -791,8 +789,7 @@ namespace Hatate
 		/// <param name="ignoredTags"></param>
 		private void WriteIgnoredsTags(List<Tag> ignoredTags)
 		{
-			string txtPath = this.GetTxtPath(TXT_IGNOREDS);
-			StreamWriter file = new StreamWriter(txtPath, File.Exists(txtPath));
+			StreamWriter file = new StreamWriter(this.IgnoredsTxtPath, true);
 
 			if (this.ignoreds == null) {
 				this.ignoreds = new List<string>();
@@ -811,6 +808,20 @@ namespace Hatate
 			file.Close();
 		}
 
+		/// <summary>
+		/// Remove a result from the Files listbox.
+		/// </summary>
+		/// <param name="result"></param>
+		private void RemoveResultFromFilesListbox(Result result)
+		{
+			// Remove the row
+			this.ListBox_Files.Items.Remove(result);
+
+			// Empty tags listboxes
+			result.Tags.Clear();
+			result.Ignoreds.Clear();
+			this.RefreshListboxes();
+		}
 
 		/// <summary>
 		/// Move a files to the not "notfound" folder and remove the row.
@@ -823,7 +834,7 @@ namespace Hatate
 			}
 
 			this.MoveFile(result.ImagePath, this.NotfoundDirPath);
-			this.ListBox_Files.Items.Remove(result);
+			this.RemoveResultFromFilesListbox(result);
 		}
 
 		/// <summary>
@@ -895,7 +906,7 @@ namespace Hatate
 		private void RemoveSelectedFiles()
 		{
 			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				this.ListBox_Files.Items.Remove(this.ListBox_Files.SelectedItems[0]);
+				this.RemoveResultFromFilesListbox(this.GetSelectedResultAt(0));
 			}
 		}
 
@@ -963,9 +974,9 @@ namespace Hatate
 		/// <param name="tags"></param>
 		private int CleanIgnoredsTxt()
 		{
-			string path = this.GetTxtPath(TXT_IGNOREDS);
+			string txtPath = this.IgnoredsTxtPath;
 
-			if (!File.Exists(path)) {
+			if (!File.Exists(txtPath)) {
 				return 0;
 			}
 
@@ -980,7 +991,7 @@ namespace Hatate
 				}
 			}
 
-			this.WriteTagsToTxt(path, copies, false);
+			this.WriteTagsToTxt(txtPath, copies, false);
 
 			return unecessary;
 		}
@@ -1070,15 +1081,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Get the path to one of the text file.
-		/// </summary>
-		/// <returns></returns>
-		private string GetTxtPath(string txt)
-		{
-			return App.appDir + DIR_TAGS + txt;
-		}
-
-		/// <summary>
 		/// Add all the selected items in a given list to he ignoreds list and remove them from the listbox.
 		/// </summary>
 		private void IngnoreSelectItems()
@@ -1118,11 +1120,11 @@ namespace Hatate
 				this.RefreshListboxes();
 			}
 
-			string txtPath = this.GetTxtPath(TXT_IGNOREDS);
+			string txtPath = this.IgnoredsTxtPath;
 
 			// Rewrite the ignoreds tags list since we removed some items from it
 			if (hasIgnoredTags && File.Exists(txtPath)) {
-				this.WriteTagsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ignoreds, false);
+				this.WriteTagsToTxt(txtPath, this.ignoreds, false);
 			}
 		}
 
@@ -1418,6 +1420,15 @@ namespace Hatate
 		private bool HasIgnoredTags
 		{
 			get { return this.ignoreds != null && this.ignoreds.Count > 0; }
+		}
+
+		/// <summary>
+		/// Get path to the ignoreds text file.
+		/// </summary>
+		/// <returns></returns>
+		private string IgnoredsTxtPath
+		{
+			get { return App.appDir + @"\" + TXT_IGNOREDS; }
 		}
 
 		#endregion Accessor
