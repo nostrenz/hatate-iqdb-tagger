@@ -1282,11 +1282,15 @@ namespace Hatate
 		{
 			BitmapImage bitmap = new BitmapImage();
 
-			// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten)
-			bitmap.BeginInit();
-			bitmap.UriSource = new Uri(filepath);
-			bitmap.CacheOption = BitmapCacheOption.OnLoad;
-			bitmap.EndInit();
+			try {
+				// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten)
+				bitmap.BeginInit();
+				bitmap.UriSource = new Uri(filepath);
+				bitmap.CacheOption = BitmapCacheOption.OnLoad;
+				bitmap.EndInit();
+			} catch (IOException e) {
+				return null;
+			}
 
 			return bitmap;
 		}
