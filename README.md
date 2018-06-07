@@ -7,44 +7,22 @@ Search and tag images using IQDB.
 * **dcsoup** by _matarillo_:
 [GitHub](https://github.com/matarillo/dcsoup)
 
-## What does it do?
-
-Takes all the images (JPG, JPEG and PNG) from the selected folder and send them to IQDB.
-If a match is found the file is moved to a "tagged" subfolder alongside a text file containing all the tags.
-Otherwise it will be moved to a "notfound" subfolder.
-
 ## How to use
 
-1. Start the program, click "Open folder" and select a folder containing the images you want to tag
+1. Start the program and import images by drag and drop or by clicking "Add files" or "Add folder" in the "Files" menu
 2. Click the "Start" button
 3. Leave it open until all the images were searched
-	* 3.1 If you checked the "Compare" option, you will have to confirm each result
+
+Found images will by colored in green in the list or in red otherwise.
+
+When an image is selected in the list the found tags will appear on the right.
+
+When you want to write the tags for the found images, select all the green rows then right click and choose "Write tags".
+Files will be moved in the "imgs/tagged/" folder from the app directory.
 
 ## Options
 
-The "Options" button in the menubar allow to change some parameters:
-
-### Keep only known tags
-
-If checked, will compare the found tags with the ones from text fields inside a "tags" folder and only keep those that matches.
-To setup this function, you will need to create a "tags" folder alongside the program executable and put some text files in it: `tags.txt`, `series.txt`, `characters.txt` and `creators.txt`.
-Put one tag per line in those files. `tags.txt` is for general tags while the others are for namespaces.
-Example:
-```
--> Content of tags.txt:
-tag1
-tag2
-
--> Content of series.txt:
-tag3
-```
-With that, if an image is found with the tags `tag1`, `tag2`, `tag3` and `tag4`, the text file for this image will contain:
-```
-tag1
-tag2
-series:tag3
-```
-Note that `tag4` is scrapped and that `tag3` has the `series` namespace before it.
+The "Options" button in the menubar allows to change some parameters:
 
 ### Add rating to tags:
 
@@ -80,11 +58,6 @@ Not found results or found without unknown tags will be moved automatically afte
 
 When importing files into the program a window will be shown asking for tags
 Those tags will be added to the known tag list for each imported files.
-
-### Parse booru page when possible
-
-Will parse the image's booru page to retrieve namespaces tags.
-If not checked the unnamespaced tags from IQDB will be used.
 
 ### Always rename move files using MD5
 
