@@ -17,12 +17,16 @@
 		<Label x:Name="Label_Results" Content="Results" Height="26" VerticalAlignment="Bottom" Margin="0,0,75,33"/>
 		<Button x:Name="Button_Start" Content="Start" Click="Button_Start_Click" Height="57" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsEnabled="False" Background="#FF3CB21A" Foreground="White" BorderBrush="{x:Null}" FontSize="20" Margin="0,0,0,33"/>
 		<Menu Height="18" VerticalAlignment="Top" Background="{DynamicResource HeaderBackground}">
-			<MenuItem Header="Files" Height="18" >
-				<MenuItem x:Name="MenuItem_AddFiles" Header="Add files" Click="MenuItem_AddFiles_Click"/>
-				<MenuItem x:Name="MenuItem_AddFolder" Header="Add folder" Click="MenuItem_AddFolder_Click"/>
-				<MenuItem x:Name="MenuItem_OpenAppFolder" Header="Open app folder" Click="MenuItem_OpenAppFolder_Click"/>
+			<MenuItem Header="Files" Height="18">
+				<MenuItem Header="Add files" Click="MenuItem_AddFiles_Click"/>
+				<MenuItem Header="Add folder" Click="MenuItem_AddFolder_Click"/>
+				<MenuItem Header="Open folder...">
+					<MenuItem Header="Program" Click="MenuItem_OpenProgramFolder_Click"/>
+					<MenuItem Header="Tagged images" Click="MenuItem_OpenTaggedFolder"/>
+					<MenuItem Header="Not found images" Click="MenuItem_OpenNotFoundFolder"/>
+				</MenuItem>
 			</MenuItem>
-			<MenuItem Header="Maintenance" Height="18" >
+			<MenuItem Header="Maintenance" Height="18">
 				<MenuItem Header="Reload ignored tags" Click="MenuItem_ReloadIgnoredTags_Click"/>
 				<MenuItem Header="Clean ignored tags" Click="MenuItem_CleanLists_Click"/>
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>

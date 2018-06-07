@@ -1697,13 +1697,33 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Called when clicking on the "Open app folder" menubar item, open the current working folder.
+		/// Called when clicking on the "Open folder... > Program" menubar item, open the folder where the program is located.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MenuItem_OpenAppFolder_Click(object sender, RoutedEventArgs e)
+		private void MenuItem_OpenProgramFolder_Click(object sender, RoutedEventArgs e)
 		{
 			this.StartProcess(App.appDir);
+		}
+
+		/// <summary>
+		/// Called when clicking on the "Open folder... > Tagged images" menubar item, open the "imgs/tagged" folder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_OpenTaggedFolder(object sender, RoutedEventArgs e)
+		{
+			this.StartProcess(this.TaggedDirPath);
+		}
+
+		/// <summary>
+		/// Called when clicking on the "Open folder... > Tagged images" menubar item, open the "imgs/notfound" folder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_OpenNotFoundFolder(object sender, RoutedEventArgs e)
+		{
+			this.StartProcess(this.NotfoundDirPath);
 		}
 
 		/// <summary>
