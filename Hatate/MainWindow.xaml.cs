@@ -345,20 +345,20 @@ namespace Hatate
 				return; // May happen if the file is in use
 			}
 
-			IqdbApi.Models.SearchResult searchResult = null;
+			IqdbApi.Models.SearchResult iqdbResult = null;
 
 			try {
-				searchResult = await new IqdbApi.IqdbApi().SearchFile(fs);
+				iqdbResult = await new IqdbApi.IqdbApi().SearchFile(fs);
 			} catch (Exception) {
 				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
 			}
 
 			// No result found
-			if (searchResult != null && searchResult.Matches != null) {
-				this.lastSearchedInSeconds = (int)searchResult.SearchedInSeconds;
+			if (iqdbResult != null && iqdbResult.Matches != null) {
+				this.lastSearchedInSeconds = (int)iqdbResult.SearchedInSeconds;
 
 				// If found, check for matching results
-				this.CheckMatches(searchResult.Matches, result);
+				this.CheckMatches(iqdbResult.Matches, result);
 			}
 
 			fs.Close();
@@ -394,7 +394,7 @@ namespace Hatate
 
 				bool success = this.ParseBooruPage(result);
 
-				// Failed to parse the booru page 
+				// Failed to parse the booru page
 				if (!success) {
 					continue;
 				}
@@ -791,12 +791,17 @@ namespace Hatate
 		/// <param name="ignoredTags"></param>
 		private void WriteIgnoredsTags(List<Tag> ignoredTags)
 		{
-			StreamWriter file = new StreamWriter(this.GetTxtPath(TXT_IGNOREDS), true);
+			string txtPath = this.GetTxtPath(TXT_IGNOREDS);
+			StreamWriter file = new StreamWriter(txtPath, File.Exists(txtPath));
+
+			if (this.ignoreds == null) {
+				this.ignoreds = new List<string>();
+			}
 
 			foreach (Tag tag in ignoredTags) {
 				string namespaced = tag.Namespaced;
 
-				// Tag isn't already in the txt list, add it
+				// Tag isn't already known as ignored, add it
 				if (!this.ignoreds.Contains(namespaced)) {
 					this.ignoreds.Add(namespaced);
 					file.WriteLine(namespaced);
@@ -1097,11 +1102,15 @@ namespace Hatate
 		private void UningnoreSelectItems()
 		{
 			Result result = this.SelectedResult;
+			bool hasIgnoredTags = this.HasIgnoredTags;
 
 			while (this.ListBox_Ignoreds.SelectedItems.Count > 0) {
 				Tag tag = (Tag)this.ListBox_Ignoreds.SelectedItems[0];
 
-				this.ignoreds.Remove(tag.Namespaced);
+				// We don't have any ignored tags
+				if (hasIgnoredTags) {
+					this.ignoreds.Remove(tag.Namespaced);
+				}
 
 				result.Ignoreds.Remove(tag);
 				result.Tags.Add(tag);
@@ -1109,8 +1118,12 @@ namespace Hatate
 				this.RefreshListboxes();
 			}
 
+			string txtPath = this.GetTxtPath(TXT_IGNOREDS);
+
 			// Rewrite the ignoreds tags list since we removed some items from it
-			this.WriteTagsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ignoreds, false);
+			if (hasIgnoredTags && File.Exists(txtPath)) {
+				this.WriteTagsToTxt(this.GetTxtPath(TXT_IGNOREDS), this.ignoreds, false);
+			}
 		}
 
 		/// <summary>
@@ -1191,6 +1204,10 @@ namespace Hatate
 		/// <returns></returns>
 		private bool IsTagInIgnoreds(Tag tag)
 		{
+			if (!this.HasIgnoredTags) {
+				return false;
+			}
+
 			return this.ignoreds.Contains(tag.Namespaced);
 		}
 
@@ -1393,6 +1410,14 @@ namespace Hatate
 		private Result SelectedResult
 		{
 			get { return (Result)this.ListBox_Files.SelectedItem; }
+		}
+
+		/// <summary>
+		/// Check if we have ignored tags.
+		/// </summary>
+		private bool HasIgnoredTags
+		{
+			get { return this.ignoreds != null && this.ignoreds.Count > 0; }
 		}
 
 		#endregion Accessor
