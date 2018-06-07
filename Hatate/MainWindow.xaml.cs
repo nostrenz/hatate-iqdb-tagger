@@ -1811,7 +1811,10 @@ namespace Hatate
 				return;
 			}
 
-			Process.Start("https:" + result.Url);
+			// All the known sources supports HTTPS except Eshuushuu
+			bool supportsHttps = (result.Source != IqdbApi.Enums.Source.Eshuushuu);
+
+			Process.Start("http" + (supportsHttps ? "s" : "") + ":" + result.Url);
 		}
 
 		#endregion Event
