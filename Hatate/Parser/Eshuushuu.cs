@@ -63,7 +63,7 @@
 			Supremes.Nodes.Elements searchTags = tagList.Select("span > a");
 
 			foreach (Supremes.Nodes.Element searchTag in searchTags) {
-				this.tags.Add(new Tag(searchTag.Text, nameSpace));
+				this.AddTag(searchTag.Text, nameSpace);
 			}
 		}
 	}
