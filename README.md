@@ -13,12 +13,12 @@ Search and tag images using IQDB.
 2. Click the "Start" button
 3. Leave it open until all the images were searched
 
-Found images will by colored in green in the list or in red otherwise.
+Found images will be colored in green in the list or in red otherwise.
 
 When an image is selected in the list the found tags will appear on the right.
 
 When you want to write the tags for the found images, select all the green rows then right click and choose "Write tags".
-Files will be moved in the "imgs/tagged/" folder from the app directory.
+When tags are written for an image the file is moved to the "imgs/tagged/" folder inside the program's directory alongside a text file with the same name as the image.
 
 ## Options
 
@@ -30,12 +30,12 @@ If available the rating will be added as a tag, for example `rating:safe`.
 
 ### Minimum match type
 
-If checked, only the results with a match type greater or equal that the selected one will be kept.
+If checked, only results with a match type greater or equal than the selected one will be kept.
 For the best results, check this option and select "Best" in the list.
 
 ### Minimum number of tags
 
-Define how many tags are needed to keep a result. With a value of `1`, results without any tags will be scrapped.
+Define how many tags are needed to keep a result. With a value of `1`, results without any tags will be marked as not found.
 
 ### Minimum similarity
 
@@ -44,25 +44,25 @@ Define the minimum similarity value to keep a result. A lower value will reduce 
 ### Delay
 
 To prevent from abusing the IQDB service and being banned from it, a certain wait time is applied between each search.
-The default is 60 seconds, consider increasing it if you have a lot of time fot it to run but don't reduce it to much.
+Default is 60 seconds, consider increasing it if you have a lot of time for it to run but don't reduce it to much (30 seconds should be ok).
 
 ### Randomize the delay
 
-Will use a random delay based on the one from the previous option.
+Will use a random delay based on the Delay option.
 
 ### Automatically move files when no user action is needed
 
-Not found results or found without unknown tags will be moved automatically after being searched.
+Not found or found results with at least one tag will be moved automatically to the `notfound` or `tagged` folder after being searched.
 
 ### Ask for tags when adding files to the list
 
-When importing files into the program a window will be shown asking for tags
-Those tags will be added to the known tag list for each imported files.
+When importing files into the program a window will be shown asking for tags.
+Those tags will be added to the tags list for each imported files.
 
 ### Always rename move files using MD5
 
-Usually when a file is moved to the `tagged` or `not found` folder it will keep its original name unless the resulting path is too long or a file with the same name already exists in the destination folder, in that case the file will be renamed by calculating its MD5.
-If this option is checked, all the moved files will be renamed taht way.
+Usually when a file is moved to the `tagged` or `not found` folder it will keep its original name unless the resulting path is too long or a file with the same name already exists at the destination folder, in that case the file will be renamed by calculating its MD5.
+If this option is checked, all the moved files will be renamed that way.
 
 ### Sources
 
