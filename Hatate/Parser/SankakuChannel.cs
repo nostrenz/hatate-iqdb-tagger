@@ -10,7 +10,7 @@
 
 		override protected bool Parse(Supremes.Nodes.Document doc)
 		{
-			// Not yet implemented
+			// Not implemented
 			return false;
 		}
 	}

@@ -12,10 +12,18 @@
 		{
 			Supremes.Nodes.Elements tagRows = doc.Select("ul#tags li");
 
-			foreach (Supremes.Nodes.Element tagRow in tagRows) {
-				Supremes.Nodes.Elements a = tagRow.Select("a");
+			if (tagRows == null) {
+				return false;
+			}
 
-				string value = a.Text.Replace(tagRow.Text, "").Trim();
+			foreach (Supremes.Nodes.Element tagRow in tagRows) {
+				Supremes.Nodes.Elements link = tagRow.Select("a");
+
+				if (link == null) {
+					continue;
+				}
+
+				string value = link.Text.Replace(tagRow.Text, "").Trim();
 				string nameSpace = tagRow.Text.Replace(value, "").Trim();
 
 				switch (nameSpace) {
