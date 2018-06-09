@@ -430,7 +430,7 @@ namespace Hatate
 		private bool ParseBooruPage(Result result)
 		{
 			Parser.IParser booru = null;
-			string urlPrefix = "https";
+			string urlPrefix = "https:";
 
 			switch (result.Source) {
 				case IqdbApi.Enums.Source.Danbooru:
@@ -444,19 +444,21 @@ namespace Hatate
 				break;
 				case IqdbApi.Enums.Source.Yandere:
 					booru = new Parser.Yandere();
+					urlPrefix = "";
 				break;
 				case IqdbApi.Enums.Source.SankakuChannel:
 					booru = new Parser.SankakuChannel();
 				break;
 				case IqdbApi.Enums.Source.Eshuushuu:
 					booru = new Parser.Eshuushuu();
-					urlPrefix = "http";
+					urlPrefix = "http:";
 				break;
 				case IqdbApi.Enums.Source.TheAnimeGallery:
 					booru = new Parser.TheAnimeGallery();
 				break;
 				case IqdbApi.Enums.Source.Zerochan:
 					booru = new Parser.Zerochan();
+					urlPrefix = "";
 				break;
 				case IqdbApi.Enums.Source.AnimePictures:
 					booru = new Parser.AnimePictures();
@@ -464,7 +466,7 @@ namespace Hatate
 				default: return false;
 			}
 
-			bool success = booru.FromUrl(urlPrefix + ":" + result.Url);
+			bool success = booru.FromUrl(urlPrefix + result.Url);
 
 			if (success) {
 				result.Tags = booru.Tags;
@@ -1874,10 +1876,7 @@ namespace Hatate
 				return;
 			}
 
-			// All the known sources supports HTTPS except Eshuushuu
-			bool supportsHttps = (result.Source != IqdbApi.Enums.Source.Eshuushuu);
-
-			Process.Start("http" + (supportsHttps ? "s" : "") + ":" + result.Url);
+			Process.Start(result.Url);
 		}
 
 		#endregion Event
