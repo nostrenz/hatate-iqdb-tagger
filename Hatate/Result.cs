@@ -61,23 +61,6 @@ namespace Hatate
 		public IqdbApi.Enums.Rating Rating { get; set; }
 
 		/// <summary>
-		/// Result is greenlighted if found and has at least one tag.
-		/// </summary>
-		public bool Greenlight
-		{
-			get
-			{
-				// Not found
-				if (!this.Found) {
-					return false;
-				}
-
-				// Found, check the tags
-				return this.HasTags || this.Ignoreds.Count > 0;
-			}
-		}
-
-		/// <summary>
 		/// A non-null preview URL means that the image was found on IQDB.
 		/// </summary>
 		public bool Found
@@ -86,11 +69,19 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Check if we have known tags.
+		/// Check if we have tags.
 		/// </summary>
 		public bool HasTags
 		{
 			get { return this.Tags.Count > 0; }
+		}
+
+		/// <summary>
+		/// Check if we have known tags or ignoreds tags.
+		/// </summary>
+		public bool HasTagsOrIgnoreds
+		{
+			get { return this.HasTags || this.Ignoreds.Count > 0; }
 		}
 
 		/// <summary>

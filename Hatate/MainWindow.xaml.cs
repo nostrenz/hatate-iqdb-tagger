@@ -303,7 +303,7 @@ namespace Hatate
 			result.Searched = true;
 
 			// We have tags
-			if (result.Greenlight) {
+			if (result.HasTagsOrIgnoreds) {
 				this.SetStatus("File found.");
 
 				// Move or update the color
@@ -1289,7 +1289,7 @@ namespace Hatate
 				Result result = this.GetSelectedResultAt(0);
 
 				// Warn when trying to move to notfound with a result
-				if (!asked && result != null && result.Greenlight) {
+				if (!asked && result != null && result.HasTagsOrIgnoreds) {
 					asked = true;
 
 					System.Windows.Forms.DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
@@ -1522,7 +1522,7 @@ namespace Hatate
 			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
 
 			// The following need the result to be found
-			if (!result.Greenlight) {
+			if (!result.Found) {
 				return;
 			}
 
