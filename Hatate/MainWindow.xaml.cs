@@ -469,7 +469,7 @@ namespace Hatate
 			bool success = booru.FromUrl(urlPrefix + result.Url);
 
 			if (success) {
-				result.Tags = booru.Tags;
+				this.AddTagsToResult(booru.Tags, result);
 			}
 
 			return success;
@@ -850,7 +850,7 @@ namespace Hatate
 			try {
 				File.Move(filepath, destination);
 			} catch (Exception e) {
-				MessageBox.Show("Unable to move file\n" + filepath + "\n\n" + e.Message);
+				MessageBox.Show("Unable to move file\n" + filepath + "\nto\n" + destination + "\n\n" + e.Message);
 
 				return null;
 			}
@@ -1257,11 +1257,10 @@ namespace Hatate
 		private void AddTagsToResult(List<Tag> tags, Result result)
 		{
 			foreach (Tag tag in tags) {
-				// Append the new tag to the list
 				if (!result.Tags.Contains(tag)) {
 					result.Tags.Add(tag);
 				}
-			}
+			}			
 		}
 
 		/// <summary>

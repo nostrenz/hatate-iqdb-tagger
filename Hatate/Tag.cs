@@ -47,7 +47,7 @@ namespace Hatate
 		/// <returns></returns>
 		public override bool Equals(object obj)
 		{
-			var item = obj as Tag;
+			Tag item = obj as Tag;
 
 			if (item == null) {
 				return false;
