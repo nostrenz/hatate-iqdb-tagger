@@ -13,6 +13,8 @@ Search and tag images using IQDB.
 2. Click the "Start" button
 3. Leave it open until all the images were searched
 
+![Main window](https://raw.githubusercontent.com/nostrenz/hatate-iqdb-tagger/master/screenshots/window.png)
+
 Found images will be colored in green in the list or in red otherwise.
 
 When an image is selected in the list the found tags will appear on the right.
