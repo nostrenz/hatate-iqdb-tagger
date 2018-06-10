@@ -61,7 +61,7 @@ Not found or found results with at least one tag will be moved automatically to 
 When importing files into the program a window will be shown asking for tags.
 Those tags will be added to the tags list for each imported files.
 
-### Always rename move files using MD5
+### Always rename moved files using MD5
 
 Usually when a file is moved to the `tagged` or `not found` folder it will keep its original name unless the resulting path is too long or a file with the same name already exists at the destination folder, in that case the file will be renamed by calculating its MD5.
 If this option is checked, all the moved files will be renamed that way.
