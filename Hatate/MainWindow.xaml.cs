@@ -1878,8 +1878,8 @@ namespace Hatate
 
 			try {
 				Process.Start(result.Url);
-			} catch (System.ComponentModel.Win32Exception e) {
-				MessageBox.Show(e.Message);
+			} catch (System.ComponentModel.Win32Exception ex) {
+				MessageBox.Show(ex.Message);
 			}
 		}
 
