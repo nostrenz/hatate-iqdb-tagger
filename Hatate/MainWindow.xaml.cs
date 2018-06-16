@@ -56,7 +56,7 @@ namespace Hatate
 
 			this.CreateFilesListContextMenu();
 			this.CreateTagsListContextMenu();
-			this.CreateUnknownTagsListContextMenu();
+			this.CreateIgnoredsListContextMenu();
 
 			// Prevent closing the window if we have some search results left
 			this.Closing += new System.ComponentModel.CancelEventHandler(CustomClosing);
@@ -196,9 +196,9 @@ namespace Hatate
 			}
 
 			// Liberate resources
-			image.Dispose();
-			bmp.Dispose();
 			gr.Dispose();
+			bmp.Dispose();
+			image.Dispose();
 
 			return output;
 		}
@@ -417,8 +417,8 @@ namespace Hatate
 				// Add rating if not already in tags
 				if (Options.Default.AddRating
 				&& result.Rating != IqdbApi.Enums.Rating.Unrated
-				&& !result.Tags.Exists(t => t.Namespace == "rating"
-				)) {
+				&& !result.Tags.Exists(t => t.Namespace == "rating")
+				) {
 					result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating"));
 				}
 
@@ -664,7 +664,7 @@ namespace Hatate
 		/// <summary>
 		/// Create the context menu for the UnknownTags ListBox.
 		/// </summary>
-		private void CreateUnknownTagsListContextMenu()
+		private void CreateIgnoredsListContextMenu()
 		{
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
