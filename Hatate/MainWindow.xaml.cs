@@ -172,26 +172,37 @@ namespace Hatate
 
 			try {
 				image = System.Drawing.Image.FromFile(filepath);
-			} catch (OutOfMemoryException) {
-				// Cannot open file, we will upload the original file
+			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
 				return filepath;
 			}
 
 			int srcWidth = image.Width;
 			int srcHeight = image.Height;
+			
 			Decimal sizeRatio = ((Decimal)srcHeight / srcWidth);
 			int thumbHeight = Decimal.ToInt32(sizeRatio * width);
+			
 			Bitmap bmp = new Bitmap(width, thumbHeight);
 			Graphics gr = Graphics.FromImage(bmp);
+			Rectangle rectDestination = new Rectangle(0, 0, width, thumbHeight);
+
 			gr.SmoothingMode = SmoothingMode.HighQuality;
 			gr.CompositingQuality = CompositingQuality.HighQuality;
 			gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-			Rectangle rectDestination = new Rectangle(0, 0, width, thumbHeight);
+
+			try {
 			gr.DrawImage(image, rectDestination, 0, 0, srcWidth, srcHeight, GraphicsUnit.Pixel);
+			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
+				gr.Dispose();
+				bmp.Dispose();
+				image.Dispose();
+
+				return filepath;
+			}
 
 			try {
 				bmp.Save(output, ImageFormat.Jpeg);
-			} catch (Exception e) { // Cannot save thumbnail, we will upload the original file
+			} catch (IOException) { // Cannot save thumbnail, we'll upload the original file
 				output = filepath;
 			}
 
