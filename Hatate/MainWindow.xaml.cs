@@ -1733,6 +1733,8 @@ namespace Hatate
 		{
 			Manage window = new Manage(false);
 
+			this.LoadIgnoredTags();
+
 			if (this.ignoreds != null) {
 				foreach (string ignored in this.ignoreds) {
 					if (String.IsNullOrWhiteSpace(ignored)) {
