@@ -606,13 +606,13 @@ namespace Hatate
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
-			context.Items.Add(new Separator());
-
 			item = new MenuItem();
 			item.Header = "Search again";
 			item.Tag = "searchAgain";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
 
 			item = new MenuItem();
 			item.Header = "Copy path";
@@ -621,8 +621,8 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Open file";
-			item.Tag = "launchFile";
+			item.Header = "Open folder";
+			item.Tag = "openFolder";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1581,9 +1581,9 @@ namespace Hatate
 				case "copyFilePath":
 					Clipboard.SetText(this.SelectedResult.ImagePath);
 				break;
-				case "launchFile":
+				case "openFolder":
 					if (this.ListBox_Files.SelectedItem != null) {
-						this.StartProcess(this.SelectedResult.ImagePath);
+						this.StartProcess(Directory.GetParent(this.SelectedResult.ImagePath).FullName);
 					}
 				break;
 				case "copyTag":
@@ -1635,10 +1635,10 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 3, hasSelecteds);
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds);
-															// 5 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, singleSelected);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, singleSelected);
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, singleSelected); // "Search again"
+															// 6 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // "Copy path"
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, singleSelected); // "Open folder"
 		}
 
 		/// <summary>
