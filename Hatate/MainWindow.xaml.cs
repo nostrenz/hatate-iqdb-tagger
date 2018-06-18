@@ -1284,8 +1284,8 @@ namespace Hatate
 			List<Tag> tags = new List<Tag>();
 
 			if (bypassOption || Options.Default.AskTags) {
-				NewTags newTags = new NewTags();
-				tags = newTags.Tags;
+				Manage window = new Manage();
+				tags = window.Tags;
 			}
 
 			return tags;
@@ -1731,7 +1731,7 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_ManageIgnoreds_Click(object sender, RoutedEventArgs e)
 		{
-			NewTags window = new NewTags(false);
+			Manage window = new Manage(false);
 
 			if (this.ignoreds != null) {
 				foreach (string ignored in this.ignoreds) {
@@ -1740,19 +1740,23 @@ namespace Hatate
 					}
 
 					string[] parts = ignored.Split(':');
+					string value = parts[0];
 					string nameSpace = null;
 
 					if (parts.Length > 1) {
-						nameSpace = parts[1];
+						value = parts[1];
+						nameSpace = parts[0];
 					}
-
-					window.AddTag(parts[0], nameSpace);
+					
+					window.AddTag(value, nameSpace);
 				}
 			}
 
 			window.ShowDialog();
 
-			this.WriteTagsToTxt(this.IgnoredsTxtPath, window.Tags, false);
+			if (window.OkClicked) {
+				this.WriteTagsToTxt(this.IgnoredsTxtPath, window.Tags, false);
+			}
 		}
 
 		/// <summary>

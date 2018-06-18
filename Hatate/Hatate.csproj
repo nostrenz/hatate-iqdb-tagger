@@ -80,8 +80,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="NewTags.xaml.cs">
-      <DependentUpon>NewTags.xaml</DependentUpon>
+    <Compile Include="Manage.xaml.cs">
+      <DependentUpon>Manage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Parser\AnimePictures.cs" />
     <Compile Include="Parser\Danbooru.cs" />
@@ -112,7 +112,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="NewTags.xaml">
+    <Page Include="Manage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

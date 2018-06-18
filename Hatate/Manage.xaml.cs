@@ -7,11 +7,13 @@ using System.Windows.Input;
 namespace Hatate
 {
 	/// <summary>
-	/// Interaction logic for NewTags.xaml
+	/// Interaction logic for Tags.xaml
 	/// </summary>
-	public partial class NewTags : Window
+	public partial class Manage : Window
 	{
-		public NewTags(bool show=true)
+		private bool okClicked = false;
+
+		public Manage(bool show=true)
 		{
 			InitializeComponent();
 
@@ -110,6 +112,11 @@ namespace Hatate
 			}
 		}
 
+		public bool OkClicked
+		{
+			get { return this.okClicked; }
+		}
+
 		#endregion Accessor
 
 		/*
@@ -157,6 +164,8 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void Button_Ok_Click(object sender, RoutedEventArgs e)
 		{
+			this.okClicked = true;
+
 			this.Close();
 		}
 
