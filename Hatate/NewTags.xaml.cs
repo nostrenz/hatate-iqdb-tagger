@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Hatate
 {
@@ -19,7 +11,7 @@ namespace Hatate
 	/// </summary>
 	public partial class NewTags : Window
 	{
-		public NewTags()
+		public NewTags(bool show=true)
 		{
 			InitializeComponent();
 
@@ -36,8 +28,38 @@ namespace Hatate
 			this.ListBox_Tags.ContextMenu = context;
 			this.TextBox_Value.Focus();
 
-			this.ShowDialog();
+			if (show) {
+				this.ShowDialog();
+			}
 		}
+
+		/*
+		============================================
+		Public
+		============================================
+		*/
+
+		#region Public
+		
+		/// <summary>
+		/// Add a new tag to the list from string values.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="nameSpace"></param>
+		public void AddTag(string value, string nameSpace=null)
+		{
+			this.ListBox_Tags.Items.Add(new Tag(value, nameSpace));
+		}
+
+		#endregion Public
+
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		#region Private
 
 		/// <summary>
 		/// Add a tag to the list.
@@ -64,6 +86,8 @@ namespace Hatate
 
 			this.TextBox_Value.Clear();
 		}
+
+		#endregion Private
 
 		/*
 		============================================
@@ -136,8 +160,6 @@ namespace Hatate
 			this.Close();
 		}
 
-		#endregion Event
-
 		/// <summary>
 		/// Add the entered text as an unnamespaced tag.
 		/// </summary>
@@ -177,5 +199,7 @@ namespace Hatate
 		{
 			this.AddTag("creator");
 		}
+
+		#endregion Event
 	}
 }

@@ -1484,16 +1484,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Called when clicking on the menubar's Reload known tags button, reload the tags from the text files.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_ReloadIgnoredTags_Click(object sender, RoutedEventArgs e)
-		{
-			this.LoadIgnoredTags();
-		}
-
-		/// <summary>
 		/// Called when selecting a row in the files list.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -1706,12 +1696,22 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Called when clicking on the menubar's Reload known tags button, reload the tags from the text files.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_ReloadIgnoreds_Click(object sender, RoutedEventArgs e)
+		{
+			this.LoadIgnoredTags();
+		}
+
+		/// <summary>
 		/// Remove duplicates entries in the txt files.
 		/// Also remove the tags if they are in the ignoreds list.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MenuItem_CleanLists_Click(object sender, RoutedEventArgs e)
+		private void MenuItem_CleanIgnoreds_Click(object sender, RoutedEventArgs e)
 		{
 			this.LoadIgnoredTags();
 			this.SetStatus("Cleaning known tag lists...");
@@ -1722,6 +1722,37 @@ namespace Hatate
 
 			this.LoadIgnoredTags();
 			this.SetStatus(unecessary + " unecessary tags removed from the lists.");
+		}
+
+		/// <summary>
+		/// Open a window listing the ignored tags allowing to remove some of them or add new ones.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_ManageIgnoreds_Click(object sender, RoutedEventArgs e)
+		{
+			NewTags window = new NewTags(false);
+
+			if (this.ignoreds != null) {
+				foreach (string ignored in this.ignoreds) {
+					if (String.IsNullOrWhiteSpace(ignored)) {
+						continue;
+					}
+
+					string[] parts = ignored.Split(':');
+					string nameSpace = null;
+
+					if (parts.Length > 1) {
+						nameSpace = parts[1];
+					}
+
+					window.AddTag(parts[0], nameSpace);
+				}
+			}
+
+			window.ShowDialog();
+
+			this.WriteTagsToTxt(this.IgnoredsTxtPath, window.Tags, false);
 		}
 
 		/// <summary>
