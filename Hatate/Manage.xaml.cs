@@ -162,7 +162,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Button_Ok_Click(object sender, RoutedEventArgs e)
+		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
 			this.okClicked = true;
 
@@ -174,7 +174,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Button_AddAsUnnamespaced(object sender, RoutedEventArgs e)
+		private void Button_AddAsUnnamespaced_Click(object sender, RoutedEventArgs e)
 		{
 			this.AddTag("unnamespaced");
 		}
@@ -184,7 +184,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Button_AddAsSeries(object sender, RoutedEventArgs e)
+		private void Button_AddAsSeries_Click(object sender, RoutedEventArgs e)
 		{
 			this.AddTag("series");
 		}
@@ -194,7 +194,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Button_AddAsCharacter(object sender, RoutedEventArgs e)
+		private void Button_AddAsCharacter_Click(object sender, RoutedEventArgs e)
 		{
 			this.AddTag("character");
 		}
@@ -204,9 +204,20 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Button_AddAsCreator(object sender, RoutedEventArgs e)
+		private void Button_AddAsCreator_Click(object sender, RoutedEventArgs e)
 		{
 			this.AddTag("creator");
+		}
+
+		/// <summary>
+		/// Sort the tags by namespace and value.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_Sort_Click(object sender, RoutedEventArgs e)
+		{
+			this.ListBox_Tags.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Namespace", System.ComponentModel.ListSortDirection.Descending));
+			this.ListBox_Tags.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Value", System.ComponentModel.ListSortDirection.Ascending));
 		}
 
 		#endregion Event

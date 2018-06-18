@@ -6,10 +6,10 @@
 	xmlns:local="clr-namespace:Hatate"
     xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="Hatate.Manage"
 	mc:Ignorable="d"
-	Title="Manage tags" Height="281" Width="310.92" WindowStartupLocation="CenterOwner">
+	Title="Manage tags" Width="310" Height="281" MinWidth="310" MinHeight="230" WindowStartupLocation="CenterOwner">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<TextBox x:Name="TextBox_Value" Height="23" Margin="10,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="TextBox_Value_KeyDown"/>
-		<Button Content="Ok" Margin="10,0,9,10" Height="25" Click="Button_Ok_Click" VerticalAlignment="Bottom"/>
+		<Button Content="Save" Margin="84,0,9,10" Height="25" Click="Button_Save_Click" VerticalAlignment="Bottom"/>
 		<ListBox x:Name="ListBox_Tags" Margin="10,63,10,40" SelectionMode="Extended">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
@@ -18,9 +18,10 @@
 			</ListBox.ItemTemplate>
 		</ListBox>
 		<Label Content="Add as" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top"/>
-		<Button Content="unnamespaced" Margin="61,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="80" Click="Button_AddAsUnnamespaced" Foreground="CadetBlue"/>
-		<Button Content="series" Margin="146,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="35" Click="Button_AddAsSeries" Foreground="DeepPink"/>
-		<Button Content="character" Margin="186,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="53" Click="Button_AddAsCharacter" Foreground="LimeGreen"/>
-		<Button Content="creator" Margin="244,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="41" Click="Button_AddAsCreator" Foreground="Brown"/>
+		<Button Content="unnamespaced" Margin="61,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="80" Click="Button_AddAsUnnamespaced_Click" Foreground="CadetBlue"/>
+		<Button Content="series" Margin="146,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="35" Click="Button_AddAsSeries_Click" Foreground="DeepPink"/>
+		<Button Content="character" Margin="186,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="53" Click="Button_AddAsCharacter_Click" Foreground="LimeGreen"/>
+		<Button Content="creator" Margin="244,38,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="41" Click="Button_AddAsCreator_Click" Foreground="Brown"/>
+		<Button Content="Sort" Margin="10,0,0,10" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="69" Click="Button_Sort_Click"/>
 	</Grid>
 </Window>
