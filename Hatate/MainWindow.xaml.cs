@@ -178,10 +178,10 @@ namespace Hatate
 
 			int srcWidth = image.Width;
 			int srcHeight = image.Height;
-			
+
 			Decimal sizeRatio = ((Decimal)srcHeight / srcWidth);
 			int thumbHeight = Decimal.ToInt32(sizeRatio * width);
-			
+
 			Bitmap bmp = new Bitmap(width, thumbHeight);
 			Graphics gr = Graphics.FromImage(bmp);
 			Rectangle rectDestination = new Rectangle(0, 0, width, thumbHeight);
@@ -191,7 +191,7 @@ namespace Hatate
 			gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
 			try {
-			gr.DrawImage(image, rectDestination, 0, 0, srcWidth, srcHeight, GraphicsUnit.Pixel);
+				gr.DrawImage(image, rectDestination, 0, 0, srcWidth, srcHeight, GraphicsUnit.Pixel);
 			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
 				gr.Dispose();
 				bmp.Dispose();
@@ -1749,7 +1749,7 @@ namespace Hatate
 						value = parts[1];
 						nameSpace = parts[0];
 					}
-					
+
 					window.AddTag(value, nameSpace);
 				}
 			}
