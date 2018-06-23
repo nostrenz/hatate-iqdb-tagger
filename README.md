@@ -1,6 +1,8 @@
 # Hatate
 Search and tag images using IQDB.
 
+Tagged images can then be imported into [Hydrus](https://github.com/hydrusnetwork/hydrus).
+
 ## Dependencies
 * **IqdbApi** by _ImoutoChan_:
 [GitHub](https://github.com/ImoutoChan/IqdbApi)
@@ -9,8 +11,8 @@ Search and tag images using IQDB.
 
 ## How to use
 
-1. Start the program and import images by drag and drop or by clicking "Add files" or "Add folder" in the "Files" menu
-2. Click the "Start" button
+1. Start the program and import images by drag and drop or by clicking "**Add files**" or "**Add folder**" in the "**Files**" menu
+2. Click the "**Start**" button
 3. Leave it open until all the images were searched
 
 ![Main window](https://raw.githubusercontent.com/nostrenz/hatate-iqdb-tagger/master/screenshots/window.png)
@@ -19,12 +21,14 @@ Found images will be colored in green in the list or in red otherwise.
 
 When an image is selected in the list the found tags will appear on the right.
 
-When you want to write the tags for the found images, select all the green rows then right click and choose "Write tags".
-When tags are written for an image the file is moved to the "imgs/tagged/" folder inside the program's directory alongside a text file with the same name as the image.
+When you want to write tags for the found images, select all the green rows then right click and choose "**Write tags**".
+When tags are written for an image the file is moved to the `imgs/tagged/` folder inside the program's directory alongside a text file with the same name as the image.
+
+If you're using [Hydrus](https://github.com/hydrusnetwork/hydrus), images in the `imgs/tagged/` folder can be imported with their tags by cliking on the "**add tags based on filename**" button at the bottom of the import window then checking "**try to load tags from neighbouring .txt files**".
 
 ## Options
 
-The "Options" button in the menubar allows to change some parameters:
+The "**Options**" button in the menubar allows to change some parameters:
 
 ### Add rating to tags:
 
@@ -33,7 +37,7 @@ If available the rating will be added as a tag, for example `rating:safe`.
 ### Minimum match type
 
 If checked, only results with a match type greater or equal than the selected one will be kept.
-For the best results, check this option and select "Best" in the list.
+For the best results, check this option and select "**Best**" in the list.
 
 ### Minimum number of tags
 
