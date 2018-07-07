@@ -75,11 +75,17 @@ namespace Hatate.Parser
 		/// <param name="doc"></param>
 		protected void GetRating(Supremes.Nodes.Element doc, string selector)
 		{
-			Supremes.Nodes.Element nextLi = doc.Select(selector).First.NextElementSibling;
+			Supremes.Nodes.Element element = doc.Select(selector).First;
 
-			while (nextLi != null) {
-				string text = nextLi.Text;
-				nextLi = nextLi.NextElementSibling;
+			if (element == null) {
+				return;
+			}
+
+			element = element.NextElementSibling;
+
+			while (element != null) {
+				string text = element.Text;
+				element = element.NextElementSibling;
 
 				if (!text.StartsWith(RATING)) {
 					continue;
