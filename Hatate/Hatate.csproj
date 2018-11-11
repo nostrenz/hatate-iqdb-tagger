@@ -80,6 +80,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Image.cs" />
     <Compile Include="Manage.xaml.cs">
       <DependentUpon>Manage.xaml</DependentUpon>
     </Compile>

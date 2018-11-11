@@ -11,6 +11,13 @@ namespace Hatate.Parser
 		private string url;
 		protected List<Tag> tags = new List<Tag>();
 
+		// Informations
+		protected string full = null;
+		protected long size = 0;
+		protected int width = 0;
+		protected int height = 0;
+		protected string rating = null;
+
 		/*
 		============================================
 		Public
@@ -99,6 +106,31 @@ namespace Hatate.Parser
 			}
 		}
 
+		/// <summary>
+		/// Convert a string like "616 KB" or "7.25 MB" to bytes.
+		/// </summary>
+		/// <returns></returns>
+		protected long KbOrMbToBytes(string size)
+		{
+			if (size.EndsWith("KB")) {
+				size = size.Substring(0, size.LastIndexOf("KB")).Trim();
+
+				long kb = 0;
+				long.TryParse(size, out kb);
+
+				return kb * 1000;
+			} else if (size.EndsWith("MB")) {
+				size = size.Substring(0, size.LastIndexOf("MB")).Trim();
+
+				float mb;
+				float.TryParse(size, out mb);
+
+				return (long)(mb * 1000000);
+			}
+
+			return 0;
+		}
+
 		/*
 		============================================
 		Accessor
@@ -108,6 +140,31 @@ namespace Hatate.Parser
 		public List<Tag> Tags
 		{
 			get { return this.tags; }
+		}
+
+		public string Full
+		{
+			get { return this.full; }
+		}
+
+		public long Size
+		{
+			get { return this.size; }
+		}
+
+		public int Width
+		{
+			get { return this.width; }
+		}
+
+		public int Height
+		{
+			get { return this.height; }
+		}
+
+		public string Rating
+		{
+			get { return this.rating; }
 		}
 
 		protected string Url

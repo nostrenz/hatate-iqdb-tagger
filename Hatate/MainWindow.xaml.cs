@@ -58,6 +58,9 @@ namespace Hatate
 			this.CreateTagsListContextMenu();
 			this.CreateIgnoredsListContextMenu();
 
+			this.Label_SourceInfos.Content = "";
+			this.Label_MatchInfos.Content = "";
+
 			// Prevent closing the window if we have some search results left
 			this.Closing += new System.ComponentModel.CancelEventHandler(CustomClosing);
 		}
@@ -150,20 +153,38 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Generate a smaller image.
+		/// Get some informations about the local image attached to a Result and also generate a smaller image.
 		/// </summary>
-		/// <param name="filepath"></param>
-		/// <param name="filename"></param>
+		/// <param name="result"></param>
 		/// <param name="width"></param>
 		/// <returns></returns>
-		private string GenerateThumbnail(string filepath, int width=150)
+		private void ReadLocalImage(Result result, int width=150)
 		{
 			string thumbsDir = this.ThumbsDirPath;
-			string output = thumbsDir + this.GetFilenameFromPath(filepath);
+			result.ThumbPath = thumbsDir + this.GetFilenameFromPath(result.ImagePath);
+
+			// Get extension
+			result.Local.Format = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.')+1);
 
 			// It already exists
-			if (File.Exists(output)) {
-				return output;
+			if (File.Exists(result.ThumbPath)) {
+				// We need to open the file to retrieve its dimensions
+				if (result.Local.Width == 0 || result.Local.Height == 0) {
+					try {
+						System.Drawing.Image img = System.Drawing.Image.FromFile(result.ImagePath);
+
+						result.Local.Width = img.Width;
+						result.Local.Height = img.Height;
+
+						img.Dispose();
+					} catch (OutOfMemoryException) { }
+				}
+
+				if (result.Local.Size == 0) {
+					result.Local.Size = new FileInfo(result.ImagePath).Length;
+				}
+
+				return;
 			}
 
 			Directory.CreateDirectory(thumbsDir);
@@ -171,15 +192,18 @@ namespace Hatate
 			System.Drawing.Image image = null;
 
 			try {
-				image = System.Drawing.Image.FromFile(filepath);
+				image = System.Drawing.Image.FromFile(result.ImagePath);
 			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
-				return filepath;
+				result.ThumbPath = result.ImagePath;
+
+				return;
 			}
 
-			int srcWidth = image.Width;
-			int srcHeight = image.Height;
+			result.Local.Width = image.Width;
+			result.Local.Height = image.Height;
+			result.Local.Size = new FileInfo(result.ImagePath).Length;
 
-			Decimal sizeRatio = ((Decimal)srcHeight / srcWidth);
+			Decimal sizeRatio = ((Decimal)image.Height / image.Width);
 			int thumbHeight = Decimal.ToInt32(sizeRatio * width);
 
 			Bitmap bmp = new Bitmap(width, thumbHeight);
@@ -191,27 +215,27 @@ namespace Hatate
 			gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
 			try {
-				gr.DrawImage(image, rectDestination, 0, 0, srcWidth, srcHeight, GraphicsUnit.Pixel);
+				gr.DrawImage(image, rectDestination, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
 				gr.Dispose();
 				bmp.Dispose();
 				image.Dispose();
 
-				return filepath;
+				result.ThumbPath = result.ImagePath;
+
+				return;
 			}
 
 			try {
-				bmp.Save(output, ImageFormat.Jpeg);
+				bmp.Save(result.ThumbPath, ImageFormat.Jpeg);
 			} catch (IOException) { // Cannot save thumbnail, we'll upload the original file
-				output = filepath;
+				result.ThumbPath = result.ImagePath;
 			}
 
 			// Liberate resources
 			gr.Dispose();
 			bmp.Dispose();
 			image.Dispose();
-
-			return output;
 		}
 
 		/// <summary>
@@ -305,7 +329,7 @@ namespace Hatate
 
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
-			result.ThumbPath = this.GenerateThumbnail(result.ImagePath);
+			this.ReadLocalImage(result);
 
 			// Search the image on IQDB
 			this.SetStatus("Searching file on IQDB...");
@@ -482,6 +506,22 @@ namespace Hatate
 
 			if (success) {
 				this.AddTagsToResult(booru.Tags, result);
+
+				result.Full = booru.Full;
+				result.Match.Size = booru.Size;
+				result.Match.Width = booru.Width;
+				result.Match.Height = booru.Height;
+
+				if (booru.Full != null) {
+					result.Match.Format = booru.Full.Substring(booru.Full.LastIndexOf('.')+1);
+				}
+
+				switch (booru.Rating) {
+					case null: break;
+					case "Safe": result.Rating = IqdbApi.Enums.Rating.Safe; break;
+					case "Questionable": result.Rating = IqdbApi.Enums.Rating.Questionable; break;
+					case "Explicit": result.Rating = IqdbApi.Enums.Rating.Explicit; break;
+				}
 			}
 
 			return success;
@@ -1354,6 +1394,43 @@ namespace Hatate
 			listBox.ItemsSource = tags;
 		}
 
+		/// <summary>
+		/// Takes a bytes value and transform it into a more human readable value like "616 KB" or "7.25 MB".
+		/// </summary>
+		/// <param name="bytes"></param>
+		/// <returns></returns>
+		private string HumanReadableFileSize(long bytes)
+		{
+			if (bytes < 1000000) {
+				return (bytes / 1000) + " KB";
+			}
+
+			return ((float)bytes / 1000000).ToString("0.00") + " MB";
+		}
+
+		/// <summary>
+		/// Try to determinate if the found file is better than the local one.
+		/// </summary>
+		/// <returns>
+		/// True for the found file, False for the local file.
+		/// </returns>
+		private bool IsMatchBetterThanLocal(Result result)
+		{
+			if (result.Match.Format != null && result.Match.Format.ToLower() == "png" && result.Local.Format.ToLower() != "png") {
+				return true;
+			}
+
+			if (result.Match.Width > result.Local.Width || result.Match.Height > result.Local.Height) {
+				return true;
+			}
+
+			if (result.Match.Size > result.Local.Size) {
+				return true;
+			}
+
+			return false;
+		}
+
 		#endregion Private
 
 		/*
@@ -1490,9 +1567,12 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			this.Label_Match.Content = "Local";
 			this.Label_Match.Content = "Match";
-			this.Image_Original.Source = null;
+			this.Label_MatchInfos.Content = "";
+			this.Image_Local.Source = null;
 			this.Image_Match.Source = null;
+			this.Border_Local.BorderBrush = this.Border_Match.BorderBrush = this.GetBrushFromString("#505050");
 
 			if (this.ListBox_Files.SelectedIndex < 0) {
 				return;
@@ -1505,8 +1585,11 @@ namespace Hatate
 			}
 
 			// Generate and set the thumbnail
-			result.ThumbPath = this.GenerateThumbnail(result.ImagePath);
-			this.Image_Original.Source = this.CreateBitmapImage(result.ThumbPath);
+			this.ReadLocalImage(result);
+
+			this.Image_Local.Source = this.CreateBitmapImage(result.ThumbPath);
+			this.Label_Local.Content = "Source " + result.Local.Format.ToUpper();
+			this.Label_SourceInfos.Content = this.HumanReadableFileSize(result.Local.Size) + " (" + result.Local.Width + "x" + result.Local.Height + ")";
 
 			// Set the image
 			if (result.PreviewUrl != null) {
@@ -1531,6 +1614,26 @@ namespace Hatate
 
 			// Set the source name
 			this.Label_Match.Content = result.Source.ToString();
+
+			if (result.Match.Format != null) {
+				this.Label_Match.Content += " " + result.Match.Format.ToUpper();
+			}
+
+			if (result.Match.Size > 0) {
+				this.Label_MatchInfos.Content += this.HumanReadableFileSize(result.Match.Size) + " ";
+			}
+
+			if (result.Match.Width > 0 && result.Match.Height > 0) {
+				this.Label_MatchInfos.Content += "(" + result.Match.Width + "x" + result.Match.Height + ")";
+			}
+
+			if (this.IsMatchBetterThanLocal(result)) {
+				this.Border_Local.BorderBrush = this.GetBrushFromString("#CC0");
+				this.Border_Match.BorderBrush = this.GetBrushFromString("#0F0");
+			} else {
+				this.Border_Local.BorderBrush = this.GetBrushFromString("#0F0");
+				this.Border_Match.BorderBrush = this.GetBrushFromString("#CC0");
+			}
 		}
 
 		/// <summary>

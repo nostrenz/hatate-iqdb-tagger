@@ -28,6 +28,44 @@
 				this.GetRating(doc, "#post-information li");
 			}
 
+			// Get informations
+			Supremes.Nodes.Element informations = doc.Select("#post-information").First;
+
+			if (informations != null) {
+				Supremes.Nodes.Elements listItems = informations.Select("ul li");
+
+				foreach (Supremes.Nodes.Element li in listItems) {
+					string content = li.Html;
+
+					if (content == null) {
+						continue;
+					}
+
+					content = content.Trim();
+
+					if (content.StartsWith("Size:")) {
+						Supremes.Nodes.Element full = li.Select("a").First;
+						Supremes.Nodes.Element width = li.Select("span[itemprop=width]").First;
+						Supremes.Nodes.Element height = li.Select("span[itemprop=height]").First;
+
+						if (full != null) {
+							this.full = full.Attr("href");
+							this.size = this.KbOrMbToBytes(full.Text);
+						}
+
+						if (width != null) {
+							int.TryParse(width.Text, out this.width);
+						}
+
+						if (height != null) {
+							int.TryParse(height.Text, out this.height);
+						}
+					} else if (content.StartsWith("Rating:")) {
+						this.rating = content.Substring("Rating:".Length);
+					}
+				}
+			}
+
 			return true;
 		}
 

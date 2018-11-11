@@ -39,15 +39,17 @@
 		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}">
 			<Label x:Name="Label_Status" Content="Status"/>
 		</StatusBar>
-		<Border BorderThickness="1" Height="74" Margin="0,18,118,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
-			<Image x:Name="Image_Original" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Original_MouseDown" Cursor="Hand"/>
+		<Border x:Name="Border_Local" BorderThickness="1" Height="74" Margin="0,18,118,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
+			<Image x:Name="Image_Local" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Original_MouseDown" Cursor="Hand"/>
 		</Border>
-		<Border BorderThickness="1" Height="74" Margin="0,18,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
+		<Border x:Name="Border_Match" BorderThickness="1" Height="74" Margin="0,18,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="113" BorderBrush="{DynamicResource BorderColor}">
 			<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Match_MouseDown" Cursor="Hand"/>
 		</Border>
-		<Label Content="Original" Margin="0,92,118,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0"/>
-		<Label x:Name="Label_Match" Content="Match" Margin="0,92,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0"/>
-		<Grid Margin="0,113,0,95" HorizontalAlignment="Right" Width="231">
+		<Label x:Name="Label_Local" Content="Local" Margin="0,92,118,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0" FontSize="11"/>
+		<Label x:Name="Label_Match" Content="Match" Margin="0,92,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Right" Width="113" Padding="0" FontSize="11"/>
+		<Label x:Name="Label_SourceInfos" Content="16.5 MB (19000x19000)" Margin="0,108,118,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Width="113" Padding="0" FontSize="11"/>
+		<Label x:Name="Label_MatchInfos" Content="616 KB (19000x19000)" Margin="0,108,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Width="113" Padding="0" FontSize="11"/>
+		<Grid Margin="0,128,0,95" HorizontalAlignment="Right" Width="231">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
 				<RowDefinition Height="5" />

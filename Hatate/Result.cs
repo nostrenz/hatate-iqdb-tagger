@@ -9,6 +9,9 @@ namespace Hatate
 	/// </summary>
 	public class Result : System.IEquatable<Result>
 	{
+		private Image local = new Image();
+		private Image match = new Image();
+
 		public Result(string imagePath)
 		{
 			this.ImagePath = imagePath;
@@ -57,8 +60,27 @@ namespace Hatate
 		public string ThumbPath { get; set; }
 		public string PreviewUrl { get; set; }
 		public string Url { get; set; }
+		public string Full { get; set; }
 		public IqdbApi.Enums.Source Source { get; set; }
 		public IqdbApi.Enums.Rating Rating { get; set; }
+
+		/// <summary>
+		/// The local image file.
+		/// </summary>
+		public Image Local
+		{
+			get { return this.local; }
+			set { this.Local = value; }
+		}
+
+		/// <summary>
+		/// The found image from a booru.
+		/// </summary>
+		public Image Match
+		{
+			get { return this.match; }
+			set { this.match = value; }
+		}
 
 		/// <summary>
 		/// A non-null preview URL means that the image was found on IQDB.

@@ -12,5 +12,10 @@ namespace Hatate.Parser
 		bool FromFile(string uri);
 
 		List<Tag> Tags { get; }
+		string Full { get; }
+		long Size { get; }
+		int Width { get; }
+		int Height { get; }
+		string Rating { get; }
 	}
 }
