@@ -49,6 +49,7 @@
 					case "copyright": tag.Namespace = "series"; break;
 					case "character": tag.Namespace = "character"; break;
 					case "artist": tag.Namespace = "creator"; break;
+					case "circle": tag.Namespace = "creator"; tag.Value += " (circle)"; break;
 				}
 
 				this.tags.Add(tag);
