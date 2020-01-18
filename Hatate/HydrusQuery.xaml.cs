@@ -193,7 +193,7 @@ namespace Hatate
 			}
 
 			// Warn user about a huge number of files being imported
-			if (fileIds.Count >= 1000 && !App.AskUser("You're about to import 1000+ files, are you sure about that?")) {
+			if (fileIds.Count >= 1000 && !App.AskUser("You're about to import " + fileIds.Count + " files, are you sure about that?")) {
 				this.CancelQuery();
 
 				return;
