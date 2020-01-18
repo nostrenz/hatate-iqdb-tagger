@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
+using Options = Hatate.Properties.Settings;
 
 namespace Hatate
 {
@@ -21,8 +22,8 @@ namespace Hatate
 
 			this.Owner = App.Current.MainWindow;
 
-			this.ListBox_Tags.Items.Add(new Tag("found", "hatate", true));
-			this.ListBox_Tags.Items.Add(new Tag("notfound", "hatate", true));
+			this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.FoundTag, true));
+			this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.NotfoundTag, true));
 
 			this.CreateTagsListContextMenu();
 
