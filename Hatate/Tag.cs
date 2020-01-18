@@ -17,9 +17,13 @@ namespace Hatate
 
 		public Tag(string namespaced, bool parseNamespace)
 		{
+			if (namespaced.StartsWith("-")) {
+				namespaced = namespaced.Substring(1);
+				this.Exclude = true;
+			}
+
 			this.Value = namespaced;
 			this.Namespace = null;
-			this.Exclude = namespaced.StartsWith("-");
 
 			if (!parseNamespace) {
 				return;
