@@ -56,14 +56,56 @@
     <Setting Name="Randomize" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="AutoMove" Type="System.Boolean" Scope="User">
+    <Setting Name="AutoSend" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AskTags" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="RenameMd5" Type="System.Boolean" Scope="User">
+    <Setting Name="HydrusApiPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">45869</Value>
+    </Setting>
+    <Setting Name="HydrusApiAccessKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="HydrusApiHost" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://127.0.0.1</Value>
+    </Setting>
+    <Setting Name="HydrusTagService" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AddTaggedTag" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AddNotfoundTag" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TaggedTag" Type="System.String" Scope="User">
+      <Value Profile="(Default)">hatate:tagged</Value>
+    </Setting>
+    <Setting Name="NotfoundTag" Type="System.String" Scope="User">
+      <Value Profile="(Default)">hatate:not found</Value>
+    </Setting>
+    <Setting Name="AddFoundTag" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="FoundTag" Type="System.String" Scope="User">
+      <Value Profile="(Default)">hatate:found</Value>
+    </Setting>
+    <Setting Name="DeleteImported" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AssociateUrl" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LogMatchedUrls" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SendUrlWithTags" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ParseTags" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

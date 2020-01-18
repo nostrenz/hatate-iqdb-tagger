@@ -27,9 +27,9 @@ namespace Hatate
 			this.Slider_Similarity.Value = Options.Default.Similarity;
 			this.Slider_Delay.Value = Options.Default.Delay;
 			this.CheckBox_Randomize.IsChecked = Options.Default.Randomize;
-			this.CheckBox_AutoMove.IsChecked = Options.Default.AutoMove;
 			this.CheckBox_AskTags.IsChecked = Options.Default.AskTags;
-			this.CheckBox_RenameMd5.IsChecked = Options.Default.RenameMd5;
+			this.CheckBox_LogMatchedUrls.IsChecked = Options.Default.LogMatchedUrls;
+			this.CheckBox_ParseTags.IsChecked = Options.Default.ParseTags;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -41,6 +41,17 @@ namespace Hatate
 			this.CheckBox_Source_TheAnimeGallery.IsChecked = Options.Default.Source_TheAnimeGallery;
 			this.CheckBox_Source_Zerochan.IsChecked = Options.Default.Source_Zerochan;
 			this.CheckBox_Source_AnimePictures.IsChecked = Options.Default.Source_AnimePictures;
+
+			// Tags
+			this.CheckBox_AddFoundTag.IsChecked = Options.Default.AddFoundTag;
+			this.CheckBox_AddNotfoundTag.IsChecked = Options.Default.AddNotfoundTag;
+			this.CheckBox_AddTaggedTag.IsChecked = Options.Default.AddTaggedTag;
+			this.TextBox_FoundTag.Text = Options.Default.FoundTag;
+			this.TextBox_NotfoundTag.Text = Options.Default.NotfoundTag;
+			this.TextBox_TaggedTag.Text = Options.Default.TaggedTag;
+			this.TextBox_FoundTag.IsEnabled = Options.Default.AddFoundTag;
+			this.TextBox_NotfoundTag.IsEnabled = Options.Default.AddNotfoundTag;
+			this.TextBox_TaggedTag.IsEnabled = Options.Default.AddTaggedTag;
 
 			this.UpdateLabels();
 			this.ShowDialog();
@@ -79,9 +90,9 @@ namespace Hatate
 			Options.Default.Similarity = (byte)this.Slider_Similarity.Value;
 			Options.Default.Delay = (int)this.Slider_Delay.Value;
 			Options.Default.Randomize = (bool)this.CheckBox_Randomize.IsChecked;
-			Options.Default.AutoMove = (bool)this.CheckBox_AutoMove.IsChecked;
 			Options.Default.AskTags = (bool)this.CheckBox_AskTags.IsChecked;
-			Options.Default.RenameMd5 = (bool)this.CheckBox_RenameMd5.IsChecked;
+			Options.Default.LogMatchedUrls = (bool)this.CheckBox_LogMatchedUrls.IsChecked;
+			Options.Default.ParseTags = (bool)this.CheckBox_ParseTags.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
@@ -93,6 +104,14 @@ namespace Hatate
 			Options.Default.Source_TheAnimeGallery = (bool)this.CheckBox_Source_TheAnimeGallery.IsChecked;
 			Options.Default.Source_Zerochan = (bool)this.CheckBox_Source_Zerochan.IsChecked;
 			Options.Default.Source_AnimePictures = (bool)this.CheckBox_Source_AnimePictures.IsChecked;
+
+			// Tags
+			Options.Default.AddFoundTag = (bool)this.CheckBox_AddFoundTag.IsChecked;
+			Options.Default.AddNotfoundTag = (bool)this.CheckBox_AddNotfoundTag.IsChecked;
+			Options.Default.AddTaggedTag = (bool)this.CheckBox_AddTaggedTag.IsChecked;
+			Options.Default.FoundTag = this.TextBox_FoundTag.Text;
+			Options.Default.NotfoundTag = this.TextBox_NotfoundTag.Text;
+			Options.Default.TaggedTag = this.TextBox_TaggedTag.Text;
 
 			Options.Default.Save();
 
@@ -109,6 +128,17 @@ namespace Hatate
 		{
 			if (this.IsLoaded) {
 				this.UpdateLabels();
+			}
+		}
+
+		private void CheckBox_AddTag_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender == this.CheckBox_AddFoundTag) {
+				this.TextBox_FoundTag.IsEnabled = (bool)this.CheckBox_AddFoundTag.IsChecked;
+			} else if (sender == this.CheckBox_AddNotfoundTag) {
+				this.TextBox_NotfoundTag.IsEnabled = (bool)this.CheckBox_AddNotfoundTag.IsChecked;
+			} else if (sender == this.CheckBox_AddTaggedTag) {
+				this.TextBox_TaggedTag.IsEnabled = (bool)this.CheckBox_AddTaggedTag.IsChecked;
 			}
 		}
 	}

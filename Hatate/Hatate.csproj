@@ -8,11 +8,12 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Hatate</RootNamespace>
     <AssemblyName>Hatate</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,6 +43,10 @@
     </Reference>
     <Reference Include="IqdbApi, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IqdbApi.1.2.1\lib\netstandard1.1\IqdbApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Supremes, Version=1.0.0.6474, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\dcsoup.1.0.0\lib\net45\Supremes.dll</HintPath>
@@ -80,6 +85,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HydrusApi.cs" />
+    <Compile Include="HydrusMetadata.cs" />
+    <Compile Include="HydrusSettings.xaml.cs">
+      <DependentUpon>HydrusSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HydrusQuery.xaml.cs">
+      <DependentUpon>HydrusQuery.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Image.cs" />
     <Compile Include="Manage.xaml.cs">
       <DependentUpon>Manage.xaml</DependentUpon>
@@ -97,6 +110,14 @@
     <Compile Include="Parser\Zerochan.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Tag.cs" />
+    <Page Include="HydrusSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HydrusQuery.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MayaDark.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

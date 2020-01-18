@@ -146,7 +146,7 @@
 	</LinearGradientBrush>
 
 	<ImageBrush x:Key="ScrollbarGrip" ViewportUnits="Absolute" Viewport="0,0,10,18" TileMode="Tile" Stretch="Uniform" ImageSource="/theme/MayaDark/grip.png" />
-	<ImageBrush x:Key="ProgressBarBrush" ViewportUnits="Absolute" Viewport="0,0,20,14" TileMode="Tile" Stretch="Uniform" ImageSource="/theme/MayaDark/progress.png" />
+	<ImageBrush x:Key="ProgressBarBrush" ViewportUnits="Absolute" Viewport="0,0,20,14" TileMode="Tile" Stretch="Uniform" />
 	<DropShadowBitmapEffect x:Key="DropDownShadow" Color="{StaticResource Base}" Direction="315" ShadowDepth="4" Softness="0.15" Opacity="0.35" />
 	<BitmapImage x:Key="ArrowDown" UriSource="/theme/MayaDark/arrowdown.png" />
 	<BitmapImage x:Key="ArrowLeft" UriSource="/theme/MayaDark/arrowleft.png" />
@@ -171,24 +171,6 @@
 	<!-- Color of text inside a TextBlock -->
 	<Style TargetType="Run">
 		<Setter Property="Foreground" Value="#D2D2D2"/>
-	</Style>
-
-	<!-- Separator -->
-	<Style TargetType="{x:Type Separator}">
-		<Setter Property="SnapsToDevicePixels" Value="True" />
-		<Setter Property="OverridesDefaultStyle" Value="True" />
-		<Setter Property="Focusable" Value="False" />
-		<Setter Property="Height" Value="1" />
-		<Setter Property="Margin" Value="2,0,2,0" />
-		<Setter Property="Background" Value="{StaticResource editBoxBorderBrush}" />
-		<Setter Property="Template">
-			<Setter.Value>
-				<ControlTemplate TargetType="{x:Type Separator}">
-					<Border Background="{x:Null}" BorderBrush="{TemplateBinding Background}" BorderThickness="{TemplateBinding Height}" />
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-		<Setter Property="FocusVisualStyle" Value="{x:Null}" />
 	</Style>
 
 	<!-- GroupBox -->

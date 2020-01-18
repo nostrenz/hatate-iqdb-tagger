@@ -11,12 +11,24 @@ namespace Hatate
 	public partial class App : Application
 	{
 		public static string appDir = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+		public static HydrusApi hydrusApi = new HydrusApi();
 
 		public App() : base()
 		{
 			#if !DEBUG
 			this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
 			#endif
+		}
+
+		/*
+		============================================
+		Public
+		============================================
+		*/
+
+		public static bool AskUser(string message)
+		{
+			return MessageBox.Show(message, "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
 		}
 
 		/*

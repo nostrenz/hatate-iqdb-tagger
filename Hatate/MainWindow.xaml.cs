@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using FileIO = Microsoft.VisualBasic.FileIO;
 using Directory = System.IO.Directory;
 using Options = Hatate.Properties.Settings;
 using ContextMenu = System.Windows.Controls.ContextMenu;
@@ -33,7 +34,8 @@ namespace Hatate
 		const string DIR_NOT_FOUND = @"notfound\";
 		const string DIR_TAGGED    = @"tagged\";
 
-		const string TXT_IGNOREDS = "ignoreds.txt";
+		const string TXT_IGNOREDS     = "ignoreds.txt";
+		const string TXT_MATCHED_URLS = "matched_urls.txt";
 
 		// Tags list
 		private List<string> ignoreds;
@@ -45,7 +47,7 @@ namespace Hatate
 		private Timer timer;
 
 		// List of accepted image extentions
-		private string[]  imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
+		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
 
 
 		public MainWindow()
@@ -160,11 +162,18 @@ namespace Hatate
 		/// <returns></returns>
 		private void ReadLocalImage(Result result, int width=150)
 		{
+			// Don't read the local image as it's already a thumbnail and we already have informations about it from Hydrus metadata
+			if (result.HydrusFileId != null) {
+				result.ThumbPath = result.ImagePath;
+
+				return;
+			}
+
 			string thumbsDir = this.ThumbsDirPath;
 			result.ThumbPath = thumbsDir + this.GetFilenameFromPath(result.ImagePath);
 
 			// Get extension
-			result.Local.Format = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.')+1);
+			result.Local.Format = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.') + 1);
 
 			// It already exists
 			if (File.Exists(result.ThumbPath)) {
@@ -195,6 +204,10 @@ namespace Hatate
 				image = System.Drawing.Image.FromFile(result.ImagePath);
 			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
 				result.ThumbPath = result.ImagePath;
+
+				return;
+			} catch (FileNotFoundException) { // Missing file, remove it from the list
+				this.RemoveResultFromFilesListbox(result);
 
 				return;
 			}
@@ -336,26 +349,41 @@ namespace Hatate
 			await this.RunIqdbApi(result);
 
 			result.Searched = true;
+			bool hasTags = result.HasTags;
 
-			// We have tags
-			if (result.HasTagsOrIgnoreds) {
+			// Add tagged tag
+			if (hasTags && Options.Default.AddTaggedTag) {
+				result.Tags.Add(new Tag(Options.Default.TaggedTag));
+			}
+
+			// Found on IQDB
+			if (result.Found) {
 				this.SetStatus("File found.");
 
-				// Move or update the color
-				if (Options.Default.AutoMove && result.HasTags) {
-					this.WriteTagsForResult(result);
+				if (Options.Default.AddFoundTag) {
+					result.Tags.Add(new Tag(Options.Default.FoundTag));
 				}
 
 				this.found++;
-			} else { // No tags were found
+			} else { // Not found on IQDB
 				this.SetStatus("File not found.");
 
-				// Move or update the color
-				if (Options.Default.AutoMove) {
-					this.MoveRowToNotFoundFolder(result);
+				if (Options.Default.AddNotfoundTag) {
+					result.Tags.Add(new Tag(Options.Default.NotfoundTag));
 				}
 
 				this.notFound++;
+			}
+
+			// Send to Hydrus
+			if (hasTags && Options.Default.AutoSend) {
+				bool success = await this.SendTagsToHydrusForResult(result);
+
+				if (success) {
+					this.RemoveResultFromFilesListbox(result);
+				} else {
+					this.ListBox_Files.SelectedItems.Remove(result);
+				}
 			}
 
 			// Update counters (remaining, found, not found)
@@ -375,7 +403,7 @@ namespace Hatate
 
 			try {
 				fs = new FileStream(result.ThumbPath, FileMode.Open);
-			} catch (IOException e) {
+			} catch (IOException) {
 				return; // May happen if the file is in use
 			}
 
@@ -429,6 +457,16 @@ namespace Hatate
 				// Fix the URL
 				if (result.Url.StartsWith("//")) {
 					result.Url = (result.Source == IqdbApi.Enums.Source.Eshuushuu ? "http" : "https") + ':' + result.Url;
+				}
+
+				// Log the URL
+				if (Options.Default.LogMatchedUrls) {
+					this.LogUrl(result.Url);
+				}
+
+				// We don't want to retrieve the tags, we can end here
+				if (!Options.Default.ParseTags) {
+					continue;
 				}
 
 				bool success = this.ParseBooruPage(result);
@@ -513,7 +551,7 @@ namespace Hatate
 				result.Match.Height = booru.Height;
 
 				if (booru.Full != null) {
-					result.Match.Format = booru.Full.Substring(booru.Full.LastIndexOf('.')+1);
+					result.Match.Format = booru.Full.Substring(booru.Full.LastIndexOf('.') + 1);
 				}
 
 				switch (booru.Rating) {
@@ -616,17 +654,24 @@ namespace Hatate
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
 
-			item = new MenuItem();
-			item.Header = "Write tags";
-			item.Tag = "writeTags";
+			item.Header = "Write tags to text files";
+			item.Tag = "writeTagsToFiles";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Not found";
-			item.Tag = "notFound";
+			item.Header = "Send tags to Hydrus";
+			item.Tag = "sendTagsToHydrus";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Send URLs to Hydrus";
+			item.Tag = "sendUrlsToHydrus";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
 
 			item = new MenuItem();
 			item.Header = "Reset result";
@@ -677,7 +722,6 @@ namespace Hatate
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
 
-			item = new MenuItem();
 			item.Header = "Remove";
 			item.Tag = "removeTags";
 			item.Click += this.ContextMenu_MenuItem_Click;
@@ -720,7 +764,6 @@ namespace Hatate
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
 
-			item = new MenuItem();
 			item.Header = "Unignore";
 			item.Tag = "unignore";
 			item.Click += this.ContextMenu_MenuItem_Click;
@@ -744,53 +787,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Get path to move a file to while taking into account the 260 chars limit.
-		/// </summary>
-		/// <param name="filepath"></param>
-		/// <param name="folder"></param>
-		/// <param name="filename"></param>
-		/// <param name="reserveTxt">If true, will reserve 4 more chars into the path for adding ".txt" to it latter</param>
-		/// <returns></returns>
-		private string GetDestinationPath(string filepath, string folder, string filename, bool reserveTxt=false)
-		{
-			// We want to rename the file using the MD5 only when needed
-			if (!Properties.Settings.Default.RenameMd5) {
-				string destination = folder + filename;
-				int length = destination.Length;
-
-				if (reserveTxt) {
-					length += 4;
-				}
-
-				// Keep the original file name only if not too long and not already existing
-				if (length <= MAX_PATH_LENGTH && !File.Exists(destination)) {
-					return destination;
-				}
-			}
-
-			// Create a filename to have a path under 260 chars
-			string md5 = this.CalculateMd5(filepath);
-			string extension = this.Extension(filename);
-
-			// Check if the MD5 allows to have a short enough path
-			int maxMd5Length = MAX_PATH_LENGTH - (folder.Length + extension.Length);
-			int md5Length = md5.Length;
-
-			if (reserveTxt) {
-				maxMd5Length -= 4;
-			}
-
-			// Shrink the MD5 for the path to not exceed 260 chars
-			if (md5Length > maxMd5Length) {
-				int exceed = md5Length - maxMd5Length;
-
-				md5 = md5.Substring(exceed, md5Length - exceed);
-			}
-
-			return folder + md5 + extension;
-		}
-
-		/// <summary>
 		/// Calculate a file's MD5 hash.
 		/// </summary>
 		/// <param name="filepath"></param>
@@ -810,21 +806,75 @@ namespace Hatate
 		/// Move a given item's file to the tagged folder with the tags in a .txt file and remove the row.
 		/// </summary>
 		/// <param name="item"></param>
-		private void WriteTagsForResult(Result result)
+		private bool WriteTagsToFilesForResult(Result result)
 		{
 			// No searched result, remove the item from the selection
 			if (result == null || !result.Searched) {
-				this.ListBox_Files.SelectedItems.Remove(result);
-
-				return;
+				return false;
 			}
 
 			if (result.Tags.Count > 0 && File.Exists(result.ImagePath)) {
-				// Move the file to the tagged folder and write tags
-				string destination = this.MoveFile(result.ImagePath, this.TaggedDirPath, true);
+				// Warn a user trying to write a txt file into the Hydrus' "client_files" folder
+				if (this.IsHydrusOwnedFolder(result.ImagePath) && !App.AskUser("This image is located inside the Hydrus' \"client_files\" folder. Writing a txt files there might not be a good idea, do you really want to do that?")) {
+					return false;
+				}
 
-				if (destination != null) {
-					this.WriteTagsToTxt(destination + ".txt", result.Tags);
+				this.WriteTagsToTxt(result.ImagePath + ".txt", result.Tags);
+			}
+
+			// Write the ignored tags to txt
+			if (result.Ignoreds.Count > 0) {
+				this.WriteIgnoredsTags(result.Ignoreds);
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Send tags to Hydrus for a given file and remove the row.
+		/// </summary>
+		/// <param name="item"></param>
+		private async Task<bool> SendTagsToHydrusForResult(Result result)
+		{
+			// Not a searched result
+			if (result == null || !result.Searched) {
+				return false;
+			}
+
+			bool imported = false;
+
+			// Not a Hydrus file, we need to import it first
+			if (String.IsNullOrEmpty(result.Local.Hash) && File.Exists(result.ImagePath)) {
+				result.Local.Hash = await App.hydrusApi.ImportFile(result);
+
+				// Still no hash, abort
+				if (String.IsNullOrEmpty(result.Local.Hash)) {
+					return false;
+				}
+
+				// Import successful
+				imported = true;
+			}
+
+			// Send tags to Hydrus
+			if (result.HasTags) {
+				bool success = await App.hydrusApi.SendTagsForFile(result);
+
+				if (!success) {
+					result.AddWarning("Hydrus: failed to send tags");
+
+					return false;
+				}
+			}
+
+			// Link matched URL
+			if (Options.Default.AssociateUrl) {
+				bool success = await App.hydrusApi.AssociateUrl(result.Local.Hash, result.Url);
+
+				if (!success) {
+					result.AddWarning("Hydrus: failed to associate URL");
+
+					return false;
 				}
 			}
 
@@ -833,9 +883,28 @@ namespace Hatate
 				this.WriteIgnoredsTags(result.Ignoreds);
 			}
 
-			this.RemoveResultFromFilesListbox(result);
+			// The file was imported into Hydrus, we can now delete it
+			if (imported && Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath)) {
+				this.SendFileToRecycleBin(result.ImagePath);
+			}
+
+			return true;
 		}
 
+		private async Task<bool> SendUrlsToHydrusForResult(Result result)
+		{
+			// Not a searched result
+			if (result == null || !result.Searched) {
+				return false;
+			}
+
+			// Move file to recycle bin
+			if (Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath) && File.Exists(result.ImagePath)) {
+				this.SendFileToRecycleBin(result.ImagePath);
+			}
+
+			return await App.hydrusApi.SendUrl(result);
+		}
 
 		/// <summary>
 		/// Add the ignoreds tags from a result to the txt list.
@@ -874,40 +943,16 @@ namespace Hatate
 			// Empty tags listboxes
 			result.Tags.Clear();
 			result.Ignoreds.Clear();
+
+			// Refresh view
 			this.RefreshListboxes();
-		}
 
-		/// <summary>
-		/// Move a files to the not "notfound" folder and remove the row.
-		/// </summary>
-		/// <param name="index"></param>
-		private void MoveRowToNotFoundFolder(Result result)
-		{
-			if (!File.Exists(result.ImagePath)) {
-				return;
-			}
-
-			this.MoveFile(result.ImagePath, this.NotfoundDirPath);
-			this.RemoveResultFromFilesListbox(result);
-		}
-
-		/// <summary>
-		/// Move a file into another directory and return its new filepath.
-		/// </summary>
-		/// <returns></returns>
-		private string MoveFile(string filepath, string targetFolder, bool reserveTxt=false)
-		{
-			string destination = this.GetDestinationPath(filepath, targetFolder, this.GetFilenameFromPath(filepath), reserveTxt);
-
+			// Delete thumbnail
 			try {
-				File.Move(filepath, destination);
-			} catch (Exception e) {
-				MessageBox.Show("Unable to move file\n" + filepath + "\nto\n" + destination + "\n\n" + e.Message);
-
-				return null;
-			}
-
-			return destination;
+				if (File.Exists(result.ThumbPath)) {
+					File.Delete(result.ThumbPath);
+				}
+			} catch (IOException) { }
 		}
 
 		/// <summary>
@@ -1107,7 +1152,7 @@ namespace Hatate
 		/// <summary>
 		/// Add a file to the list if it's not already in it or not in the tagged or notfound folder.
 		/// </summary>
-		private void AddFileToList(string filepath, List<Tag> tags=null)
+		private void AddFileToList(string filepath, List<Tag> tags=null, HydrusMetadata hydrusMetadata=null)
 		{
 			// Windows does not support longer file paths, causing a PathTooLongException
 			if (filepath.Length > MAX_PATH_LENGTH) {
@@ -1118,9 +1163,7 @@ namespace Hatate
 			Result result = new Result(filepath);
 
 			if (//this.ListBox_Files.Items.Contains(result)
-			this.ListBox_Files.Items.Cast<Result>().Any(r => r.ImagePath == filepath)
-			|| File.Exists(this.TaggedDirPath + filename)
-			|| File.Exists(this.NotfoundDirPath + filename)) {
+			this.ListBox_Files.Items.Cast<Result>().Any(r => r.ImagePath == filepath)) {
 				return;
 			}
 
@@ -1129,6 +1172,11 @@ namespace Hatate
 				foreach (Tag tag in tags) {
 					result.Tags.Add(tag);
 				}
+			}
+
+			// Set Hydrus metadata
+			if (hydrusMetadata != null) {
+				result.SetHydrusMetadata(hydrusMetadata);
 			}
 
 			this.ListBox_Files.Items.Add(result);
@@ -1332,34 +1380,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Move all the selected files to the "notfound" folder.
-		/// </summary>
-		private void MoveSelectedFilesToNotFound()
-		{
-			bool asked = false;
-
-			while (this.ListBox_Files.SelectedItems.Count > 0) {
-				Result result = this.GetSelectedResultAt(0);
-
-				// Warn when trying to move to notfound with a result
-				if (!asked && result != null && result.HasTagsOrIgnoreds) {
-					asked = true;
-
-					System.Windows.Forms.DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
-						"Some of the selected files were found with tags, do you want to continue moving to the notfound folder?",
-						"Attention", System.Windows.Forms.MessageBoxButtons.YesNo
-					);
-
-					if (dialogResult == System.Windows.Forms.DialogResult.No) {
-						return;
-					}
-				}
-
-				this.MoveRowToNotFoundFolder(result);
-			}
-		}
-
-		/// <summary>
 		/// Create a non-locked BitmapImage from a file path.
 		/// </summary>
 		/// <param name="filepath"></param>
@@ -1373,7 +1393,9 @@ namespace Hatate
 				bitmap.UriSource = new Uri(filepath);
 				bitmap.CacheOption = BitmapCacheOption.OnLoad;
 				bitmap.EndInit();
-			} catch (IOException e) {
+			} catch (IOException) {
+				return null;
+			} catch (NotSupportedException) {
 				return null;
 			}
 
@@ -1409,26 +1431,126 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Try to determinate if the found file is better than the local one.
+		/// Checks if the given path looks like a Hydrus owned folder, like the "client_files" one.
 		/// </summary>
-		/// <returns>
-		/// True for the found file, False for the local file.
-		/// </returns>
-		private bool IsMatchBetterThanLocal(Result result)
+		/// <returns></returns>
+		private bool IsHydrusOwnedFolder(string path)
 		{
-			if (result.Match.Format != null && result.Match.Format.ToLower() == "png" && result.Local.Format.ToLower() != "png") {
-				return true;
+			return path.Contains(@"\client_files\");
+		}
+
+		private void WriteTagsForSelectedFiles()
+		{
+			int successes = 0;
+			int failures = 0;
+			string counts = null;
+
+			this.ListBox_Files.IsEnabled = false;
+
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				Result result = this.GetSelectedResultAt(0);
+				bool success = this.WriteTagsToFilesForResult(result);
+				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
+
+				this.SetStatus("Writing tags... " + counts);
 			}
 
-			if (result.Match.Width > result.Local.Width || result.Match.Height > result.Local.Height) {
-				return true;
+			this.ListBox_Files.Items.Refresh();
+			this.ListBox_Files.IsEnabled = true;
+			this.SetStatus("Tags wrote for all the selected file. " + counts);
+		}
+
+		private async void SendTagsForSelectedFiles()
+		{
+			int successes = 0;
+			int failures = 0;
+			string counts = null;
+
+			App.hydrusApi.ResetUnreachableFlag();
+			this.ListBox_Files.IsEnabled = false;
+
+			// Process each selected file until no one remain or the API becomes unreachable
+			while (this.ListBox_Files.SelectedItems.Count > 0 && !App.hydrusApi.Unreachable) {
+				Result result = this.GetSelectedResultAt(0);
+				bool success = await this.SendTagsToHydrusForResult(result);
+				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
+
+				this.SetStatus("Sending tags to Hydrus... " + counts);
 			}
 
-			if (result.Match.Size > result.Local.Size) {
-				return true;
+			this.ListBox_Files.Items.Refresh();
+			this.ListBox_Files.IsEnabled = true;
+			this.SetStatus("Tags sent to Hydrus for all the selected files. " + counts);
+		}
+
+		private async void SendUrlsForSelectedFiles()
+		{
+			int successes = 0;
+			int failures = 0;
+			string counts = null;
+
+			App.hydrusApi.ResetUnreachableFlag();
+			this.ListBox_Files.IsEnabled = false;
+
+			// Process each selected file until no one remain or the API becomes unreachable
+			while (this.ListBox_Files.SelectedItems.Count > 0 && !App.hydrusApi.Unreachable) {
+				Result result = this.GetSelectedResultAt(0);
+				bool success = await this.SendUrlsToHydrusForResult(result);
+				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
+
+				this.SetStatus("Sending URLs to Hydrus... " + counts);
 			}
 
-			return false;
+			this.ListBox_Files.Items.Refresh();
+			this.ListBox_Files.IsEnabled = true;
+			this.SetStatus("URLs sent to Hydrus for all the selected files. " + counts);
+		}
+
+		/// <summary>
+		/// Keep a URL in a text file.
+		/// </summary>
+		/// <param name="url"></param>
+		private void LogUrl(string url)
+		{
+			string filePath = App.appDir + @"\" + TXT_MATCHED_URLS;
+
+			using (StreamWriter file = new StreamWriter(filePath, true)) {
+				file.WriteLine(url);
+			}
+		}
+
+		/// <summary>
+		/// What to do with a Result after being processed.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <param name="success"></param>
+		/// <param name="successes"></param>
+		/// <param name="failures"></param>
+		/// <returns></returns>
+		private string HandleProcessedResult(Result result, bool success, ref int successes, ref int failures)
+		{
+			if (success) {
+				this.RemoveResultFromFilesListbox(result);
+
+				successes++;
+			} else {
+				this.ListBox_Files.SelectedItems.Remove(result);
+
+				failures++;
+			}
+
+			return "(" + successes + " successful, " + failures + " failed)";
+		}
+
+		/// <summary>
+		/// Delete a file by sending it to the recycle bin.
+		/// </summary>
+		/// <param name="filePath"></param>
+		private void SendFileToRecycleBin(string filePath)
+		{
+			try {
+				FileIO.FileSystem.DeleteFile(filePath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin);
+			} catch (Exception) { }
 		}
 
 		#endregion Private
@@ -1450,38 +1572,6 @@ namespace Hatate
 				string path = App.appDir + DIR_THUMBS;
 
 				this.CreateDirIfNeeded(path);
-
-				return path;
-			}
-		}
-
-		/// <summary>
-		/// Get the full path to the tagged subfolder under the working directory.
-		/// </summary>
-		private string TaggedDirPath
-		{
-			get
-			{
-				string path = App.appDir + DIR_IMGS + DIR_TAGGED;
-
-				this.CreateDirIfNeeded(path);
-
-				return path;
-			}
-		}
-
-		/// <summary>
-		/// Get the full path to the notfound subfolder under the working directory.
-		/// </summary>
-		private string NotfoundDirPath
-		{
-			get
-			{
-				string path = App.appDir + DIR_IMGS + DIR_NOT_FOUND;
-
-				if (!Directory.Exists(path)) {
-					Directory.CreateDirectory(path);
-				}
 
 				return path;
 			}
@@ -1561,6 +1651,16 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Opens a window allowing to edit the Hydrus API connection parameters.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_HydrusApi_Click(object sender, RoutedEventArgs e)
+		{
+			new HydrusSettings().ShowDialog();
+		}
+
+		/// <summary>
 		/// Called when selecting a row in the files list.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -1627,7 +1727,7 @@ namespace Hatate
 				this.Label_MatchInfos.Content += "(" + result.Match.Width + "x" + result.Match.Height + ")";
 			}
 
-			if (this.IsMatchBetterThanLocal(result)) {
+			if (result.IsMatchBetterThanLocal) {
 				this.Border_Local.BorderBrush = this.GetBrushFromString("#CC0");
 				this.Border_Match.BorderBrush = this.GetBrushFromString("#0F0");
 			} else {
@@ -1641,7 +1741,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void ContextMenu_MenuItem_Click(object sender, RoutedEventArgs e)
+		private async void ContextMenu_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			MenuItem mi = sender as MenuItem;
 
@@ -1650,14 +1750,14 @@ namespace Hatate
 			}
 
 			switch (mi.Tag) {
-				case "writeTags": {
-					while (this.ListBox_Files.SelectedItems.Count > 0) {
-						this.WriteTagsForResult(this.GetSelectedResultAt(0));
-					}
-				}
+				case "writeTagsToFiles":
+					this.WriteTagsForSelectedFiles();
 				break;
-				case "notFound":
-					this.MoveSelectedFilesToNotFound();
+				case "sendTagsToHydrus":
+					this.SendTagsForSelectedFiles();
+				break;
+				case "sendUrlsToHydrus":
+					this.SendUrlsForSelectedFiles();
 				break;
 				case "unignore":
 					this.UningnoreSelectItems();
@@ -1692,7 +1792,7 @@ namespace Hatate
 					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
 				case "searchAgain":
-					this.SearchFile(this.ListBox_Files.SelectedIndex);
+					await this.SearchFile(this.ListBox_Files.SelectedIndex);
 				break;
 				case "resetResult":
 					this.ResetSelectedFilesResult();
@@ -1718,20 +1818,23 @@ namespace Hatate
 			bool hasSelecteds = (countSelected > 0);
 			bool singleSelected = (countSelected == 1);
 			bool searched = true;
+			Result result = this.SelectedResult;
 
 			if (singleSelected) {
-				searched = this.SelectedResult.Searched;
+				searched = result.Searched;
 			}
 
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds && searched);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds && searched);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 3, hasSelecteds);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds);
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, singleSelected); // "Search again"
-															// 6 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // "Copy path"
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, singleSelected); // "Open folder"
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds && searched); // Write tags to files
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds && searched); // Send tags to Hydrus
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds && searched); // Send URLs to Hydrus
+															// 3 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Reset result
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds); // Remove
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Add tags
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // "Search again"
+															// 8 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, singleSelected); // "Copy path"
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 10, singleSelected); // "Open folder"
 		}
 
 		/// <summary>
@@ -1886,7 +1989,38 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Called when clicking on the "Open folder... > Program" menubar item, open the folder where the program is located.
+		/// Opens a window allowing to enter a Hydrus query and import the returned files.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private async void MenuItem_QueryHydrus_Click(object sender, RoutedEventArgs e)
+		{
+			HydrusQuery window = new HydrusQuery();
+			List<HydrusMetadata> hydrusMetadataList = window.HydrusMetadataList;
+
+			if (hydrusMetadataList == null || hydrusMetadataList.Count < 1) {
+				return;
+			}
+
+			int count = 0;
+
+			foreach (HydrusMetadata hydrusMetadata in hydrusMetadataList) {
+				count++;
+
+				string thumbnailPath = await App.hydrusApi.DownloadThumbnailAsync(hydrusMetadata.FileId, this.ThumbsDirPath);
+
+				this.SetStatus("Adding query file " + count + " / " + hydrusMetadataList.Count);
+				this.AddFileToList(thumbnailPath, null, hydrusMetadata);
+			}
+
+
+			this.SetStatus(hydrusMetadataList.Count + " files added from Hydrus query.");
+			this.UpdateLabels();
+			this.ChangeStartButtonEnabledValue();
+		}
+
+		/// <summary>
+		/// Called when clicking on the "Open program folder" menu item, opens the folder where the program is located.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -1896,23 +2030,19 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Called when clicking on the "Open folder... > Tagged images" menubar item, open the "imgs/tagged" folder.
+		/// Called when clicking the "Open matched URLs" menu item, opens the matched URLs text file.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MenuItem_OpenTaggedFolder(object sender, RoutedEventArgs e)
+		private void MenuItem_OpenMatchedUrls_Click(object sender, RoutedEventArgs e)
 		{
-			this.StartProcess(this.TaggedDirPath);
-		}
+			string filePath = App.appDir + @"\" + TXT_MATCHED_URLS;
 
-		/// <summary>
-		/// Called when clicking on the "Open folder... > Tagged images" menubar item, open the "imgs/notfound" folder.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_OpenNotFoundFolder(object sender, RoutedEventArgs e)
-		{
-			this.StartProcess(this.NotfoundDirPath);
+			if (!File.Exists(filePath)) {
+				File.CreateText(filePath);
+			}
+
+			this.StartProcess(filePath);
 		}
 
 		/// <summary>

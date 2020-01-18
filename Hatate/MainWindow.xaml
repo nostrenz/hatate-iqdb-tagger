@@ -9,7 +9,7 @@
 		<ListBox x:Name="ListBox_Files" Margin="0,18,236,95" SelectionChanged="ListBox_Files_SelectionChanged" ContextMenuOpening="ListBox_Files_ContextMenuOpening" SelectionMode="Extended" Drop="ListBox_Files_Drop" DragEnter="ListBox_Files_DragEnter" AllowDrop="True">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding ImagePath}" Foreground="{Binding Foreground}"/>
+					<TextBlock Text="{Binding Text}" Foreground="{Binding Foreground}" ToolTip="{Binding Tooltip}"/>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
@@ -20,11 +20,10 @@
 			<MenuItem Header="Files" Height="18">
 				<MenuItem Header="Add files" Click="MenuItem_AddFiles_Click"/>
 				<MenuItem Header="Add folder" Click="MenuItem_AddFolder_Click"/>
-				<MenuItem Header="Open folder">
-					<MenuItem Header="Program" Click="MenuItem_OpenProgramFolder_Click"/>
-					<MenuItem Header="Tagged images" Click="MenuItem_OpenTaggedFolder"/>
-					<MenuItem Header="Not found images" Click="MenuItem_OpenNotFoundFolder"/>
-				</MenuItem>
+				<MenuItem Header="Query Hydrus" Click="MenuItem_QueryHydrus_Click"/>
+				<Separator/>
+				<MenuItem Header="Open program folder" Click="MenuItem_OpenProgramFolder_Click"/>
+				<MenuItem Header="Open matched URLs" Click="MenuItem_OpenMatchedUrls_Click"/>
 			</MenuItem>
 			<MenuItem Header="Maintenance" Height="18">
 				<MenuItem Header="Ignored tags">
@@ -34,7 +33,10 @@
 				</MenuItem>
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
 			</MenuItem>
-			<MenuItem Header="Options" Height="18" Click="MenuItem_Options_Click" />
+			<MenuItem Header="Settings" Height="18">
+				<MenuItem Header="Options" Height="18" Click="MenuItem_Options_Click" />
+				<MenuItem Header="Hydrus API" Height="18" Click="MenuItem_HydrusApi_Click" />
+			</MenuItem>
 		</Menu>
 		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}">
 			<Label x:Name="Label_Status" Content="Status"/>

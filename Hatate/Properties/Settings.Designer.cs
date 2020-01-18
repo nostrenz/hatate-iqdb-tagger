@@ -242,12 +242,12 @@ namespace Hatate.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AutoMove {
+        public bool AutoSend {
             get {
-                return ((bool)(this["AutoMove"]));
+                return ((bool)(this["AutoSend"]));
             }
             set {
-                this["AutoMove"] = value;
+                this["AutoSend"] = value;
             }
         }
         
@@ -265,13 +265,181 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool RenameMd5 {
+        [global::System.Configuration.DefaultSettingValueAttribute("45869")]
+        public string HydrusApiPort {
             get {
-                return ((bool)(this["RenameMd5"]));
+                return ((string)(this["HydrusApiPort"]));
             }
             set {
-                this["RenameMd5"] = value;
+                this["HydrusApiPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HydrusApiAccessKey {
+            get {
+                return ((string)(this["HydrusApiAccessKey"]));
+            }
+            set {
+                this["HydrusApiAccessKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1")]
+        public string HydrusApiHost {
+            get {
+                return ((string)(this["HydrusApiHost"]));
+            }
+            set {
+                this["HydrusApiHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HydrusTagService {
+            get {
+                return ((string)(this["HydrusTagService"]));
+            }
+            set {
+                this["HydrusTagService"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AddTaggedTag {
+            get {
+                return ((bool)(this["AddTaggedTag"]));
+            }
+            set {
+                this["AddTaggedTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AddNotfoundTag {
+            get {
+                return ((bool)(this["AddNotfoundTag"]));
+            }
+            set {
+                this["AddNotfoundTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("hatate:tagged")]
+        public string TaggedTag {
+            get {
+                return ((string)(this["TaggedTag"]));
+            }
+            set {
+                this["TaggedTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("hatate:not found")]
+        public string NotfoundTag {
+            get {
+                return ((string)(this["NotfoundTag"]));
+            }
+            set {
+                this["NotfoundTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AddFoundTag {
+            get {
+                return ((bool)(this["AddFoundTag"]));
+            }
+            set {
+                this["AddFoundTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("hatate:found")]
+        public string FoundTag {
+            get {
+                return ((string)(this["FoundTag"]));
+            }
+            set {
+                this["FoundTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DeleteImported {
+            get {
+                return ((bool)(this["DeleteImported"]));
+            }
+            set {
+                this["DeleteImported"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AssociateUrl {
+            get {
+                return ((bool)(this["AssociateUrl"]));
+            }
+            set {
+                this["AssociateUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LogMatchedUrls {
+            get {
+                return ((bool)(this["LogMatchedUrls"]));
+            }
+            set {
+                this["LogMatchedUrls"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SendUrlWithTags {
+            get {
+                return ((bool)(this["SendUrlWithTags"]));
+            }
+            set {
+                this["SendUrlWithTags"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ParseTags {
+            get {
+                return ((bool)(this["ParseTags"]));
+            }
+            set {
+                this["ParseTags"] = value;
             }
         }
     }

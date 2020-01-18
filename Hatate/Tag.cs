@@ -1,15 +1,38 @@
 ﻿using IComparable = System.IComparable;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
+using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 
 namespace Hatate
 {
 	public class Tag : IComparable
 	{
-		public Tag(string value, string nameSpace=null)
+		public Tag(string value, string nameSpace=null, bool exclude=false)
 		{
 			this.Value = value;
 			this.Namespace = nameSpace;
+			this.Exclude = exclude;
+		}
+
+		public Tag(string namespaced, bool parseNamespace)
+		{
+			this.Value = namespaced;
+			this.Namespace = null;
+			this.Exclude = namespaced.StartsWith("-");
+
+			if (!parseNamespace) {
+				return;
+			}
+
+			int index = namespaced.IndexOf(':');
+
+			if (index == -1) {
+				return;
+			}
+
+			this.Namespace = namespaced.Substring(0, index);
+			this.Value = namespaced.Substring(index + 1);
 		}
 
 		/*
@@ -75,6 +98,7 @@ namespace Hatate
 
 		#region Accessor
 
+		public bool Exclude { get; set; }
 		public string Value { get; set; }
 		public string Namespace { get; set; }
 
@@ -89,7 +113,7 @@ namespace Hatate
 					return this.Value;
 				}
 
-				return this.Namespace + ":" + this.Value;
+				return (this.Exclude ? "-" : "") + this.Namespace + ":" + this.Value;
 			}
 		}
 
@@ -122,7 +146,14 @@ namespace Hatate
 					case "creator": return Brushes.Brown;
 					case "meta": return Brushes.DarkOrange;
 					case "rating": return Brushes.LightSlateGray;
-					default: return Brushes.CadetBlue;
+					default: {
+						if (this.Namespace == null) {
+							return Brushes.CadetBlue;
+						}
+
+						// Namespaced tag
+						return new SolidColorBrush(Color.FromRgb(114, 160, 193));
+					};
 				}
 			}
 		}

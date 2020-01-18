@@ -9,8 +9,11 @@ namespace Hatate
 	/// </summary>
 	public class Result : System.IEquatable<Result>
 	{
+		const byte FEW = 9;
+
 		private Image local = new Image();
 		private Image match = new Image();
+		private List<string> warnings = new List<string>();
 
 		public Result(string imagePath)
 		{
@@ -45,6 +48,30 @@ namespace Hatate
 			return this.ImagePath.GetHashCode();
 		}
 
+		public void SetHydrusMetadata(HydrusMetadata hydrusMetadata)
+		{
+			this.HydrusFileId = hydrusMetadata.FileId;
+
+			this.local.Width = hydrusMetadata.Width;
+			this.local.Height = hydrusMetadata.Height;
+			this.local.Size = hydrusMetadata.Size;
+			this.local.Hash = hydrusMetadata.Hash;
+
+			switch (hydrusMetadata.Mime) {
+				case "image/jpg": this.local.Format = "jpg"; break;
+				case "image/jpeg": this.local.Format = "jpg"; break;
+				case "image/png": this.local.Format = "png"; break;
+				case "image/bmp": this.local.Format = "bmp"; break;
+			}
+		}
+
+		public void AddWarning(string message)
+		{
+			if (!this.warnings.Contains(message)) {
+				this.warnings.Add(message);
+			}
+		}
+
 		/*
 		============================================
 		Accessor
@@ -63,6 +90,7 @@ namespace Hatate
 		public string Full { get; set; }
 		public IqdbApi.Enums.Source Source { get; set; }
 		public IqdbApi.Enums.Rating Rating { get; set; }
+		public string HydrusFileId { get; set; }
 
 		/// <summary>
 		/// The local image file.
@@ -106,6 +134,11 @@ namespace Hatate
 			get { return this.HasTags || this.Ignoreds.Count > 0; }
 		}
 
+		public bool HasWarnings
+		{
+			get { return this.warnings.Count > 0; }
+		}
+
 		/// <summary>
 		/// Text color in the Files listbox.
 		/// </summary>
@@ -117,11 +150,104 @@ namespace Hatate
 					return (Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFD2D2D2");
 				}
 
+				if (this.HasWarnings) {
+					return Brushes.Orange;
+				}
+
 				if (!this.Found) {
 					return Brushes.Red;
 				}
 
-				return (this.HasTags ? Brushes.LimeGreen : Brushes.Orange);
+				// Few tags were retrived, we should review this file
+				if (this.Tags.Count <= FEW) {
+					return Brushes.Yellow;
+				}
+
+				// Booru image seems better than the local one, we should review this file
+				if (this.IsMatchBetterThanLocal) {
+					return Brushes.Yellow;
+				}
+
+				return Brushes.LimeGreen;
+			}
+		}
+
+		public string Tooltip
+		{
+			get
+			{
+				if (!this.Searched) {
+					return null;
+				}
+
+				if (this.HasWarnings) {
+					return "- " + string.Join("\n- ", this.warnings);
+				}
+
+				if (!this.Found) {
+					return "Not found on IQDB";
+				}
+
+				string text = "Found on IQDB, ";
+
+				// Few tags were retrived, we should review this file
+				if (this.Tags.Count <= FEW) {
+					return text + "but few tags were retrieved";
+				}
+
+				// Booru image seems better than the local one, we should review this file
+				if (this.IsMatchBetterThanLocal) {
+					return text + "booru image seems better";
+				}
+
+				return text + "local image seems better";
+			}
+		}
+
+		/// <summary>
+		/// Try to determinate if the distant file is better than the local one.
+		/// </summary>
+		/// <returns>
+		/// True for the found file, False for the local file.
+		/// </returns>
+		public bool IsMatchBetterThanLocal
+		{
+			get
+			{
+				if (this.match == null) {
+					return false;
+				}
+
+				if (this.Match.Format != null && this.Match.Format.ToLower() == "png" && this.Local.Format.ToLower() != "png") {
+					return true;
+				}
+
+				if (this.Match.Width > this.Local.Width || this.Match.Height > this.Local.Height) {
+					return true;
+				}
+
+				if (this.Match.Size > this.Local.Size) {
+					return true;
+				}
+
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Text displayed in the listbox.
+		/// </summary>
+		public string Text
+		{
+			get
+			{
+				int count = this.Tags.Count;
+
+				if (count < 1) {
+					return this.ImagePath;
+				}
+
+				return "(" + count + ") " + this.ImagePath;
 			}
 		}
 
