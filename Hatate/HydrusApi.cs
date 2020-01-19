@@ -335,7 +335,7 @@ namespace Hatate
 			string str = "";
 
 			for (int i = 0; i < tags.Count; i++) {
-				str += "\"" + System.Uri.EscapeDataString(tags[i].Namespaced) + "\"";
+				str += "\"" + tags[i].Namespaced.Replace(@"\", @"\\") + "\"";
 
 				if (i < tags.Count - 1) {
 					str += ", ";
