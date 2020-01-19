@@ -109,9 +109,23 @@ namespace Hatate
 			Options.Default.AddFoundTag = (bool)this.CheckBox_AddFoundTag.IsChecked;
 			Options.Default.AddNotfoundTag = (bool)this.CheckBox_AddNotfoundTag.IsChecked;
 			Options.Default.AddTaggedTag = (bool)this.CheckBox_AddTaggedTag.IsChecked;
-			Options.Default.FoundTag = this.TextBox_FoundTag.Text;
-			Options.Default.NotfoundTag = this.TextBox_NotfoundTag.Text;
-			Options.Default.TaggedTag = this.TextBox_TaggedTag.Text;
+			Options.Default.FoundTag = this.TextBox_FoundTag.Text.Trim();
+			Options.Default.NotfoundTag = this.TextBox_NotfoundTag.Text.Trim();
+			Options.Default.TaggedTag = this.TextBox_TaggedTag.Text.Trim();
+
+			// Default tags
+			if (string.IsNullOrEmpty(Options.Default.FoundTag)) {
+				Options.Default.FoundTag = "hatate:found";
+				Options.Default.AddFoundTag = false;
+			}
+			if (string.IsNullOrEmpty(Options.Default.NotfoundTag)) {
+				Options.Default.NotfoundTag = "hatate:not found";
+				Options.Default.AddNotfoundTag = false;
+			}
+			if (string.IsNullOrEmpty(Options.Default.TaggedTag)) {
+				Options.Default.TaggedTag = "hatate:tagged";
+				Options.Default.AddTaggedTag = false;
+			}
 
 			Options.Default.Save();
 
