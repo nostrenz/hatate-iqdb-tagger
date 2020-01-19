@@ -14,6 +14,7 @@ namespace Hatate
 	/// </summary>
 	public partial class HydrusQuery : Window
 	{
+		const int WARN_LIMIT = 1000;
 		private List<HydrusMetadata> hydrusMetadataList = null;
 
 		public HydrusQuery()
@@ -192,15 +193,30 @@ namespace Hatate
 				return;
 			}
 
-			// Warn user about a huge number of files being imported
-			if (fileIds.Count >= 1000 && !App.AskUser("You're about to import " + fileIds.Count + " files, are you sure about that?")) {
+			int limit = this.Limit;
+
+			// Create a smaller array according to the limit
+			if (Limit > 0 && limit < fileIds.Count) {
+				JArray limitedFileIds = new JArray();
+
+				for (int i = 0; i < limit; i++) {
+					limitedFileIds.Add(fileIds[i]);
+				}
+
+				fileIds = limitedFileIds;
+				limitedFileIds = null;
+			}
+
+			// Warn the user about a huge number of files being imported
+			if (fileIds.Count >= WARN_LIMIT && !App.AskUser("You're about to import " + fileIds.Count + " files, are you sure about that?")) {
+				this.TextBox_Limit.Text = (WARN_LIMIT - 1).ToString();
 				this.CancelQuery();
 
 				return;
 			}
 
 			// Get files' metadata
-			JArray jTokens = await App.hydrusApi.GetFileMetadata(fileIds);
+			JArray jTokens = await App.hydrusApi.GetFilesMetadata(fileIds);
 
 			if (jTokens == null || jTokens.Count < 1) {
 				this.NoResult();
@@ -208,16 +224,11 @@ namespace Hatate
 				return;
 			}
 
+			// Fill the HydrusMetadata list from the JTokens
 			this.hydrusMetadataList = new List<HydrusMetadata>();
-			int total = jTokens.Count;
-			int limit = this.Limit;
 
-			if (limit > 0 && limit < total) {
-				total = limit + 1;
-			}
-
-			for (int i = 0; i < total; i++) {
-				HydrusMetadata hydrusMetadata = new HydrusMetadata(jTokens[i]);
+			foreach (JToken jToken in jTokens) {
+				HydrusMetadata hydrusMetadata = new HydrusMetadata(jToken);
 
 				if (hydrusMetadata.IsImage) {
 					this.hydrusMetadataList.Add(hydrusMetadata);

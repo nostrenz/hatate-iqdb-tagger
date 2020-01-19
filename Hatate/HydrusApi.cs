@@ -12,6 +12,8 @@ namespace Hatate
 {
 	public class HydrusApi
 	{
+		const int METADATA_BATCH_SIZE = 1000;
+
 		// Will turn true if the API is unreachable
 		private bool unreachable = false;
 
@@ -67,19 +69,38 @@ namespace Hatate
 		/// </summary>
 		/// <param name="fileIds"></param>
 		/// <returns></returns>
-		public async Task<JArray> GetFileMetadata(JArray fileIds)
+		public async Task<JArray> GetFilesMetadata(JArray fileIds)
 		{
-			string json = await this.GetRequestAsync("/get_files/file_metadata?file_ids=" + System.Uri.EscapeDataString(
-				Newtonsoft.Json.JsonConvert.SerializeObject(fileIds.ToArray())
-			));
+			// We're limited by how long the URL can be as EscapeDataString() won't accept to work with strings longer than 32766 chars
+			// So we'll query the metadata by batches of 1000
 
-			if (string.IsNullOrEmpty(json)) {
-				return null;
+			if (fileIds.Count <= METADATA_BATCH_SIZE) {
+				return await this.GetBatchMetadata(fileIds);
 			}
 			
-			dynamic parsed = JObject.Parse(json);
-			
-			return parsed.metadata;
+			JArray metadata = new JArray();
+			JArray batch = new JArray();
+
+			while (fileIds.Count > 0) {
+				// End now
+				if (fileIds.Count <= METADATA_BATCH_SIZE) {
+					metadata.Merge(await this.GetBatchMetadata(fileIds));
+
+					return metadata;
+				}
+
+				// Fill the batch while emptying fileIds
+				batch.Add(fileIds[0]);
+				fileIds.Remove(fileIds[0]);
+
+				// Batch is ready to be used
+				if (batch.Count >= METADATA_BATCH_SIZE) {
+					metadata.Merge(await this.GetBatchMetadata(batch));
+					batch.Clear();
+				}
+			}
+
+			return metadata;
 		}
 
 		/// <summary>
@@ -320,6 +341,32 @@ namespace Hatate
 		private string BoolToString(bool value)
 		{
 			return value ? "true" : "false";
+		}
+
+		private async Task<JArray> GetBatchMetadata(JArray fileIds)
+		{
+			string param = Newtonsoft.Json.JsonConvert.SerializeObject(fileIds.ToArray());
+
+			// EscapeDataString() won't accept to work with a string longer than 32766 chars
+			if (param.Length > 32766) {
+				return null;
+			}
+
+			try {
+				param = System.Uri.EscapeDataString(param);
+			} catch (System.UriFormatException) {
+				return null;
+			}
+
+			string json = await this.GetRequestAsync("/get_files/file_metadata?file_ids=" + param);
+
+			if (string.IsNullOrEmpty(json)) {
+				return null;
+			}
+
+			dynamic parsed = JObject.Parse(json);
+
+			return parsed.metadata;
 		}
 
 		#endregion Private
