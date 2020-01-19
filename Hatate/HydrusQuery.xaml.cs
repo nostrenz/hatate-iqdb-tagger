@@ -23,8 +23,12 @@ namespace Hatate
 
 			this.Owner = App.Current.MainWindow;
 
-			this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.FoundTag, true));
-			this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.NotfoundTag, true));
+			if (Options.Default.AddFoundTag) {
+				this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.FoundTag, true));
+			}
+			if (Options.Default.AddNotfoundTag) {
+				this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.NotfoundTag, true));
+			}
 
 			this.CreateTagsListContextMenu();
 
