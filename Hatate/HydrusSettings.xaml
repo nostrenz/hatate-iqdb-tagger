@@ -21,6 +21,6 @@
 		<CheckBox x:Name="CheckBox_AutoSend" Content="Automatically send searched files to Hydrus" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Height="14"/>
 		<Separator Height="25" Margin="101,103,10,0" VerticalAlignment="Top"/>
 		<CheckBox x:Name="CheckBox_AssociateUrl" Content="Associate found URL with file when sending tags" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top"/>
-		<CheckBox x:Name="CheckBox_SendUrlWithTags" Content="Also send tags when sending URLs" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top"/>
+		<CheckBox x:Name="CheckBox_SendUrlWithTags" Content="Send tags alongside a URL" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top"/>
 	</Grid>
 </Window>

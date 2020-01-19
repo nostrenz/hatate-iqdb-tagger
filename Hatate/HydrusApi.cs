@@ -140,7 +140,14 @@ namespace Hatate
 
 			string tagsPart = "";
 
-			if (Settings.Default.SendUrlWithTags && result.HasTags && !string.IsNullOrEmpty(Settings.Default.HydrusTagService)) {
+			if (Settings.Default.SendUrlWithTags && result.HasTags) {
+				// Missing tag service
+				if (string.IsNullOrEmpty(Settings.Default.HydrusTagService)) {
+					result.AddWarning("Hydrus: tags not sent alongside the URL - please go to Settings > Hydrus API and select a tag service or disable the \"Send tags alongside a URL\" option.");
+
+					return false;
+				}
+
 				tagsPart = @",
 				""service_names_to_tags"" : {
 					""" + Settings.Default.HydrusTagService + @""" : [" + this.TagsListToString(result.Tags) + @"]
