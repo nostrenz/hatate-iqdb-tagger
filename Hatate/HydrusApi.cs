@@ -112,7 +112,7 @@ namespace Hatate
 		{
 			// Missing tag service
 			if (string.IsNullOrEmpty(Settings.Default.HydrusTagService)) {
-				result.AddWarning("Hydrus: tags not sent - please select a tag service in Settings > Hydrus API");
+				result.AddWarning("Hydrus: tags not sent - please go to Settings > Hydrus API and select a tag service");
 
 				return false;
 			}
@@ -167,7 +167,7 @@ namespace Hatate
 		/// </summary>
 		public async Task<string> ImportFile(Result result)
 		{
-			string postData = (@"{""path"" : """ + result.ImagePath + @"""}").Replace('\\', '/');
+			string postData = @"{""path"" : """ + result.ImagePath.Replace('\\', '/') + @"""}";
 			string response = await this.PostRequestAsync("/add_files/add_file", postData);
 
 			if (string.IsNullOrEmpty(response)) {
@@ -335,7 +335,7 @@ namespace Hatate
 			string str = "";
 
 			for (int i = 0; i < tags.Count; i++) {
-				str += "\"" + tags[i].Namespaced + "\"";
+				str += "\"" + System.Uri.EscapeDataString(tags[i].Namespaced) + "\"";
 
 				if (i < tags.Count - 1) {
 					str += ", ";
