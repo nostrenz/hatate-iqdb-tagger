@@ -654,7 +654,7 @@ namespace Hatate
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
 
-			item.Header = "Write tags to text files";
+			item.Header = "Write tags to text file";
 			item.Tag = "writeTagsToFiles";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
@@ -666,7 +666,7 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Send URLs to Hydrus";
+			item.Header = "Send URL to Hydrus";
 			item.Tag = "sendUrlsToHydrus";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
@@ -674,13 +674,7 @@ namespace Hatate
 			context.Items.Add(new Separator());
 
 			item = new MenuItem();
-			item.Header = "Reset result";
-			item.Tag = "resetResult";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Remove";
+			item.Header = "Remove from list";
 			item.Tag = "removeFiles";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
@@ -688,6 +682,12 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Add tags";
 			item.Tag = "addTagsForSelectedResults";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Reset result";
+			item.Tag = "resetResult";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -708,6 +708,12 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Open folder";
 			item.Tag = "openFolder";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Delete file";
+			item.Tag = "deleteFiles";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1007,6 +1013,37 @@ namespace Hatate
 			while (this.ListBox_Files.SelectedItems.Count > 0) {
 				this.RemoveResultFromFilesListbox(this.GetSelectedResultAt(0));
 			}
+		}
+
+		/// <summary>
+		/// Send all selected files in the list to the recycle bin.
+		/// </summary>
+		private async Task DeleteSelectedFiles()
+		{
+			MessageBoxResult choice = MessageBox.Show(
+				"This will send all selected files to the recycle bin.",
+				"Are you sure?",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Warning
+			);
+
+			if (choice != MessageBoxResult.Yes) {
+				return;
+			}
+
+			this.ListBox_Files.IsEnabled = false;
+
+			while (this.ListBox_Files.SelectedItems.Count > 0) {
+				Result result = this.GetSelectedResultAt(0);
+
+				if (!this.IsHydrusOwnedFolder(result.ImagePath)) {
+					await Task.Run(() => this.SendFileToRecycleBin(result.ImagePath));
+				}
+
+				this.RemoveResultFromFilesListbox(result);
+			}
+
+			this.ListBox_Files.IsEnabled = true;
 		}
 
 		/// <summary>
@@ -1779,6 +1816,9 @@ namespace Hatate
 						this.StartProcess(Directory.GetParent(this.SelectedResult.ImagePath).FullName);
 					}
 				break;
+				case "deleteFiles":
+					await this.DeleteSelectedFiles();
+				break;
 				case "copyTag":
 					this.CopySelectedTagToClipboard(this.ListBox_Tags);
 				break;
@@ -1828,13 +1868,14 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds && searched); // Send tags to Hydrus
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds && searched); // Send URLs to Hydrus
 															// 3 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Reset result
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds); // Remove
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Add tags
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Remove from list
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds); // Add tags
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Reset result
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // "Search again"
 															// 8 is a separator
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, singleSelected); // "Copy path"
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 10, singleSelected); // "Open folder"
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 11, hasSelecteds); // "Delete file"
 		}
 
 		/// <summary>
