@@ -58,7 +58,7 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<GroupBox Header="Tags" HorizontalAlignment="Right" Width="231" Margin="0,0,0,2">
-				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_Tags_ContextMenuOpening">
+				<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_Tags_ContextMenuOpening" MouseDoubleClick="ListBox_Tags_MouseDoubleClick">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>

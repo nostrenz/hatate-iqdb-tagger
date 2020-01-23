@@ -85,6 +85,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EditTag.xaml.cs">
+      <DependentUpon>EditTag.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HydrusApi.cs" />
     <Compile Include="HydrusMetadata.cs" />
     <Compile Include="HydrusSettings.xaml.cs">
@@ -110,6 +113,10 @@
     <Compile Include="Parser\Zerochan.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Tag.cs" />
+    <Page Include="EditTag.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="HydrusSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

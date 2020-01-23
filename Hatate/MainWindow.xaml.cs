@@ -728,6 +728,12 @@ namespace Hatate
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
 
+			item.Header = "Edit";
+			item.Tag = "editTags";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
 			item.Header = "Remove";
 			item.Tag = "removeTags";
 			item.Click += this.ContextMenu_MenuItem_Click;
@@ -749,7 +755,7 @@ namespace Hatate
 
 			item = new MenuItem();
 			item.Header = "Copy to clipboard";
-			item.Tag = "copyTag";
+			item.Tag = "copyTags";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1061,6 +1067,26 @@ namespace Hatate
 			}
 		}
 
+		private void EditSelectedTags()
+		{
+			EditTag window = new EditTag(this.ListBox_Tags.SelectedItems);
+
+			foreach (Tag tag in this.ListBox_Tags.SelectedItems) {
+				Tag edited = window.Tag;
+
+				if (edited.Namespace != EditTag.VARIOUS) {
+					tag.Namespace = edited.Namespace;
+				}
+
+				if (edited.Value != EditTag.VARIOUS) {
+					tag.Value = edited.Value;
+				}
+			}
+
+			this.ListBox_Tags.SelectedItems.Clear();
+			this.ListBox_Tags.Items.Refresh();
+		}
+
 		/// <summary>
 		/// Remove result and background color of all the selected files.
 		/// </summary>
@@ -1222,7 +1248,7 @@ namespace Hatate
 		/// <summary>
 		/// Add all the selected items in a given list to he ignoreds list and remove them from the listbox.
 		/// </summary>
-		private void IngnoreSelectItems()
+		private void IgnoreSelectItems()
 		{
 			Result result = this.SelectedResult;
 
@@ -1298,13 +1324,19 @@ namespace Hatate
 		/// Copy the selected item of a given listbox to the clipboard.
 		/// </summary>
 		/// <param name="from"></param>
-		private void CopySelectedTagToClipboard(ListBox from)
+		private void CopySelectedTagsToClipboard(ListBox from)
 		{
-			if (from.SelectedItem != null) {
-				Tag item = from.SelectedItem as Tag;
+			string text = "";
 
-				Clipboard.SetText(item.Underscored);
+			for (int i = 0; i < from.SelectedItems.Count; i++) {
+				text += (from.SelectedItems[i] as Tag).Namespaced;
+
+				if (i < from.SelectedItems.Count - 1) {
+					text += "\n";
+				}
 			}
+
+			Clipboard.SetText(text);
 		}
 
 		/// <summary>
@@ -1802,11 +1834,14 @@ namespace Hatate
 				case "removeFiles":
 					this.RemoveSelectedFiles();
 				break;
+				case "editTags":
+					this.EditSelectedTags();
+				break;
 				case "removeTags":
 					this.RemoveSelectedTags();
 				break;
 				case "ignore":
-					this.IngnoreSelectItems();
+					this.IgnoreSelectItems();
 				break;
 				case "copyFilePath":
 					Clipboard.SetText(this.SelectedResult.ImagePath);
@@ -1819,11 +1854,11 @@ namespace Hatate
 				case "deleteFiles":
 					await this.DeleteSelectedFiles();
 				break;
-				case "copyTag":
-					this.CopySelectedTagToClipboard(this.ListBox_Tags);
+				case "copyTags":
+					this.CopySelectedTagsToClipboard(this.ListBox_Tags);
 				break;
 				case "copyUnknownTag":
-					this.CopySelectedTagToClipboard(this.ListBox_Ignoreds);
+					this.CopySelectedTagsToClipboard(this.ListBox_Ignoreds);
 				break;
 				case "helpTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Tags);
@@ -1890,12 +1925,13 @@ namespace Hatate
 			bool hasSelecteds = (countSelected > 0);
 			bool singleSelected = (countSelected == 1);
 
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 0, hasSelecteds);   // "Remove"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 1, hasSelecteds);   // "Remove and ignore"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 2, this.ListBox_Files.SelectedItems.Count > 0); // "Add tags"
-														   // 3 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Copy to clipboard"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, singleSelected); // "Search on Danbooru"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 0, hasSelecteds);   // "Edit"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 1, hasSelecteds);   // "Remove"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 2, hasSelecteds);   // "Remove and ignore"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, this.ListBox_Files.SelectedItems.Count > 0); // "Add tags"
+														   // 4 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, hasSelecteds); // "Copy to clipboard"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 6, singleSelected); // "Search on Danbooru"
 		}
 
 		/// <summary>
@@ -1911,8 +1947,8 @@ namespace Hatate
 			bool singleSelected = (countSelected == 1);
 
 			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 0, hasSelecteds);   // "Unignore"
-																					  // 1 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 2, singleSelected); // "Copy to clipboard"
+															   // 1 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 2, hasSelecteds); // "Copy to clipboard"
 			this.SetContextMenuItemEnabled(this.ListBox_Ignoreds, 3, singleSelected); // "Search on Danbooru"
 		}
 
@@ -2203,6 +2239,23 @@ namespace Hatate
 			} catch (System.ComponentModel.Win32Exception ex) {
 				MessageBox.Show(ex.Message);
 			}
+		}
+
+		/// <summary>
+		/// Remove a tag in the list by double clicking it.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Tags_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Result result = this.SelectedResult;
+
+			if (result == null) {
+				return;
+			}
+
+			result.Tags.Remove((Tag)this.ListBox_Tags.SelectedItem);
+			this.ListBox_Tags.Items.Refresh();
 		}
 
 		#endregion Event
