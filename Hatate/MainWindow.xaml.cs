@@ -1069,21 +1069,32 @@ namespace Hatate
 
 		private void EditSelectedTags()
 		{
-			EditTag window = new EditTag(this.ListBox_Tags.SelectedItems);
+			Result result = this.SelectedResult;
+			List<Tag> selectedTags = new List<Tag>();
 
-			foreach (Tag tag in this.ListBox_Tags.SelectedItems) {
-				Tag edited = window.Tag;
-
-				if (edited.Namespace != EditTag.VARIOUS) {
-					tag.Namespace = edited.Namespace;
-				}
-
-				if (edited.Value != EditTag.VARIOUS) {
-					tag.Value = edited.Value;
-				}
+			foreach (Tag selectedTag in this.ListBox_Tags.SelectedItems) {
+				selectedTags.Add(selectedTag);
+				result.Tags.Remove(selectedTag);
 			}
 
 			this.ListBox_Tags.SelectedItems.Clear();
+
+			EditTag window = new EditTag(selectedTags);
+			Tag editedTag = window.Tag;
+
+			foreach (Tag selectedTag in selectedTags) {
+				if (editedTag.Namespace != EditTag.VARIOUS) {
+					selectedTag.Namespace = editedTag.Namespace;
+				}
+
+				if (editedTag.Value != EditTag.VARIOUS) {
+					selectedTag.Value = editedTag.Value;
+				}
+
+				result.Tags.Add(selectedTag);
+			}
+
+			result.Tags.Sort();
 			this.ListBox_Tags.Items.Refresh();
 		}
 
@@ -1526,7 +1537,7 @@ namespace Hatate
 
 			this.ListBox_Files.Items.Refresh();
 			this.ListBox_Files.IsEnabled = true;
-			this.SetStatus("Tags wrote for all the selected file. " + counts);
+			this.SetStatus("Tags wrote for all the selected files. " + counts);
 		}
 
 		private async void SendTagsForSelectedFiles()
