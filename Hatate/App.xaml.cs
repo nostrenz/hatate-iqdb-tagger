@@ -31,6 +31,25 @@ namespace Hatate
 			return MessageBox.Show(message, "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
 		}
 
+		/// <summary>
+		/// Copy the selected item of a given listbox to the clipboard.
+		/// </summary>
+		/// <param name="from"></param>
+		public static void CopySelectedTagsToClipboard(System.Windows.Controls.ListBox from)
+		{
+			string text = "";
+
+			for (int i = 0; i < from.SelectedItems.Count; i++) {
+				text += (from.SelectedItems[i] as Tag).Namespaced;
+
+				if (i < from.SelectedItems.Count - 1) {
+					text += "\n";
+				}
+			}
+
+			Clipboard.SetText(text);
+		}
+
 		/*
 		============================================
 		Event

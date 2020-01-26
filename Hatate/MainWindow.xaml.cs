@@ -1332,25 +1332,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Copy the selected item of a given listbox to the clipboard.
-		/// </summary>
-		/// <param name="from"></param>
-		private void CopySelectedTagsToClipboard(ListBox from)
-		{
-			string text = "";
-
-			for (int i = 0; i < from.SelectedItems.Count; i++) {
-				text += (from.SelectedItems[i] as Tag).Namespaced;
-
-				if (i < from.SelectedItems.Count - 1) {
-					text += "\n";
-				}
-			}
-
-			Clipboard.SetText(text);
-		}
-
-		/// <summary>
 		/// Search the selected tag on danbooru.
 		/// </summary>
 		private void OpenHelpForSelectedTag(ListBox from)
@@ -1866,10 +1847,10 @@ namespace Hatate
 					await this.DeleteSelectedFiles();
 				break;
 				case "copyTags":
-					this.CopySelectedTagsToClipboard(this.ListBox_Tags);
+					App.CopySelectedTagsToClipboard(this.ListBox_Tags);
 				break;
 				case "copyUnknownTag":
-					this.CopySelectedTagsToClipboard(this.ListBox_Ignoreds);
+					App.CopySelectedTagsToClipboard(this.ListBox_Ignoreds);
 				break;
 				case "helpTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Tags);

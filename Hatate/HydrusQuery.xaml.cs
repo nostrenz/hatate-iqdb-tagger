@@ -287,9 +287,7 @@ namespace Hatate
 
 			switch (mi.Tag) {
 				case "copy":
-					if (this.ListBox_Tags.SelectedItem != null) {
-						Clipboard.SetText(((Tag)this.ListBox_Tags.SelectedItem).Namespaced);
-					}
+					App.CopySelectedTagsToClipboard(this.ListBox_Tags);
 				break;
 				case "remove":
 					while (this.ListBox_Tags.SelectedItems.Count > 0) {

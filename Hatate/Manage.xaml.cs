@@ -22,9 +22,15 @@ namespace Hatate
 			ContextMenu context = new ContextMenu();
 			MenuItem item = new MenuItem();
 
+			item.Header = "Copy";
+			item.Tag = "copy";
+			item.Click += this.ContextMenu_MenuItem_Copy;
+			context.Items.Add(item);
+
+			item = new MenuItem();
 			item.Header = "Remove";
 			item.Tag = "remove";
-			item.Click += this.ContextMenu_MenuItem_Click;
+			item.Click += this.ContextMenu_MenuItem_Remove;
 			context.Items.Add(item);
 
 			this.ListBox_Tags.ContextMenu = context;
@@ -42,7 +48,7 @@ namespace Hatate
 		*/
 
 		#region Public
-		
+
 		/// <summary>
 		/// Add a new tag to the list from string values.
 		/// </summary>
@@ -76,11 +82,13 @@ namespace Hatate
 				return;
 			}
 
-			if (nameSpace == "unnamespaced") {
-				nameSpace = null;
-			}
+			Tag tag = null;
 
-			Tag tag = new Tag(value, nameSpace);
+			if (nameSpace != null) {
+				tag = new Tag(value, nameSpace);
+			} else {
+				tag = new Tag(value, true);
+			}
 
 			if (!this.ListBox_Tags.Items.Contains(tag)) {
 				this.ListBox_Tags.Items.Add(tag);
@@ -135,7 +143,7 @@ namespace Hatate
 		private void TextBox_Value_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter) {
-				this.AddTag("unnamespaced");
+				this.AddTag(null);
 			}
 		}
 
@@ -144,14 +152,18 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void ContextMenu_MenuItem_Click(object sender, RoutedEventArgs e)
+		private void ContextMenu_MenuItem_Copy(object sender, RoutedEventArgs e)
 		{
-			MenuItem mi = sender as MenuItem;
+			App.CopySelectedTagsToClipboard(this.ListBox_Tags);
+		}
 
-			if (mi == null) {
-				return;
-			}
-
+		/// <summary>
+		/// Called after clicking on an option from the Tags ListBox's context menu.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ContextMenu_MenuItem_Remove(object sender, RoutedEventArgs e)
+		{
 			while (this.ListBox_Tags.SelectedItems.Count > 0) {
 				this.ListBox_Tags.Items.Remove(this.ListBox_Tags.SelectedItems[0]);
 			}
@@ -167,16 +179,6 @@ namespace Hatate
 			this.okClicked = true;
 
 			this.Close();
-		}
-
-		/// <summary>
-		/// Add the entered text as an unnamespaced tag.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void Button_AddAsUnnamespaced_Click(object sender, RoutedEventArgs e)
-		{
-			this.AddTag("unnamespaced");
 		}
 
 		/// <summary>
@@ -210,6 +212,16 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Add the entered text as an unnamespaced tag.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_AddAsMeta_Click(object sender, RoutedEventArgs e)
+		{
+			this.AddTag("meta");
+		}
+
+		/// <summary>
 		/// Sort the tags by namespace and value.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -218,6 +230,16 @@ namespace Hatate
 		{
 			this.ListBox_Tags.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Namespace", System.ComponentModel.ListSortDirection.Descending));
 			this.ListBox_Tags.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Value", System.ComponentModel.ListSortDirection.Ascending));
+		}
+
+		/// <summary>
+		/// Remove a tag in the list by double clicking on it.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ListBox_Tags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			this.ListBox_Tags.Items.Remove(this.ListBox_Tags.SelectedItem);
 		}
 
 		#endregion Event

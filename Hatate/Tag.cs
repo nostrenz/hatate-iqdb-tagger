@@ -114,7 +114,7 @@ namespace Hatate
 			get
 			{
 				if (string.IsNullOrEmpty(this.Namespace)) {
-					return this.Value;
+					return (this.Exclude ? "-" : "") + this.Value;
 				}
 
 				return (this.Exclude ? "-" : "") + this.Namespace + ":" + this.Value;
