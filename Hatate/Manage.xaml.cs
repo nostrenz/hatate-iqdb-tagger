@@ -36,6 +36,8 @@ namespace Hatate
 			this.ListBox_Tags.ContextMenu = context;
 			this.TextBox_Value.Focus();
 
+			DataObject.AddPastingHandler(this.TextBox_Value, this.TextBox_Tag_Paste);
+
 			if (show) {
 				this.ShowDialog();
 			}
@@ -240,6 +242,11 @@ namespace Hatate
 		private void ListBox_Tags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			this.ListBox_Tags.Items.Remove(this.ListBox_Tags.SelectedItem);
+		}
+
+		private void TextBox_Tag_Paste(object sender, DataObjectPastingEventArgs e)
+		{
+			App.PasteTags(this.TextBox_Value, this.ListBox_Tags, e);
 		}
 
 		#endregion Event

@@ -2,6 +2,7 @@
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Controls;
 
 namespace Hatate
 {
@@ -35,7 +36,7 @@ namespace Hatate
 		/// Copy the selected item of a given listbox to the clipboard.
 		/// </summary>
 		/// <param name="from"></param>
-		public static void CopySelectedTagsToClipboard(System.Windows.Controls.ListBox from)
+		public static void CopySelectedTagsToClipboard(ListBox from)
 		{
 			string text = "";
 
@@ -48,6 +49,31 @@ namespace Hatate
 			}
 
 			Clipboard.SetText(text);
+		}
+
+		public static void PasteTags(TextBox textBox, ListBox listBox, DataObjectPastingEventArgs e)
+		{
+			if (!e.SourceDataObject.GetDataPresent(DataFormats.UnicodeText, true)) {
+				return;
+			}
+
+			string text = e.SourceDataObject.GetData(DataFormats.UnicodeText) as string;
+			string[] lines = text.Split('\n');
+
+			if (lines.Length <= 1) {
+				return;
+			}
+
+			// Add each line as a tag
+			foreach (string line in lines) {
+				Tag tag = new Tag(line.Trim(), true);
+
+				if (!listBox.Items.Contains(tag)) {
+					listBox.Items.Add(tag);
+				}
+			}
+
+			textBox.Clear();
 		}
 
 		/*

@@ -254,27 +254,7 @@ namespace Hatate
 
 		private void TextBox_Tag_Paste(object sender, DataObjectPastingEventArgs e)
 		{
-			if (!e.SourceDataObject.GetDataPresent(DataFormats.UnicodeText, true)) {
-				return;
-			}
-
-			string text = e.SourceDataObject.GetData(DataFormats.UnicodeText) as string;
-			string[] lines = text.Split('\n');
-
-			if (lines.Length <= 1) {
-				return;
-			}
-
-			// Add each line as a tag
-			foreach (string line in lines) {
-				Tag tag = new Tag(line.Trim(), true);
-
-				if (!this.ListBox_Tags.Items.Contains(tag)) {
-					this.ListBox_Tags.Items.Add(tag);
-				}
-			}
-
-			this.TextBox_Tag.Clear();
+			App.PasteTags(this.TextBox_Tag, this.ListBox_Tags, e);
 		}
 
 		private void ContextMenu_MenuItem_Click(object sender, RoutedEventArgs e)
