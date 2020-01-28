@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using FileIO = Microsoft.VisualBasic.FileIO;
 using Directory = System.IO.Directory;
 using Options = Hatate.Properties.Settings;
@@ -674,8 +673,14 @@ namespace Hatate
 			context.Items.Add(new Separator());
 
 			item = new MenuItem();
-			item.Header = "Remove from list";
-			item.Tag = "removeFiles";
+			item.Header = "Copy hash";
+			item.Tag = "copyHashes";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Copy URL";
+			item.Tag = "copyUrls";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -686,14 +691,20 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
+			item.Header = "Search IQDB now";
+			item.Tag = "searchIqdbNow";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
 			item.Header = "Reset result";
 			item.Tag = "resetResult";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Search again";
-			item.Tag = "searchAgain";
+			item.Header = "Remove from list";
+			item.Tag = "removeFiles";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -796,22 +807,6 @@ namespace Hatate
 			context.Items.Add(item);
 
 			this.ListBox_Ignoreds.ContextMenu = context;
-		}
-
-		/// <summary>
-		/// Calculate a file's MD5 hash.
-		/// </summary>
-		/// <param name="filepath"></param>
-		/// <returns></returns>
-		private string CalculateMd5(string filepath)
-		{
-			using (var md5 = MD5.Create()) {
-				using (var stream = File.OpenRead(filepath)) {
-					var hash = md5.ComputeHash(stream);
-
-					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-				}
-			}
 		}
 
 		/// <summary>
@@ -1050,6 +1045,60 @@ namespace Hatate
 			}
 
 			this.ListBox_Files.IsEnabled = true;
+		}
+
+		/// <summary>
+		/// Copy hashes for all the selected files.
+		/// </summary>
+		private void CopySelectedHashes()
+		{
+			string text = "";
+
+			for (int i = 0; i < this.ListBox_Files.SelectedItems.Count; i++) {
+				Result result = this.ListBox_Files.SelectedItems[i] as Result;
+
+				// No hash, calculate it
+				if (String.IsNullOrEmpty(result.Local.Hash)) {
+					result.CalculateLocalHash();
+
+					// Hash is still null or empty
+					if (String.IsNullOrEmpty(result.Local.Hash)) {
+						continue;
+					}
+				}
+
+				text += "md5:" + result.Local.Hash;
+
+				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
+					text += "\n";
+				}
+			}
+
+			Clipboard.SetText(text);
+		}
+
+		/// <summary>
+		/// Copy matched URLs for all the selected files
+		/// </summary>
+		private void CopySelectedUrls()
+		{
+			string text = "";
+
+			for (int i = 0; i < this.ListBox_Files.SelectedItems.Count; i++) {
+				string url = (this.ListBox_Files.SelectedItems[i] as Result).Url;
+
+				if (String.IsNullOrEmpty(url)) {
+					continue;
+				}
+				
+				text += url;
+
+				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
+					text += "\n";
+				}
+			}
+
+			Clipboard.SetText(text);
 		}
 
 		/// <summary>
@@ -1858,7 +1907,7 @@ namespace Hatate
 				case "helpUnknownTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
-				case "searchAgain":
+				case "searchIqdbNow":
 					await this.SearchFile(this.ListBox_Files.SelectedIndex);
 				break;
 				case "resetResult":
@@ -1869,6 +1918,12 @@ namespace Hatate
 				break;
 				case "addTagsForSelectedResults":
 					this.AddTagsForSelectedResults();
+				break;
+				case "copyHashes":
+					this.CopySelectedHashes();
+				break;
+				case "copyUrls":
+					this.CopySelectedUrls();
 				break;
 			}
 		}
@@ -1895,14 +1950,16 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds && searched); // Send tags to Hydrus
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds && searched); // Send URLs to Hydrus
 															// 3 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Remove from list
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds); // Add tags
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Reset result
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // "Search again"
-															// 8 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, singleSelected); // "Copy path"
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 10, singleSelected); // "Open folder"
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 11, hasSelecteds); // "Delete file"
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Copy hash
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds && searched); // Copy URL
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Add tags
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected && searched); // Search IQDB now
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, hasSelecteds); // Reset result
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, hasSelecteds); // Remove from list
+															// 10 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 11, singleSelected); // Copy path
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 12, singleSelected); // Open folder
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 13, hasSelecteds); // Delete file
 		}
 
 		/// <summary>

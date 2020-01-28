@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 
@@ -69,6 +70,20 @@ namespace Hatate
 		{
 			if (!this.warnings.Contains(message)) {
 				this.warnings.Add(message);
+			}
+		}
+
+		/// <summary>
+		/// Calculate the local image's MD5 hash.
+		/// </summary>
+		public void CalculateLocalHash()
+		{
+			using (var md5 = MD5.Create()) {
+				using (var stream = System.IO.File.OpenRead(this.ImagePath)) {
+					var hash = md5.ComputeHash(stream);
+
+					this.local.Hash = System.BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+				}
 			}
 		}
 
