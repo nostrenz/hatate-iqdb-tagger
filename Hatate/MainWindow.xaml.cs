@@ -1775,7 +1775,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private async void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			this.Label_Match.Content = "Local";
 			this.Label_Match.Content = "Match";
@@ -1795,7 +1795,12 @@ namespace Hatate
 			}
 
 			// Generate and set the thumbnail
-			this.ReadLocalImage(result);
+			await Task.Run(() => this.ReadLocalImage(result));
+
+			// Another result was selected while generating the thumbnail, don't update the view
+			if (this.SelectedResult != result) {
+				return;
+			}
 
 			this.Image_Local.Source = this.CreateBitmapImage(result.ThumbPath);
 			this.Label_Local.Content = "Source " + result.Local.Format.ToUpper();
