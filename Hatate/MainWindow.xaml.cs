@@ -956,9 +956,7 @@ namespace Hatate
 
 			// Delete thumbnail
 			try {
-				if (File.Exists(result.ThumbPath)) {
-					File.Delete(result.ThumbPath);
-				}
+				using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous));
 			} catch (IOException) { }
 		}
 
