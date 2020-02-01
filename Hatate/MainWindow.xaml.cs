@@ -158,14 +158,20 @@ namespace Hatate
 		/// </summary>
 		/// <param name="result"></param>
 		/// <param name="width"></param>
-		/// <returns></returns>
-		private void ReadLocalImage(Result result, int width=150)
+		/// <returns>
+		/// True if the file was successfuly read, false otherwise.
+		/// </returns>
+		private bool ReadLocalImage(Result result, int width=150)
 		{
+			if (result == null) {
+				return false;
+			}
+
 			// Don't read the local image as it's already a thumbnail and we already have informations about it from Hydrus metadata
 			if (result.HydrusFileId != null) {
 				result.ThumbPath = result.ImagePath;
 
-				return;
+				return true;
 			}
 
 			string thumbsDir = this.ThumbsDirPath;
@@ -192,7 +198,7 @@ namespace Hatate
 					result.Local.Size = new FileInfo(result.ImagePath).Length;
 				}
 
-				return;
+				return true;
 			}
 
 			Directory.CreateDirectory(thumbsDir);
@@ -204,11 +210,9 @@ namespace Hatate
 			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
 				result.ThumbPath = result.ImagePath;
 
-				return;
+				return true;
 			} catch (FileNotFoundException) { // Missing file, remove it from the list
-				this.RemoveResultFromFilesListbox(result);
-
-				return;
+				return false;
 			}
 
 			result.Local.Width = image.Width;
@@ -235,7 +239,7 @@ namespace Hatate
 
 				result.ThumbPath = result.ImagePath;
 
-				return;
+				return true;
 			}
 
 			try {
@@ -248,6 +252,8 @@ namespace Hatate
 			gr.Dispose();
 			bmp.Dispose();
 			image.Dispose();
+
+			return true;
 		}
 
 		/// <summary>
@@ -332,16 +338,16 @@ namespace Hatate
 		{
 			Result result = this.GetResultAt(index);
 
-			// Remove non existant file
-			if (!File.Exists(result.ImagePath)) {
+			// Generate a smaller image for uploading
+			this.SetStatus("Generating thumbnail...");
+			bool read = this.ReadLocalImage(result);
+
+			// Unable to read the file
+			if (!read) {
 				this.RemoveResultFromFilesListbox(result);
 
 				return;
 			}
-
-			// Generate a smaller image for uploading
-			this.SetStatus("Generating thumbnail...");
-			this.ReadLocalImage(result);
 
 			// Search the image on IQDB
 			this.SetStatus("Searching file on IQDB...");
@@ -1790,12 +1796,15 @@ namespace Hatate
 
 			Result result = this.SelectedResult;
 
-			if (result == null) {
+			// Generate and set the thumbnail
+			bool read = await Task.Run(() => this.ReadLocalImage(result));
+
+			// Unable to read the file
+			if (!read) {
+				this.RemoveResultFromFilesListbox(result);
+
 				return;
 			}
-
-			// Generate and set the thumbnail
-			await Task.Run(() => this.ReadLocalImage(result));
 
 			// Another result was selected while generating the thumbnail, don't update the view
 			if (this.SelectedResult != result) {
