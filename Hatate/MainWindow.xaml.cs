@@ -1914,6 +1914,7 @@ namespace Hatate
 				break;
 				case "searchIqdbNow":
 					await this.SearchFile(this.ListBox_Files.SelectedIndex);
+					this.ListBox_Files.Items.Refresh();
 				break;
 				case "resetResult":
 					this.ResetSelectedFilesResult();
@@ -1958,7 +1959,7 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Copy hash
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds && searched); // Copy URL
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Add tags
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected && searched); // Search IQDB now
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // Search IQDB now
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, hasSelecteds); // Reset result
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, hasSelecteds); // Remove from list
 															// 10 is a separator
