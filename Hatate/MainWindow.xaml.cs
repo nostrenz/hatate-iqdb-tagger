@@ -955,9 +955,11 @@ namespace Hatate
 			this.RefreshListboxes();
 
 			// Delete thumbnail
-			try {
-				using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous));
-			} catch (IOException) { }
+			if (result.ThumbPath != null) {
+				try {
+					using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous)) ;
+				} catch (IOException) { }
+			}
 		}
 
 		/// <summary>
