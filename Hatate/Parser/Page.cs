@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Hatate.Parser
 {
@@ -123,7 +124,7 @@ namespace Hatate.Parser
 				size = size.Substring(0, size.LastIndexOf("MB")).Trim();
 
 				float mb;
-				float.TryParse(size, out mb);
+				float.TryParse(size, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out mb);
 
 				return (long)(mb * 1000000);
 			}
