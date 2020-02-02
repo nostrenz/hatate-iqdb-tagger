@@ -356,27 +356,12 @@ namespace Hatate
 			result.Searched = true;
 			bool hasTags = result.HasTags;
 
-			// Add tagged tag
-			if (hasTags && Options.Default.AddTaggedTag) {
-				result.Tags.Add(new Tag(Options.Default.TaggedTag));
-			}
-
 			// Found on IQDB
 			if (result.Found) {
 				this.SetStatus("File found.");
-
-				if (Options.Default.AddFoundTag) {
-					result.Tags.Add(new Tag(Options.Default.FoundTag));
-				}
-
 				this.found++;
 			} else { // Not found on IQDB
 				this.SetStatus("File not found.");
-
-				if (Options.Default.AddNotfoundTag) {
-					result.Tags.Add(new Tag(Options.Default.NotfoundTag));
-				}
-
 				this.notFound++;
 			}
 
@@ -497,8 +482,8 @@ namespace Hatate
 			if (!booru.FromUrl(result.Url)) {
 				return false;
 			}
-			
-			// Add tags
+
+			// Add tags from the parsed booru page
 			result.Tags.Clear();
 			this.AddTagsToResult(booru.Tags, result);
 
@@ -536,6 +521,22 @@ namespace Hatate
 			&& !result.Tags.Exists(t => t.Namespace == "rating")
 			) {
 				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating"));
+			}
+
+			// Add tagged tag
+			if (result.HasTags && Options.Default.AddTaggedTag) {
+				result.Tags.Add(new Tag(Options.Default.TaggedTag));
+			}
+
+			// Found on IQDB
+			if (result.Found) {
+				if (Options.Default.AddFoundTag) {
+					result.Tags.Add(new Tag(Options.Default.FoundTag));
+				}
+			} else { // Not found on IQDB
+				if (Options.Default.AddNotfoundTag) {
+					result.Tags.Add(new Tag(Options.Default.NotfoundTag));
+				}
 			}
 
 			this.ListBox_Tags.Items.Refresh();
