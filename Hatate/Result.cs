@@ -123,7 +123,7 @@ namespace Hatate
 		{
 			get
 			{
-				if (this.matchIndex < 0) {
+				if (!this.HasMatch) {
 					return null;
 				}
 
@@ -197,7 +197,17 @@ namespace Hatate
 		/// </summary>
 		public bool Found
 		{
-			get { return this.Matches != null && this.Matches.Count > 0 && this.matchIndex >= 0; }
+			get { return this.HasMatches && this.HasMatch; }
+		}
+
+		public bool HasMatches
+		{
+			get { return this.Matches != null && this.Matches.Count > 0; }
+		}
+
+		public bool HasMatch
+		{
+			get { return this.matchIndex >= 0; }
 		}
 
 		/// <summary>

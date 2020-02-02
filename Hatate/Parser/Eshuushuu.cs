@@ -60,6 +60,10 @@
 		/// <param name="nameSpace"></param>
 		private void AddTags(Supremes.Nodes.Element tagList, string nameSpace = null)
 		{
+			if (tagList == null) {
+				return;
+			}
+
 			Supremes.Nodes.Elements searchTags = tagList.Select("span > a");
 
 			foreach (Supremes.Nodes.Element searchTag in searchTags) {

@@ -1652,8 +1652,17 @@ namespace Hatate
 			this.GroupBox_Tags.Header = "Tags (" + result.Tags.Count + ")";
 			this.GroupBox_Ignoreds.Header = "Ignoreds (" + result.Ignoreds.Count + ")";
 
-			// The image isn't found on IQDB, don't update the match infos
-			if (!result.Found) {
+			// No matches, nothing to update
+			if (!result.HasMatches) {
+				return;
+			}
+
+			// Set matches in selector
+			this.ComboBox_Matches.ItemsSource = result.Matches;
+			this.ComboBox_Matches.IsEnabled = true;
+
+			// No match found, nothing to update
+			if (!result.HasMatch) {
 				return;
 			}
 
@@ -1691,10 +1700,8 @@ namespace Hatate
 				this.Border_Match.BorderBrush = this.GetBrushFromString("#CC0");
 			}
 
-			// Set match selector
-			this.ComboBox_Matches.ItemsSource = result.Matches;
+			// Set selected match
 			this.ComboBox_Matches.SelectedItem = result.Match;
-			this.ComboBox_Matches.IsEnabled = true;
 		}
 
 		#endregion Private
