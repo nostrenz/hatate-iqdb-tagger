@@ -35,6 +35,8 @@ namespace Hatate
 			// Register tag paste event
 			DataObject.AddPastingHandler(this.TextBox_Tag, this.TextBox_Tag_Paste);
 
+			this.TextBox_Tag.Focus();
+			
 			this.ShowDialog();
 		}
 

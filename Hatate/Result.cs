@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
@@ -13,8 +14,10 @@ namespace Hatate
 		const byte FEW = 9;
 
 		private Image local = new Image();
-		private Image match = new Image();
+		private Image remote = new Image();
 		private List<string> warnings = new List<string>();
+		private int matchIndex = -1;
+		private IqdbApi.Enums.Rating overrideRating = IqdbApi.Enums.Rating.Unrated;
 
 		public Result(string imagePath)
 		{
@@ -87,6 +90,18 @@ namespace Hatate
 			}
 		}
 
+		public void Reset()
+		{
+			this.Searched = false;
+			this.Full = null;
+			this.Rating = IqdbApi.Enums.Rating.Unrated;
+			this.matchIndex = -1;
+
+			this.Tags.Clear();
+			this.Ignoreds.Clear();
+			this.Matches.Clear();
+		}
+
 		/*
 		============================================
 		Accessor
@@ -100,12 +115,64 @@ namespace Hatate
 		public List<Tag> Tags { get; set; }
 		public List<Tag> Ignoreds { get; set; }
 		public string ThumbPath { get; set; }
-		public string PreviewUrl { get; set; }
-		public string Url { get; set; }
 		public string Full { get; set; }
-		public IqdbApi.Enums.Source Source { get; set; }
-		public IqdbApi.Enums.Rating Rating { get; set; }
 		public string HydrusFileId { get; set; }
+		public ImmutableList<IqdbApi.Models.Match> Matches { get; set; }
+
+		public IqdbApi.Models.Match Match
+		{
+			get
+			{
+				if (this.matchIndex < 0) {
+					return null;
+				}
+
+				return this.Matches[this.matchIndex];
+			}
+			set
+			{
+				this.matchIndex = this.Matches.IndexOf(value);
+			}
+		}
+
+		public string Url
+		{
+			get
+			{
+				// Fix the URL
+				if (this.Match.Url.StartsWith("//")) {
+					return (this.Match.Source == IqdbApi.Enums.Source.Eshuushuu ? "http" : "https") + ':' + this.Match.Url;
+				}
+
+				return this.Match.Url;
+			}
+		}
+
+		public string PreviewUrl
+		{
+			get { return "http://iqdb.org" + this.Match.PreviewUrl; }
+		}
+
+		public IqdbApi.Enums.Source Source
+		{
+			get { return this.Match.Source; }
+		}
+		
+		public IqdbApi.Enums.Rating Rating
+		{
+			get
+			{
+				if (this.overrideRating != IqdbApi.Enums.Rating.Unrated) {
+					return this.overrideRating;
+				}
+
+				return this.Match.Rating;
+			}
+			set
+			{
+				this.overrideRating = value;
+			}
+		}
 
 		/// <summary>
 		/// The local image file.
@@ -119,10 +186,10 @@ namespace Hatate
 		/// <summary>
 		/// The found image from a booru.
 		/// </summary>
-		public Image Match
+		public Image Remote
 		{
-			get { return this.match; }
-			set { this.match = value; }
+			get { return this.remote; }
+			set { this.remote = value; }
 		}
 
 		/// <summary>
@@ -130,7 +197,7 @@ namespace Hatate
 		/// </summary>
 		public bool Found
 		{
-			get { return this.PreviewUrl != null; }
+			get { return this.Matches != null && this.Matches.Count > 0 && this.matchIndex >= 0; }
 		}
 
 		/// <summary>
@@ -229,19 +296,19 @@ namespace Hatate
 		{
 			get
 			{
-				if (this.match == null) {
+				if (this.remote == null) {
 					return false;
 				}
 
-				if (this.Match.Format != null && this.Match.Format.ToLower() == "png" && this.Local.Format.ToLower() != "png") {
+				if (this.remote.Format != null && this.remote.Format.ToLower() == "png" && this.local.Format.ToLower() != "png") {
 					return true;
 				}
 
-				if (this.Match.Width > this.Local.Width || this.Match.Height > this.Local.Height) {
+				if (this.remote.Width > this.local.Width || this.remote.Height > this.local.Height) {
 					return true;
 				}
 
-				if (this.Match.Size > this.Local.Size) {
+				if (this.remote.Size > this.local.Size) {
 					return true;
 				}
 

@@ -22,6 +22,8 @@ namespace Hatate
 				this.tags.Add(tag);
 			}
 
+			this.TextBox_Tag.Focus();
+
 			this.UpdateTextBox();
 			this.ShowDialog();
 		}

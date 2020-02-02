@@ -420,12 +420,13 @@ namespace Hatate
 				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
 			}
 
-			// No result found
+			// Result(s) found
 			if (iqdbResult != null && iqdbResult.Matches != null) {
 				this.lastSearchedInSeconds = (int)iqdbResult.SearchedInSeconds;
+				result.Matches = iqdbResult.Matches;
 
-				// If found, check for matching results
-				this.CheckMatches(iqdbResult.Matches, result);
+				// Check for matching results
+				this.CheckMatches(result);
 			}
 
 			fs.Close();
@@ -435,9 +436,9 @@ namespace Hatate
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
-		private void CheckMatches(System.Collections.Immutable.ImmutableList<IqdbApi.Models.Match> matches, Result result)
+		private void CheckMatches(Result result)
 		{
-			foreach (IqdbApi.Models.Match match in matches) {
+			foreach (IqdbApi.Models.Match match in result.Matches) {
 				// Check minimum similarity and number of tags
 				if (match.Similarity < Options.Default.Similarity || match.Tags == null || match.Tags.Count < Options.Default.TagsCount) {
 					continue;
@@ -454,15 +455,7 @@ namespace Hatate
 				}
 
 				// Match found
-				result.Source = match.Source;
-				result.Rating = match.Rating;
-				result.PreviewUrl = "http://iqdb.org" + match.PreviewUrl;
-				result.Url = match.Url;
-
-				// Fix the URL
-				if (result.Url.StartsWith("//")) {
-					result.Url = (result.Source == IqdbApi.Enums.Source.Eshuushuu ? "http" : "https") + ':' + result.Url;
-				}
+				result.Match = match;
 
 				// Log the URL
 				if (Options.Default.LogMatchedUrls) {
@@ -470,104 +463,85 @@ namespace Hatate
 				}
 
 				// We don't want to retrieve the tags, we can end here
-				if (!Options.Default.ParseTags) {
-					continue;
-				}
+				if (Options.Default.ParseTags) {
+					bool success = this.RetrieveTags(result);
 
-				bool success = this.ParseBooruPage(result);
-
-				// Failed to parse the booru page
-				if (!success) {
-					continue;
-				}
-
-				// Check ignored tags
-				for (int i=result.Tags.Count-1; i>=0; i--) {
-					Tag tag = result.Tags[i];
-					bool isIgnored = this.IsTagInIgnoreds(tag);
-
-					if (isIgnored && !result.Ignoreds.Contains(tag)) {
-						result.Ignoreds.Add(tag);
-						result.Tags.Remove(tag);
+					// Unable to retrieve tags for this match, we'll try another one
+					if (!success) {
+						continue;
 					}
 				}
 
-				// Add rating if not already in tags
-				if (Options.Default.AddRating
-				&& result.Rating != IqdbApi.Enums.Rating.Unrated
-				&& !result.Tags.Exists(t => t.Namespace == "rating")
-				) {
-					result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating"));
-				}
-
-				this.ListBox_Tags.Items.Refresh();
-				this.ListBox_Ignoreds.Items.Refresh();
-
+				// We have our match, no need to check the others
 				return;
 			}
 		}
 
-		/// <summary>
-		/// Parse a booru page to obtain namespaced tags.
-		/// </summary>
-		private bool ParseBooruPage(Result result)
+		private bool RetrieveTags(Result result)
 		{
 			Parser.IParser booru = null;
 
 			switch (result.Source) {
-				case IqdbApi.Enums.Source.Danbooru:
-					booru = new Parser.Danbooru();
-				break;
-				case IqdbApi.Enums.Source.Gelbooru:
-					booru = new Parser.Gelbooru();
-				break;
-				case IqdbApi.Enums.Source.Konachan:
-					booru = new Parser.Konachan();
-				break;
-				case IqdbApi.Enums.Source.Yandere:
-					booru = new Parser.Yandere();
-				break;
-				case IqdbApi.Enums.Source.SankakuChannel:
-					booru = new Parser.SankakuChannel();
-				break;
-				case IqdbApi.Enums.Source.Eshuushuu:
-					booru = new Parser.Eshuushuu();
-				break;
-				case IqdbApi.Enums.Source.TheAnimeGallery:
-					booru = new Parser.TheAnimeGallery();
-				break;
-				case IqdbApi.Enums.Source.Zerochan:
-					booru = new Parser.Zerochan();
-				break;
-				case IqdbApi.Enums.Source.AnimePictures:
-					booru = new Parser.AnimePictures();
-				break;
+				case IqdbApi.Enums.Source.Danbooru: booru = new Parser.Danbooru(); break;
+				case IqdbApi.Enums.Source.Gelbooru: booru = new Parser.Gelbooru(); break;
+				case IqdbApi.Enums.Source.Konachan: booru = new Parser.Konachan(); break;
+				case IqdbApi.Enums.Source.Yandere: booru = new Parser.Yandere(); break;
+				case IqdbApi.Enums.Source.SankakuChannel: booru = new Parser.SankakuChannel(); break;
+				case IqdbApi.Enums.Source.Eshuushuu: booru = new Parser.Eshuushuu(); break;
+				case IqdbApi.Enums.Source.TheAnimeGallery: booru = new Parser.TheAnimeGallery(); break;
+				case IqdbApi.Enums.Source.Zerochan: booru = new Parser.Zerochan(); break;
+				case IqdbApi.Enums.Source.AnimePictures: booru = new Parser.AnimePictures(); break;
 				default: return false;
 			}
 
-			bool success = booru.FromUrl(result.Url);
+			if (!booru.FromUrl(result.Url)) {
+				return false;
+			}
+			
+			// Add tags
+			result.Tags.Clear();
+			this.AddTagsToResult(booru.Tags, result);
 
-			if (success) {
-				this.AddTagsToResult(booru.Tags, result);
+			result.Full = booru.Full;
+			result.Remote = new Image();
+			result.Remote.Size = booru.Size;
+			result.Remote.Width = booru.Width;
+			result.Remote.Height = booru.Height;
 
-				result.Full = booru.Full;
-				result.Match.Size = booru.Size;
-				result.Match.Width = booru.Width;
-				result.Match.Height = booru.Height;
+			if (booru.Full != null) {
+				result.Remote.Format = booru.Full.Substring(booru.Full.LastIndexOf('.') + 1);
+			}
 
-				if (booru.Full != null) {
-					result.Match.Format = booru.Full.Substring(booru.Full.LastIndexOf('.') + 1);
-				}
+			switch (booru.Rating) {
+				case null: break;
+				case "Safe": result.Rating = IqdbApi.Enums.Rating.Safe; break;
+				case "Questionable": result.Rating = IqdbApi.Enums.Rating.Questionable; break;
+				case "Explicit": result.Rating = IqdbApi.Enums.Rating.Explicit; break;
+			}
 
-				switch (booru.Rating) {
-					case null: break;
-					case "Safe": result.Rating = IqdbApi.Enums.Rating.Safe; break;
-					case "Questionable": result.Rating = IqdbApi.Enums.Rating.Questionable; break;
-					case "Explicit": result.Rating = IqdbApi.Enums.Rating.Explicit; break;
+			// Check ignored tags
+			for (int i = result.Tags.Count - 1; i >= 0; i--) {
+				Tag tag = result.Tags[i];
+				bool isIgnored = this.IsTagInIgnoreds(tag);
+
+				if (isIgnored && !result.Ignoreds.Contains(tag)) {
+					result.Ignoreds.Add(tag);
+					result.Tags.Remove(tag);
 				}
 			}
 
-			return success;
+			// Add rating if not already in tags
+			if (Options.Default.AddRating
+			&& result.Rating != IqdbApi.Enums.Rating.Unrated
+			&& !result.Tags.Exists(t => t.Namespace == "rating")
+			) {
+				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating"));
+			}
+
+			this.ListBox_Tags.Items.Refresh();
+			this.ListBox_Ignoreds.Items.Refresh();
+
+			return true;
 		}
 
 		/// <summary>
@@ -963,7 +937,7 @@ namespace Hatate
 			// Delete thumbnail
 			if (result.ThumbPath != null) {
 				try {
-					using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous)) ;
+					using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous));
 				} catch (IOException) { }
 			}
 		}
@@ -1159,14 +1133,7 @@ namespace Hatate
 		private void ResetSelectedFilesResult()
 		{
 			foreach (Result result in this.ListBox_Files.SelectedItems) {
-				result.Searched = false;
-				result.PreviewUrl = null;
-				result.Url = null;
-				result.Source = 0;
-				result.Rating = 0;
-
-				result.Tags.Clear();
-				result.Ignoreds.Clear();
+				result.Reset();
 			}
 
 			this.RefreshListboxes();
@@ -1669,6 +1636,66 @@ namespace Hatate
 			} catch (Exception) { }
 		}
 
+		/// <summary>
+		/// Update the view elements on the right (tag lists, images, labels...)
+		/// </summary>
+		private void UpdateRightView(Result result)
+		{
+			// Add tags to the list
+			result.Tags.Sort();
+			result.Ignoreds.Sort();
+
+			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
+			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
+
+			this.GroupBox_Tags.Header = "Tags (" + result.Tags.Count + ")";
+			this.GroupBox_Ignoreds.Header = "Ignoreds (" + result.Ignoreds.Count + ")";
+
+			// The image isn't found on IQDB, don't update the match infos
+			if (!result.Found) {
+				return;
+			}
+
+			// Set match labels
+			this.Label_Match.Content = result.Source.ToString();
+			this.Label_MatchInfos.Content = "";
+
+			if (result.Remote.Format != null) {
+				this.Label_Match.Content += " " + result.Remote.Format.ToUpper();
+			}
+
+			if (result.Remote.Size > 0) {
+				this.Label_MatchInfos.Content += this.HumanReadableFileSize(result.Remote.Size) + " ";
+			}
+
+			if (result.Remote.Width > 0 && result.Remote.Height > 0) {
+				this.Label_MatchInfos.Content += "(" + result.Remote.Width + "x" + result.Remote.Height + ")";
+			}
+
+			// Set match image
+			if (result.PreviewUrl != null) {
+				try {
+					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
+				} catch (Exception) {
+					// UriFormatException may happen if the uri is incorrect
+				}
+			}
+
+			// Set borders
+			if (result.IsMatchBetterThanLocal) {
+				this.Border_Local.BorderBrush = this.GetBrushFromString("#CC0");
+				this.Border_Match.BorderBrush = this.GetBrushFromString("#0F0");
+			} else {
+				this.Border_Local.BorderBrush = this.GetBrushFromString("#0F0");
+				this.Border_Match.BorderBrush = this.GetBrushFromString("#CC0");
+			}
+
+			// Set match selector
+			this.ComboBox_Matches.ItemsSource = result.Matches;
+			this.ComboBox_Matches.SelectedItem = result.Match;
+			this.ComboBox_Matches.IsEnabled = true;
+		}
+
 		#endregion Private
 
 		/*
@@ -1783,12 +1810,13 @@ namespace Hatate
 		/// <param name="e"></param>
 		private async void ListBox_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			this.Label_Match.Content = "Local";
+			this.Label_Local.Content = "Local";
 			this.Label_Match.Content = "Match";
 			this.Label_MatchInfos.Content = "";
 			this.Image_Local.Source = null;
 			this.Image_Match.Source = null;
 			this.Border_Local.BorderBrush = this.Border_Match.BorderBrush = this.GetBrushFromString("#505050");
+			this.ComboBox_Matches.IsEnabled = false;
 
 			if (this.ListBox_Files.SelectedIndex < 0) {
 				return;
@@ -1806,58 +1834,16 @@ namespace Hatate
 				return;
 			}
 
-			// Another result was selected while generating the thumbnail, don't update the view
+			// A different result was selected while generating the thumbnail, don't update the view
 			if (this.SelectedResult != result) {
 				return;
 			}
 
 			this.Image_Local.Source = this.CreateBitmapImage(result.ThumbPath);
-			this.Label_Local.Content = "Source " + result.Local.Format.ToUpper();
+			this.Label_Local.Content = "Local " + result.Local.Format.ToUpper();
 			this.Label_SourceInfos.Content = this.HumanReadableFileSize(result.Local.Size) + " (" + result.Local.Width + "x" + result.Local.Height + ")";
 
-			// Set the image
-			if (result.PreviewUrl != null) {
-				try {
-					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
-				} catch (Exception) {
-					// UriFormatException may happen if the uri is incorrect
-				}
-			}
-
-			// Add tags to the list
-			result.Tags.Sort();
-			result.Ignoreds.Sort();
-
-			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
-			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
-
-			// The following need the result to be found
-			if (!result.Found) {
-				return;
-			}
-
-			// Set the source name
-			this.Label_Match.Content = result.Source.ToString();
-
-			if (result.Match.Format != null) {
-				this.Label_Match.Content += " " + result.Match.Format.ToUpper();
-			}
-
-			if (result.Match.Size > 0) {
-				this.Label_MatchInfos.Content += this.HumanReadableFileSize(result.Match.Size) + " ";
-			}
-
-			if (result.Match.Width > 0 && result.Match.Height > 0) {
-				this.Label_MatchInfos.Content += "(" + result.Match.Width + "x" + result.Match.Height + ")";
-			}
-
-			if (result.IsMatchBetterThanLocal) {
-				this.Border_Local.BorderBrush = this.GetBrushFromString("#CC0");
-				this.Border_Match.BorderBrush = this.GetBrushFromString("#0F0");
-			} else {
-				this.Border_Local.BorderBrush = this.GetBrushFromString("#0F0");
-				this.Border_Match.BorderBrush = this.GetBrushFromString("#CC0");
-			}
+			this.UpdateRightView(result);
 		}
 
 		/// <summary>
@@ -2320,6 +2306,34 @@ namespace Hatate
 
 			result.Tags.Remove((Tag)this.ListBox_Tags.SelectedItem);
 			this.ListBox_Tags.Items.Refresh();
+		}
+
+		/// <summary>
+		/// Called when selecting a different match in the combobox under the match image.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ComboBox_Matches_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (this.ComboBox_Matches.SelectedItem == null) {
+				return;
+			}
+
+			Result result = this.SelectedResult;
+			IqdbApi.Models.Match match = (IqdbApi.Models.Match)this.ComboBox_Matches.SelectedItem;
+
+			// This match is already selected, nothing to do
+			if (match == result.Match) {
+				return;
+			}
+
+			result.Match = match;
+
+			if (Options.Default.ParseTags) {
+				this.RetrieveTags(result);
+			}
+
+			this.UpdateRightView(result);
 		}
 
 		#endregion Event
