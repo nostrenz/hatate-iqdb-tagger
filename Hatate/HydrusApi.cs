@@ -272,7 +272,7 @@ namespace Hatate
 		private string PostRequest(string route, string postData)
 		{
 			HttpWebRequest request = this.CreateRequest(route);
-			byte[] data = System.Text.Encoding.ASCII.GetBytes(postData);
+			byte[] data = System.Text.Encoding.UTF8.GetBytes(postData);
 			string response = null;
 
 			request.Method = "POST";
