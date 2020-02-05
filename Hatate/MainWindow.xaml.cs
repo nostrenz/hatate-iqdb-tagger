@@ -879,10 +879,10 @@ namespace Hatate
 			return true;
 		}
 
-		private async Task<bool> SendUrlsToHydrusForResult(Result result)
+		private async Task<bool> SendUrlToHydrusForResult(Result result)
 		{
 			// Not a searched result
-			if (result == null || !result.Searched) {
+			if (result == null || !result.Searched || !result.HasMatch) {
 				return false;
 			}
 
@@ -1567,7 +1567,7 @@ namespace Hatate
 			this.SetStatus("Tags sent to Hydrus for all the selected files. " + counts);
 		}
 
-		private async void SendUrlsForSelectedFiles()
+		private async void SendUrlForSelectedFiles()
 		{
 			int successes = 0;
 			int failures = 0;
@@ -1579,7 +1579,7 @@ namespace Hatate
 			// Process each selected file until no one remain or the API becomes unreachable
 			while (this.ListBox_Files.SelectedItems.Count > 0 && !App.hydrusApi.Unreachable) {
 				Result result = this.GetSelectedResultAt(0);
-				bool success = await this.SendUrlsToHydrusForResult(result);
+				bool success = await this.SendUrlToHydrusForResult(result);
 				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
 
 				this.SetStatus("Sending URLs to Hydrus... " + counts);
@@ -1875,7 +1875,7 @@ namespace Hatate
 					this.SendTagsForSelectedFiles();
 				break;
 				case "sendUrlsToHydrus":
-					this.SendUrlsForSelectedFiles();
+					this.SendUrlForSelectedFiles();
 				break;
 				case "unignore":
 					this.UningnoreSelectItems();
