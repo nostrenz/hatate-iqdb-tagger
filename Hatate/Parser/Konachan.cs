@@ -42,7 +42,7 @@
 					continue;
 				}
 
-				Tag tag = new Tag(name.Replace("_", " "));
+				Tag tag = new Tag(name.Replace("_", " ")) { Source = Hatate.Tag.SOURCE_BOORU };
 				string type = searchTag.Attr("data-type");
 
 				switch (type) {

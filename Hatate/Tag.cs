@@ -8,6 +8,10 @@ namespace Hatate
 {
 	public class Tag : IComparable
 	{
+		public const byte SOURCE_BOORU = 1; // Added from parsing a booru page 
+		public const byte SOURCE_AUTO  = 2; // Auto-added tags (found, not found, tagged)
+		public const byte SOURCE_USER  = 3; // Added manually by the user
+
 		public Tag(string value, string nameSpace=null, bool exclude=false)
 		{
 			this.Value = value;
@@ -105,6 +109,7 @@ namespace Hatate
 		public bool Exclude { get; set; }
 		public string Value { get; set; }
 		public string Namespace { get; set; }
+		public byte Source { get; set; }
 
 		/// <summary>
 		/// Return in format "namespace:value".

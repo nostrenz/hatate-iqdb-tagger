@@ -58,7 +58,7 @@ namespace Hatate
 		/// <param name="nameSpace"></param>
 		public void AddTag(string value, string nameSpace=null)
 		{
-			this.ListBox_Tags.Items.Add(new Tag(value, nameSpace));
+			this.ListBox_Tags.Items.Add(new Tag(value, nameSpace) { Source = Hatate.Tag.SOURCE_USER });
 		}
 
 		#endregion Public
@@ -87,9 +87,9 @@ namespace Hatate
 			Tag tag = null;
 
 			if (nameSpace != null) {
-				tag = new Tag(value, nameSpace);
+				tag = new Tag(value, nameSpace) { Source = Hatate.Tag.SOURCE_USER };
 			} else {
-				tag = new Tag(value, true);
+				tag = new Tag(value, true) { Source = Hatate.Tag.SOURCE_USER };
 			}
 
 			if (!this.ListBox_Tags.Items.Contains(tag)) {

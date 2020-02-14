@@ -52,7 +52,7 @@
 					continue;
 				}
 
-				this.tags.Add(new Tag(searchTag.Text, nameSpace));
+				this.AddTag(searchTag.Text, nameSpace);
 			}
 		}
 	}

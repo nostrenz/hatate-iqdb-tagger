@@ -35,7 +35,7 @@
 		<CheckBox x:Name="CheckBox_AskTags" Content="Ask for tags when adding files to the list" HorizontalAlignment="Left" Margin="10,155,0,0" VerticalAlignment="Top" Height="14"/>
 		<CheckBox x:Name="CheckBox_AddFoundTag" Content="Add this tag to files found on IQDB" HorizontalAlignment="Left" Margin="10,214,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" Width="228" Click="CheckBox_AddTag_Click"/>
 		<CheckBox x:Name="CheckBox_AddNotfoundTag" Content="Add this tag to files not found on IQDB" HorizontalAlignment="Left" Margin="10,242,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" Width="228" Click="CheckBox_AddTag_Click"/>
-		<CheckBox x:Name="CheckBox_AddTaggedTag" Content="Add this tag to tagged files" HorizontalAlignment="Left" Margin="10,270,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" Width="228" Click="CheckBox_AddTag_Click"/>
+		<CheckBox x:Name="CheckBox_AddTaggedTag" Content="Add this tag to files tagged from a booru" HorizontalAlignment="Left" Margin="10,270,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" Width="228" Click="CheckBox_AddTag_Click"/>
 		<TextBox x:Name="TextBox_FoundTag" Height="23" Margin="243,214,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
 		<TextBox x:Name="TextBox_NotfoundTag" Height="23" Margin="243,242,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
 		<TextBox x:Name="TextBox_TaggedTag" Height="23" Margin="243,270,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>

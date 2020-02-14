@@ -84,9 +84,9 @@
 		private void AddTags(Supremes.Nodes.Element tagList, string category, string nameSpace=null)
 		{
 			Supremes.Nodes.Elements searchTags = tagList.Select("ul." + category + "-tag-list a.search-tag");
-			
+
 			foreach (Supremes.Nodes.Element searchTag in searchTags) {
-				this.tags.Add(new Tag(searchTag.Text, nameSpace));
+				this.AddTag(searchTag.Text, nameSpace);
 			}
 		}
 	}

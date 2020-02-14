@@ -74,7 +74,7 @@ namespace Hatate.Parser
 		/// <param name="nameSpace"></param>
 		protected void AddTag(string value, string nameSpace=null)
 		{
-			this.tags.Add(new Tag(value, nameSpace));
+			this.tags.Add(new Tag(value, nameSpace) { Source = Hatate.Tag.SOURCE_BOORU });
 		}
 
 		/// <summary>

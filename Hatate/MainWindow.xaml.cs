@@ -414,6 +414,8 @@ namespace Hatate
 				this.CheckMatches(result);
 			}
 
+			this.AddAutoTags(result);
+
 			fs.Close();
 			fs.Dispose();
 		}
@@ -447,7 +449,7 @@ namespace Hatate
 					this.LogUrl(result.Url);
 				}
 
-				// We don't want to retrieve the tags, we can end here
+				// We want to retrieve tags from a booru
 				if (Options.Default.ParseTags) {
 					bool success = this.RetrieveTags(result);
 
@@ -459,6 +461,34 @@ namespace Hatate
 
 				// We have our match, no need to check the others
 				return;
+			}
+		}
+
+		private void AddAutoTags(Result result)
+		{
+			// Remove the previous auto-added tags
+			result.ClearTagsOfSource(Hatate.Tag.SOURCE_AUTO);
+
+			// Found on IQDB
+			if (result.Found) {
+				if (Options.Default.AddFoundTag) {
+					result.Tags.Add(new Tag(Options.Default.FoundTag) { Source = Hatate.Tag.SOURCE_AUTO });
+				}
+			} else { // Not found on IQDB
+				if (Options.Default.AddNotfoundTag) {
+					result.Tags.Add(new Tag(Options.Default.NotfoundTag) { Source = Hatate.Tag.SOURCE_AUTO });
+				}
+			}
+
+			// Add tagged tag if at least one booru tags exists
+			if (Options.Default.AddTaggedTag) {
+				foreach (Tag tag in result.Tags) {
+					if (tag.Source == Hatate.Tag.SOURCE_BOORU) {
+						result.Tags.Add(new Tag(Options.Default.TaggedTag) { Source = Hatate.Tag.SOURCE_AUTO });
+
+						return;
+					}
+				}
 			}
 		}
 
@@ -484,7 +514,7 @@ namespace Hatate
 			}
 
 			// Add tags from the parsed booru page
-			result.Tags.Clear();
+			result.ClearTagsOfSource(Hatate.Tag.SOURCE_BOORU);
 			this.AddTagsToResult(booru.Tags, result);
 
 			result.Full = booru.Full;
@@ -520,23 +550,7 @@ namespace Hatate
 			&& result.Rating != IqdbApi.Enums.Rating.Unrated
 			&& !result.Tags.Exists(t => t.Namespace == "rating")
 			) {
-				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating"));
-			}
-
-			// Add tagged tag
-			if (result.HasTags && Options.Default.AddTaggedTag) {
-				result.Tags.Add(new Tag(Options.Default.TaggedTag));
-			}
-
-			// Found on IQDB
-			if (result.Found) {
-				if (Options.Default.AddFoundTag) {
-					result.Tags.Add(new Tag(Options.Default.FoundTag));
-				}
-			} else { // Not found on IQDB
-				if (Options.Default.AddNotfoundTag) {
-					result.Tags.Add(new Tag(Options.Default.NotfoundTag));
-				}
+				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating") { Source = Hatate.Tag.SOURCE_BOORU });
 			}
 
 			this.ListBox_Tags.Items.Refresh();
@@ -1071,7 +1085,7 @@ namespace Hatate
 				if (String.IsNullOrEmpty(url)) {
 					continue;
 				}
-				
+
 				text += url;
 
 				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
@@ -2341,6 +2355,7 @@ namespace Hatate
 				this.RetrieveTags(result);
 			}
 
+			this.AddAutoTags(result);
 			this.UpdateRightView(result);
 		}
 

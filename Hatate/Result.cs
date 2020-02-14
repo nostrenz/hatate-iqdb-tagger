@@ -90,6 +90,14 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Remove all tags obtained from a certain source.
+		/// </summary>
+		public void ClearTagsOfSource(byte source)
+		{
+			this.Tags.RemoveAll(tag => tag.Source == source);
+		}
+
 		public void Reset()
 		{
 			this.Searched = false;
