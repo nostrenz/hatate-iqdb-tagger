@@ -472,11 +472,11 @@ namespace Hatate
 			// Found on IQDB
 			if (result.Found) {
 				if (Options.Default.AddFoundTag) {
-					result.Tags.Add(new Tag(Options.Default.FoundTag) { Source = Hatate.Tag.SOURCE_AUTO });
+					result.Tags.Add(new Tag(Options.Default.FoundTag, true) { Source = Hatate.Tag.SOURCE_AUTO });
 				}
 			} else { // Not found on IQDB
 				if (Options.Default.AddNotfoundTag) {
-					result.Tags.Add(new Tag(Options.Default.NotfoundTag) { Source = Hatate.Tag.SOURCE_AUTO });
+					result.Tags.Add(new Tag(Options.Default.NotfoundTag, true) { Source = Hatate.Tag.SOURCE_AUTO });
 				}
 			}
 
@@ -484,7 +484,7 @@ namespace Hatate
 			if (Options.Default.AddTaggedTag) {
 				foreach (Tag tag in result.Tags) {
 					if (tag.Source == Hatate.Tag.SOURCE_BOORU) {
-						result.Tags.Add(new Tag(Options.Default.TaggedTag) { Source = Hatate.Tag.SOURCE_AUTO });
+						result.Tags.Add(new Tag(Options.Default.TaggedTag, true) { Source = Hatate.Tag.SOURCE_AUTO });
 
 						return;
 					}
