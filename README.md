@@ -11,9 +11,10 @@ Tagged images can then be imported into [Hydrus](https://github.com/hydrusnetwor
 
 ## How to use
 
-1. Start the program and [add images](#Adding-images)
-2. Click the "**Start**" button
-3. Leave it open and wait for the images to be searched and tagged.
+1. Download the latest release [here](https://github.com/nostrenz/hatate-iqdb-tagger/releases)
+2. Start the program and [add images](#Adding-images)
+3. Click the "**Start**" button
+4. Leave it open and wait for the images to be searched and tagged.
 
 ![Main window](https://raw.githubusercontent.com/nostrenz/hatate-iqdb-tagger/master/screenshots/window.png)
 
