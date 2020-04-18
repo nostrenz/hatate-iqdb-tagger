@@ -46,7 +46,7 @@ namespace Hatate
 		private Timer timer;
 
 		// List of accepted image extentions
-		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
+		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp", ".jfif" };
 
 
 		public MainWindow()
