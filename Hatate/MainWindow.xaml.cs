@@ -202,13 +202,6 @@ namespace Hatate
 
 			Directory.CreateDirectory(thumbsDir);
 
-			// We'll upload the original image
-			if (!Options.Default.ResizeImage) {
-				result.ThumbPath = result.ImagePath;
-
-				return true;
-			}
-
 			// We'll generate a thumbnail to be uploaded
 			System.Drawing.Image image = null;
 
@@ -222,18 +215,18 @@ namespace Hatate
 				return false;
 			}
 
-			// Image width is lower than the target thumbnail width, we'll upload the original image
-			if (image.Width <= Options.Default.ThumbWidth) {
+			result.Local.Width = image.Width;
+			result.Local.Height = image.Height;
+			result.Local.Size = new FileInfo(result.ImagePath).Length;
+
+			// We don't want to generate a thumbnail or image width is lower than the resized width, we'll upload the original image
+			if (!Options.Default.ResizeImage || image.Width <= Options.Default.ThumbWidth) {
 				image.Dispose();
 
 				result.ThumbPath = result.ImagePath;
 
 				return true;
 			}
-
-			result.Local.Width = image.Width;
-			result.Local.Height = image.Height;
-			result.Local.Size = new FileInfo(result.ImagePath).Length;
 
 			Decimal sizeRatio = ((Decimal)image.Height / image.Width);
 			int thumbHeight = Decimal.ToInt32(sizeRatio * Options.Default.ThumbWidth);
