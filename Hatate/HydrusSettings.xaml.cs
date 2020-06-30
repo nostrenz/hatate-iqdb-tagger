@@ -14,8 +14,14 @@ namespace Hatate
 
 			this.Owner = App.Current.MainWindow;
 
+			// Ensure compatibility with previous versions
+			if (!string.IsNullOrEmpty(Settings.Default.HydrusApiPort)) {
+				Settings.Default.HydrusApiHost += ':' + Settings.Default.HydrusApiPort;
+				Settings.Default.HydrusApiPort = null;
+				Settings.Default.Save();
+			}
+
 			this.TextBox_ApiHost.Text = Settings.Default.HydrusApiHost;
-			this.TextBox_ApiPort.Text = Settings.Default.HydrusApiPort;
 			this.TextBox_ApiAccessKey.Text = Settings.Default.HydrusApiAccessKey;
 			this.CheckBox_AutoSend.IsChecked = Settings.Default.AutoSend;
 			this.CheckBox_DeleteImported.IsChecked = Settings.Default.DeleteImported;
@@ -53,10 +59,6 @@ namespace Hatate
 				return false;
 			}
 
-			if (string.IsNullOrWhiteSpace(this.TextBox_ApiPort.Text)) {
-				return false;
-			}
-
 			if (string.IsNullOrWhiteSpace(this.TextBox_ApiAccessKey.Text)) {
 				return false;
 			}
@@ -67,7 +69,6 @@ namespace Hatate
 		private void SetConnectionSettings()
 		{
 			Settings.Default.HydrusApiHost = this.TextBox_ApiHost.Text.Trim();
-			Settings.Default.HydrusApiPort = this.TextBox_ApiPort.Text.Trim();
 			Settings.Default.HydrusApiAccessKey = this.TextBox_ApiAccessKey.Text.Trim();
 			Settings.Default.HydrusTagService = (string)this.ComboBox_TagServices.SelectedValue;
 		}
@@ -75,13 +76,7 @@ namespace Hatate
 		private void Button_Apply_Click(object sender, RoutedEventArgs e)
 		{
 			if (string.IsNullOrWhiteSpace(this.TextBox_ApiHost.Text)) {
-				MessageBox.Show("Missing host URL");
-				this.Button_Apply.IsEnabled = false;
-				return;
-			}
-
-			if (string.IsNullOrWhiteSpace(this.TextBox_ApiPort.Text)) {
-				MessageBox.Show("Missing port number");
+				MessageBox.Show("Missing URL");
 				this.Button_Apply.IsEnabled = false;
 				return;
 			}
@@ -118,19 +113,21 @@ namespace Hatate
 				return;
 			}
 
-			if (string.IsNullOrWhiteSpace(this.TextBox_ApiPort.Text)) {
-				MessageBox.Show("Missing port number");
-				this.Button_Apply.IsEnabled = false;
-				return;
-			}
-
 			if (string.IsNullOrWhiteSpace(this.TextBox_ApiAccessKey.Text)) {
 				MessageBox.Show("Missing access key");
 				this.Button_Apply.IsEnabled = false;
 				return;
 			}
 
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(this.TextBox_ApiHost.Text + ':' + this.TextBox_ApiPort.Text + "/verify_access_key");
+			HttpWebRequest request;
+
+			try {
+				request = (HttpWebRequest)WebRequest.Create(this.TextBox_ApiHost.Text + "/verify_access_key");
+			} catch (System.UriFormatException) {
+				MessageBox.Show("Connection failed");
+				this.Button_Apply.IsEnabled = false;
+				return;
+			}
 
 			request.Headers.Add("Hydrus-Client-API-Access-Key: " + this.TextBox_ApiAccessKey.Text);
 			request.AutomaticDecompression = DecompressionMethods.GZip;

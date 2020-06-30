@@ -238,7 +238,7 @@ namespace Hatate
 
 		private HttpWebRequest CreateRequest(string route)
 		{
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Settings.Default.HydrusApiHost + ':' + Settings.Default.HydrusApiPort + route);
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Settings.Default.HydrusApiHost + route);
 
 			request.Headers.Add("Hydrus-Client-API-Access-Key: " + Settings.Default.HydrusApiAccessKey);
 
@@ -248,7 +248,14 @@ namespace Hatate
 		private string GetRequest(string route)
 		{
 			string response = null;
-			HttpWebRequest request = this.CreateRequest(route);
+			HttpWebRequest request;
+
+			try {
+				request = this.CreateRequest(route);
+			} catch (System.UriFormatException) {
+				return null;
+			}
+
 			request.AutomaticDecompression = DecompressionMethods.GZip;
 
 			try {

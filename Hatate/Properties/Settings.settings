@@ -69,7 +69,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HydrusApiHost" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://127.0.0.1</Value>
+      <Value Profile="(Default)">http://127.0.0.1:45869</Value>
     </Setting>
     <Setting Name="HydrusTagService" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

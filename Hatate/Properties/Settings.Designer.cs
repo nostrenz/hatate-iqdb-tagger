@@ -289,7 +289,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1:45869")]
         public string HydrusApiHost {
             get {
                 return ((string)(this["HydrusApiHost"]));

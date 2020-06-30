@@ -7,13 +7,11 @@
         mc:Ignorable="d"
         Title="Hydrus settings" Height="280" MinHeight="268" MaxHeight="280" Width="550" WindowStartupLocation="CenterOwner" MinWidth="550">
 	<Grid Background="{DynamicResource WindowBackground}">
-		<TextBox x:Name="TextBox_ApiPort" Height="26" Margin="0,10,10,0" TextWrapping="Wrap" Text="45869" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Width="52"/>
-		<Label Content="API host : port" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
+		<Label Content="API URL" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
 		<Label Content="API access key" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
 		<TextBox x:Name="TextBox_ApiAccessKey" Height="26" Margin="101,41,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
 		<Button x:Name="Button_Apply" Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Apply_Click" IsEnabled="False"/>
-		<TextBox x:Name="TextBox_ApiHost" Height="26" Margin="101,10,85,0" TextWrapping="Wrap" Text="http://127.0.0.1" VerticalAlignment="Top"/>
-		<Label Content=":" Margin="0,9,67,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="13"/>
+		<TextBox x:Name="TextBox_ApiHost" Height="26" Margin="101,10,10,0" TextWrapping="Wrap" Text="http://127.0.0.1:45869" VerticalAlignment="Top"/>
 		<Button Content="Test connection" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Width="86" Click="Button_Test_Click"/>
 		<ComboBox x:Name="ComboBox_TagServices" Margin="101,72,10,0" VerticalAlignment="Top" Height="26" IsEnabled="False"/>
 		<Label x:Name="Label_TagService" Content="Tag service" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="86" IsEnabled="False"/>
