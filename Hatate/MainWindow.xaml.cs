@@ -157,11 +157,10 @@ namespace Hatate
 		/// Get some informations about the local image attached to a Result and also generate a smaller image.
 		/// </summary>
 		/// <param name="result"></param>
-		/// <param name="width"></param>
 		/// <returns>
 		/// True if the file was successfuly read, false otherwise.
 		/// </returns>
-		private bool ReadLocalImage(Result result, int width=150)
+		private bool ReadLocalImage(Result result)
 		{
 			if (result == null) {
 				return false;
@@ -203,6 +202,14 @@ namespace Hatate
 
 			Directory.CreateDirectory(thumbsDir);
 
+			// We'll upload the original image
+			if (!Options.Default.ResizeImage) {
+				result.ThumbPath = result.ImagePath;
+
+				return true;
+			}
+
+			// We'll generate a thumbnail to be uploaded
 			System.Drawing.Image image = null;
 
 			try {
@@ -215,16 +222,25 @@ namespace Hatate
 				return false;
 			}
 
+			// Image width is lower than the target thumbnail width, we'll upload the original image
+			if (image.Width <= Options.Default.ThumbWidth) {
+				image.Dispose();
+
+				result.ThumbPath = result.ImagePath;
+
+				return true;
+			}
+
 			result.Local.Width = image.Width;
 			result.Local.Height = image.Height;
 			result.Local.Size = new FileInfo(result.ImagePath).Length;
 
 			Decimal sizeRatio = ((Decimal)image.Height / image.Width);
-			int thumbHeight = Decimal.ToInt32(sizeRatio * width);
+			int thumbHeight = Decimal.ToInt32(sizeRatio * Options.Default.ThumbWidth);
 
-			Bitmap bmp = new Bitmap(width, thumbHeight);
+			Bitmap bmp = new Bitmap(Options.Default.ThumbWidth, thumbHeight);
 			Graphics gr = Graphics.FromImage(bmp);
-			Rectangle rectDestination = new Rectangle(0, 0, width, thumbHeight);
+			Rectangle rectDestination = new Rectangle(0, 0, Options.Default.ThumbWidth, thumbHeight);
 
 			gr.SmoothingMode = SmoothingMode.HighQuality;
 			gr.CompositingQuality = CompositingQuality.HighQuality;
@@ -950,7 +966,7 @@ namespace Hatate
 			this.RefreshListboxes();
 
 			// Delete thumbnail
-			if (result.ThumbPath != null) {
+			if (result.ThumbPath != null && result.ThumbPath != result.ImagePath) {
 				try {
 					using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous));
 				} catch (IOException) { }

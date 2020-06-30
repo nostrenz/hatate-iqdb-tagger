@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Options" Height="380" Width="608" MinWidth="608" MinHeight="380" MaxHeight="380" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Options" Height="410" Width="608" MinWidth="608" MinHeight="380" MaxHeight="410" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
 		<CheckBox x:Name="CheckBox_AddRating" Content="Add rating to tags" HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top" Height="14"/>
@@ -41,5 +41,7 @@
 		<TextBox x:Name="TextBox_TaggedTag" Height="23" Margin="243,270,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
 		<CheckBox x:Name="CheckBox_LogMatchedUrls" Content="Log matched URLs into a text file" HorizontalAlignment="Left" Margin="10,174,0,0" VerticalAlignment="Top" Height="14"/>
 		<CheckBox x:Name="CheckBox_ParseTags" Content="Retrieve booru tags" HorizontalAlignment="Left" Margin="10,193,0,0" VerticalAlignment="Top" Height="14"/>
+		<CheckBox x:Name="CheckBox_ResizeImage" Content="Resized image width for sending to IQDB" HorizontalAlignment="Left" Margin="10,298,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="228" Height="23"/>
+		<TextBox x:Name="TextBox_ThumbWidth" Height="23" Margin="243,298,10,0" TextWrapping="Wrap" Text="150" VerticalAlignment="Top"/>
 	</Grid>
 </Window>

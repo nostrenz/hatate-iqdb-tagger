@@ -442,5 +442,29 @@ namespace Hatate.Properties {
                 this["ParseTags"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ResizeImage {
+            get {
+                return ((bool)(this["ResizeImage"]));
+            }
+            set {
+                this["ResizeImage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public int ThumbWidth {
+            get {
+                return ((int)(this["ThumbWidth"]));
+            }
+            set {
+                this["ThumbWidth"] = value;
+            }
+        }
     }
 }

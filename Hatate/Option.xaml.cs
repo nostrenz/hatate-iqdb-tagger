@@ -30,6 +30,8 @@ namespace Hatate
 			this.CheckBox_AskTags.IsChecked = Options.Default.AskTags;
 			this.CheckBox_LogMatchedUrls.IsChecked = Options.Default.LogMatchedUrls;
 			this.CheckBox_ParseTags.IsChecked = Options.Default.ParseTags;
+			this.CheckBox_ResizeImage.IsChecked = Options.Default.ResizeImage;
+			this.TextBox_ThumbWidth.Text = Options.Default.ThumbWidth.ToString();
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -93,6 +95,7 @@ namespace Hatate
 			Options.Default.AskTags = (bool)this.CheckBox_AskTags.IsChecked;
 			Options.Default.LogMatchedUrls = (bool)this.CheckBox_LogMatchedUrls.IsChecked;
 			Options.Default.ParseTags = (bool)this.CheckBox_ParseTags.IsChecked;
+			Options.Default.ResizeImage = (bool)this.CheckBox_ResizeImage.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
@@ -126,6 +129,10 @@ namespace Hatate
 				Options.Default.TaggedTag = "hatate:tagged";
 				Options.Default.AddTaggedTag = false;
 			}
+
+			int thumbWidth = 0;
+			int.TryParse(this.TextBox_ThumbWidth.Text, out thumbWidth);
+			Options.Default.ThumbWidth = thumbWidth > 0 ? thumbWidth : 150;
 
 			Options.Default.Save();
 
