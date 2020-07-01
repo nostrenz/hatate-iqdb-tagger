@@ -238,6 +238,13 @@ namespace Hatate
 
 		private HttpWebRequest CreateRequest(string route)
 		{
+			// Ensure compatibility with previous versions
+			if (!string.IsNullOrEmpty(Settings.Default.HydrusApiPort)) {
+				Settings.Default.HydrusApiHost += ':' + Settings.Default.HydrusApiPort;
+				Settings.Default.HydrusApiPort = null;
+				Settings.Default.Save();
+			}
+
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Settings.Default.HydrusApiHost + route);
 
 			request.Headers.Add("Hydrus-Client-API-Access-Key: " + Settings.Default.HydrusApiAccessKey);
