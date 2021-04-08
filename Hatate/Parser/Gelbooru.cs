@@ -10,7 +10,7 @@
 
 		override protected bool Parse(Supremes.Nodes.Document doc)
 		{
-			Supremes.Nodes.Element tagList = doc.Select("#tag-list > div").First;
+			Supremes.Nodes.Element tagList = doc.Select("#tag-list").First;
 
 			if (tagList == null) {
 				return false;
@@ -26,6 +26,37 @@
 			// Get rating
 			if (Properties.Settings.Default.AddRating) {
 				this.GetRating(doc, "#tag-list li");
+			}
+
+			// Get informations
+			Supremes.Nodes.Elements lis = tagList.Select("li");
+
+			foreach (Supremes.Nodes.Element li in lis) {
+				string content = li.Html;
+
+				if (content == null) {
+					continue;
+				}
+
+				content = content.Trim();
+
+				if (content.Length < 1) {
+					continue;
+				}
+
+				if (content.StartsWith("Size:")) {
+					int end = content.IndexOf('<');
+
+					if (end > 0) {
+						content = content.Substring(6, end - 6);
+						string[] parts = content.Trim().Split('x');
+
+						if (parts.Length == 2) {
+							int.TryParse(parts[0], out this.width);
+							int.TryParse(parts[1], out this.height);
+						}
+					}
+				}
 			}
 
 			return true;
