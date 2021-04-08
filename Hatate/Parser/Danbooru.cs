@@ -45,20 +45,20 @@
 
 					if (content.StartsWith("Size:")) {
 						Supremes.Nodes.Element full = li.Select("a").First;
-						Supremes.Nodes.Element width = li.Select("span[itemprop=width]").First;
-						Supremes.Nodes.Element height = li.Select("span[itemprop=height]").First;
 
 						if (full != null) {
 							this.full = full.Attr("href");
-							this.size = this.KbOrMbToBytes(full.Text);
+							this.size = this.KbOrMbToBytes(full.Text.Substring(0, full.Text.LastIndexOf(' ')));
 						}
 
-						if (width != null) {
-							int.TryParse(width.Text, out this.width);
-						}
+						int start = content.LastIndexOf('(');
+						int end = content.LastIndexOf(')');
 
-						if (height != null) {
-							int.TryParse(height.Text, out this.height);
+						if (start > 0 && end > 0) {
+							string[] parts = content.Substring(start + 1, end - start - 1).Split('x');
+
+							int.TryParse(parts[0], out this.width);
+							int.TryParse(parts[1], out this.height);
 						}
 					} else if (content.StartsWith("Rating:")) {
 						this.rating = content.Substring("Rating:".Length);
