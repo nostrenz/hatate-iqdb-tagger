@@ -879,7 +879,7 @@ namespace Hatate
 			}
 
 			// Link matched URL
-			if (Options.Default.AssociateUrl && result.Match != null) {
+			if (Options.Default.AssociateUrl && result.HasMatch) {
 				bool success = await App.hydrusApi.AssociateUrl(result.Local.Hash, result.Url);
 
 				if (!success) {
