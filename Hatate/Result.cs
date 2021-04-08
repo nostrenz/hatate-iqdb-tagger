@@ -147,6 +147,10 @@ namespace Hatate
 		{
 			get
 			{
+				if (this.Match == null) {
+					return null;
+				}
+
 				// Fix the URL
 				if (this.Match.Url.StartsWith("//")) {
 					return (this.Match.Source == IqdbApi.Enums.Source.Eshuushuu ? "http" : "https") + ':' + this.Match.Url;
