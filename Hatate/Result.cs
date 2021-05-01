@@ -98,6 +98,9 @@ namespace Hatate
 			this.Tags.RemoveAll(tag => tag.Source == source);
 		}
 
+		/// <summary>
+		/// Reset this object.
+		/// </summary>
 		public void Reset()
 		{
 			this.Searched = false;
@@ -108,6 +111,33 @@ namespace Hatate
 			this.Tags.Clear();
 			this.Ignoreds.Clear();
 			this.Matches.Clear();
+		}
+
+		/// <summary>
+		/// Populate the Matches list from a list of IqdbApi.Models.Match.
+		/// </summary>
+		/// <param name="iqdbMatches"></param>
+		public void UseIqdbApiMatches(ImmutableList<IqdbApi.Models.Match> iqdbMatches)
+		{
+			List<Match> matches = new List<Match>();
+
+			foreach (IqdbApi.Models.Match iqdbMatch in iqdbMatches) {
+				Match match = new Match();
+
+				match.MatchType = iqdbMatch.MatchType;
+				match.Url = iqdbMatch.Url;
+				match.PreviewUrl = "http://iqdb.org" + iqdbMatch.PreviewUrl;
+				match.Rating = iqdbMatch.Rating;
+				match.Score = iqdbMatch.Score;
+				match.Tags = iqdbMatch.Tags;
+				match.Source = iqdbMatch.Source;
+				match.Resolution = iqdbMatch.Resolution;
+				match.Similarity = iqdbMatch.Similarity;
+
+				matches.Add(match);
+			}
+
+			this.Matches = ImmutableList.Create(matches.ToArray());
 		}
 
 		/*
@@ -125,9 +155,9 @@ namespace Hatate
 		public string ThumbPath { get; set; }
 		public string Full { get; set; }
 		public string HydrusFileId { get; set; }
-		public ImmutableList<IqdbApi.Models.Match> Matches { get; set; }
+		public ImmutableList<Match> Matches { get; set; }
 
-		public IqdbApi.Models.Match Match
+		public Match Match
 		{
 			get
 			{
@@ -162,7 +192,7 @@ namespace Hatate
 
 		public string PreviewUrl
 		{
-			get { return "http://iqdb.org" + this.Match.PreviewUrl; }
+			get { return this.Match.PreviewUrl; }
 		}
 
 		public IqdbApi.Enums.Source Source

@@ -113,23 +113,24 @@ namespace Hatate.Parser
 		/// <returns></returns>
 		protected long KbOrMbToBytes(string size)
 		{
+			float value = 0;
+			int multiplier = 0;
+
 			if (size.EndsWith("KB")) {
 				size = size.Substring(0, size.LastIndexOf("KB")).Trim();
-
-				long kb = 0;
-				long.TryParse(size, out kb);
-
-				return kb * 1000;
+				multiplier = 1000;
 			} else if (size.EndsWith("MB")) {
 				size = size.Substring(0, size.LastIndexOf("MB")).Trim();
-
-				float mb;
-				float.TryParse(size, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out mb);
-
-				return (long)(mb * 1000000);
+				multiplier = 1000000;
 			}
 
-			return 0;
+			float.TryParse(size, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out value);
+
+			if (multiplier == 0 || value <= 0) {
+				return 0;
+			}
+
+			return (long)(value * multiplier);
 		}
 
 		/*

@@ -358,14 +358,22 @@ namespace Hatate
 				return;
 			}
 
-			// Search the image on IQDB
-			this.SetStatus("Searching file on IQDB...");
-			await this.RunIqdbApi(result);
+			// Search the image
+			this.SetStatus("Searching file...");
+
+			switch (this.SearchEngine) {
+				case SearchEngine.IQDB:
+					await this.SearchWithIqdb(result);
+				break;
+				case SearchEngine.SauceNAO:
+					await this.SearchWithSauceNao(result);
+				break;
+			}
 
 			result.Searched = true;
 			bool hasTags = result.HasTags;
 
-			// Found on IQDB
+			// Image found
 			if (result.Found) {
 				this.SetStatus("File found.");
 				this.found++;
@@ -390,13 +398,13 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Run the IQDB search.
+		/// Search a Result using IQDB.
 		/// </summary>
 		/// <param name="api"></param>
 		/// <param name="thumbPath"></param>
 		/// <param name="filename"></param>
 		/// <returns></returns>
-		private async Task RunIqdbApi(Result result)
+		private async Task SearchWithIqdb(Result result)
 		{
 			FileStream fs = null;
 
@@ -417,7 +425,7 @@ namespace Hatate
 			// Result(s) found
 			if (iqdbResult != null && iqdbResult.Matches != null) {
 				this.lastSearchedInSeconds = (int)iqdbResult.SearchedInSeconds;
-				result.Matches = iqdbResult.Matches;
+				result.UseIqdbApiMatches(iqdbResult.Matches);
 
 				// Check for matching results
 				this.CheckMatches(result);
@@ -430,13 +438,40 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Search a Result using SauceNAO.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		private async Task SearchWithSauceNao(Result result)
+		{
+			SauceNao sauceNao = new SauceNao();
+
+			try {
+				await sauceNao.SearchFile(result.ThumbPath);
+			} catch (Exception) {
+				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
+			}
+
+			this.lastSearchedInSeconds = 1;
+			result.Matches = sauceNao.Matches;
+
+			this.CheckMatches(result);
+			this.AddAutoTags(result);
+		}
+
+		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
 		private void CheckMatches(Result result)
 		{
-			foreach (IqdbApi.Models.Match match in result.Matches) {
-				// Check minimum similarity and number of tags
-				if (match.Similarity < Options.Default.Similarity || match.Tags == null || match.Tags.Count < Options.Default.TagsCount) {
+			foreach (Match match in result.Matches) {
+				// Check minimum similarity
+				if (match.Similarity < Options.Default.Similarity) {
+					continue;
+				}
+
+				// Check minimum number of tags (only for IQDB)
+				if (this.SearchEngine == SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
 					continue;
 				}
 
@@ -1785,6 +1820,14 @@ namespace Hatate
 			get { return App.appDir + @"\" + TXT_IGNOREDS; }
 		}
 
+		/// <summary>
+		/// Selected search engine in settings.
+		/// </summary>
+		private SearchEngine SearchEngine
+		{
+			get { return (SearchEngine)Options.Default.SearchEngine; }
+		}
+
 		#endregion Accessor
 
 		/*
@@ -2351,7 +2394,7 @@ namespace Hatate
 			}
 
 			Result result = this.SelectedResult;
-			IqdbApi.Models.Match match = (IqdbApi.Models.Match)this.ComboBox_Matches.SelectedItem;
+			Match match = (Match)this.ComboBox_Matches.SelectedItem;
 
 			// This match is already selected, nothing to do
 			if (match == result.Match) {

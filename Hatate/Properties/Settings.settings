@@ -6,7 +6,7 @@
       <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="TagsCount" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="MatchType" Type="IqdbApi.Enums.MatchType" Scope="User">
       <Value Profile="(Default)">Additional</Value>
@@ -112,6 +112,9 @@
     </Setting>
     <Setting Name="ThumbWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">150</Value>
+    </Setting>
+    <Setting Name="SearchEngine" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

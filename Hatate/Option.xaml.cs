@@ -19,7 +19,12 @@ namespace Hatate
 			foreach (var item in Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
 				Combo_MatchType.Items.Add(item);
 			}
-			
+
+			// Add search engines
+			foreach (var item in Enum.GetValues(typeof(SearchEngine))) {
+				Combo_SearchEngines.Items.Add(item);
+			}
+
 			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
 			this.CheckBox_MatchType.IsChecked = Options.Default.CheckMatchType;
 			this.Combo_MatchType.SelectedItem = Options.Default.MatchType;
@@ -32,6 +37,7 @@ namespace Hatate
 			this.CheckBox_ParseTags.IsChecked = Options.Default.ParseTags;
 			this.CheckBox_ResizeImage.IsChecked = Options.Default.ResizeImage;
 			this.TextBox_ThumbWidth.Text = Options.Default.ThumbWidth.ToString();
+			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -96,6 +102,7 @@ namespace Hatate
 			Options.Default.LogMatchedUrls = (bool)this.CheckBox_LogMatchedUrls.IsChecked;
 			Options.Default.ParseTags = (bool)this.CheckBox_ParseTags.IsChecked;
 			Options.Default.ResizeImage = (bool)this.CheckBox_ResizeImage.IsChecked;
+			Options.Default.SearchEngine = (byte)(SearchEngine)this.Combo_SearchEngines.SelectedItem;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;

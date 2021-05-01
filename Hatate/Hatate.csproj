@@ -112,6 +112,9 @@
     <Compile Include="Parser\Yandere.cs" />
     <Compile Include="Parser\Zerochan.cs" />
     <Compile Include="Result.cs" />
+    <Compile Include="SearchEngine.cs" />
+    <Compile Include="Match.cs" />
+    <Compile Include="SauceNao.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="EditTag.xaml">
       <SubType>Designer</SubType>

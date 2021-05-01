@@ -37,7 +37,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int TagsCount {
             get {
                 return ((int)(this["TagsCount"]));
@@ -464,6 +464,18 @@ namespace Hatate.Properties {
             }
             set {
                 this["ThumbWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public byte SearchEngine {
+            get {
+                return ((byte)(this["SearchEngine"]));
+            }
+            set {
+                this["SearchEngine"] = value;
             }
         }
     }
