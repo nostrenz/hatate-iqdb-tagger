@@ -359,13 +359,13 @@ namespace Hatate
 			}
 
 			// Search the image
-			this.SetStatus("Searching file...");
-
 			switch (this.SearchEngine) {
 				case SearchEngine.IQDB:
+					this.SetStatus("Searching file with IQDB...");
 					await this.SearchWithIqdb(result);
 				break;
 				case SearchEngine.SauceNAO:
+					this.SetStatus("Searching file with SauceNAO...");
 					await this.SearchWithSauceNao(result);
 				break;
 			}
@@ -730,8 +730,8 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Search IQDB now";
-			item.Tag = "searchIqdbNow";
+			item.Header = "Search now";
+			item.Tag = "searchNow";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1981,7 +1981,7 @@ namespace Hatate
 				case "helpUnknownTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
-				case "searchIqdbNow":
+				case "searchNow":
 					await this.SearchFile(this.ListBox_Files.SelectedIndex);
 					this.ListBox_Files.Items.Refresh();
 				break;
@@ -2028,7 +2028,7 @@ namespace Hatate
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Copy hash
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds && searched); // Copy URL
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Add tags
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // Search IQDB now
+			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // Search now
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, hasSelecteds); // Reset result
 			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, hasSelecteds); // Remove from list
 															// 10 is a separator
