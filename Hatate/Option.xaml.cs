@@ -38,6 +38,7 @@ namespace Hatate
 			this.CheckBox_ResizeImage.IsChecked = Options.Default.ResizeImage;
 			this.TextBox_ThumbWidth.Text = Options.Default.ThumbWidth.ToString();
 			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
+			this.CheckBox_RemoveResultAfter.IsChecked = Options.Default.RemoveResultAfter;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -103,6 +104,7 @@ namespace Hatate
 			Options.Default.ParseTags = (bool)this.CheckBox_ParseTags.IsChecked;
 			Options.Default.ResizeImage = (bool)this.CheckBox_ResizeImage.IsChecked;
 			Options.Default.SearchEngine = (byte)(SearchEngine)this.Combo_SearchEngines.SelectedItem;
+			Options.Default.RemoveResultAfter = (bool)this.CheckBox_RemoveResultAfter.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
@@ -168,6 +170,20 @@ namespace Hatate
 			} else if (sender == this.CheckBox_AddTaggedTag) {
 				this.TextBox_TaggedTag.IsEnabled = (bool)this.CheckBox_AddTaggedTag.IsChecked;
 			}
+		}
+
+		/// <summary>
+		/// Some options are only used for IQDB, enable or diable them depending on which search engine is selected.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Combo_SearchEngines_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+		{
+			bool iqdbIsSelected = ((SearchEngine)this.Combo_SearchEngines.SelectedItem == SearchEngine.IQDB);
+
+			this.TextBox_MinimumTagsCount.IsEnabled = iqdbIsSelected;
+			this.Combo_MatchType.IsEnabled = iqdbIsSelected;
+			this.CheckBox_MatchType.IsEnabled = iqdbIsSelected;
 		}
 	}
 }

@@ -859,21 +859,6 @@ namespace Hatate
 			return true;
 		}
 
-		private async Task<bool> SendUrlToHydrusForResult(Result result)
-		{
-			// Not a searched result
-			if (result == null || !result.Searched || !result.HasMatch) {
-				return false;
-			}
-
-			// Move file to recycle bin
-			if (Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath) && File.Exists(result.ImagePath)) {
-				this.SendFileToRecycleBin(result.ImagePath);
-			}
-
-			return await App.hydrusApi.SendUrl(result);
-		}
-
 		/// <summary>
 		/// Add the ignoreds tags from a result to the txt list.
 		/// </summary>
@@ -1585,7 +1570,7 @@ namespace Hatate
 			this.SetStatus("Tags sent to Hydrus for all the selected files. " + counts);
 		}
 
-		private async void SendUrlForSelectedFiles()
+		private async void SendUrlForSelectedFiles(bool sendPageUrlInsteadOfImageUrl)
 		{
 			int successes = 0;
 			int failures = 0;
@@ -1597,7 +1582,18 @@ namespace Hatate
 			// Process each selected file until no one remain or the API becomes unreachable
 			while (this.ListBox_Files.SelectedItems.Count > 0 && !App.hydrusApi.Unreachable) {
 				Result result = this.GetSelectedResultAt(0);
-				bool success = await this.SendUrlToHydrusForResult(result);
+
+				// Not a searched result, skip
+				if (result == null || !result.Searched || !result.HasMatch) {
+					continue;
+				}
+
+				// Move file to recycle bin
+				if (Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath) && File.Exists(result.ImagePath)) {
+					this.SendFileToRecycleBin(result.ImagePath);
+				}
+
+				bool success = await App.hydrusApi.SendUrl(result, sendPageUrlInsteadOfImageUrl);
 				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
 
 				this.SetStatus("Sending URLs to Hydrus... " + counts);
@@ -1632,13 +1628,21 @@ namespace Hatate
 		private string HandleProcessedResult(Result result, bool success, ref int successes, ref int failures)
 		{
 			if (success) {
-				this.RemoveResultFromFilesListbox(result);
+				if (Options.Default.RemoveResultAfter) {
+					this.RemoveResultFromFilesListbox(result);
+				}
 
 				successes++;
 			} else {
-				this.ListBox_Files.SelectedItems.Remove(result);
+				if (Options.Default.RemoveResultAfter) {
+					this.ListBox_Files.SelectedItems.Remove(result);
+				}
 
 				failures++;
+			}
+
+			if (!Options.Default.RemoveResultAfter) {
+				this.ListBox_Files.SelectedItems.Remove(result);
 			}
 
 			return "(" + successes + " successful, " + failures + " failed)";
@@ -1947,8 +1951,11 @@ namespace Hatate
 				case "sendTagsToHydrus":
 					this.SendTagsForSelectedFiles();
 				break;
-				case "sendUrlsToHydrus":
-					this.SendUrlForSelectedFiles();
+				case "sendImageUrlsToHydrus":
+					this.SendUrlForSelectedFiles(false);
+				break;
+				case "sendPageUrlsToHydrus":
+					this.SendUrlForSelectedFiles(true);
 				break;
 				case "unignore":
 					this.UningnoreSelectItems();
@@ -2016,24 +2023,6 @@ namespace Hatate
 				case "copySourceUrls":
 					this.CopySelectedSourceUrls();
 				break;
-				case "openMatchedUrl":
-					if (this.ListBox_Files.SelectedItem == null) {
-						return;
-					}
-
-					if (this.SelectedResult.Match != null) {
-						this.StartProcess(this.SelectedResult.Match.Url);
-					}
-				break;
-				case "openSourceUrl":
-					if (this.ListBox_Files.SelectedItem == null) {
-						return;
-					}
-
-					if (this.SelectedResult.Match != null) {
-						this.StartProcess(this.SelectedResult.Match.SourceUrl);
-					}
-				break;
 				case "sendThisUrlToHydrus":
 					await App.hydrusApi.SendUrl(mi.Header.ToString());
 				break;
@@ -2065,6 +2054,7 @@ namespace Hatate
 
 			bool hasTags = false;
 			bool hasUrl = false;
+			bool hasFull = false;
 			bool hasMatchUrls = false;
 
 			foreach (Result result in this.ListBox_Files.SelectedItems) {
@@ -2074,6 +2064,10 @@ namespace Hatate
 
 				if (result.Url != null) {
 					hasUrl = true;
+				}
+
+				if (result.Full != null) {
+					hasFull = true;
 				}
 
 				if (result.HasMatches) {
@@ -2086,52 +2080,110 @@ namespace Hatate
 			}
 
 			ContextMenu context = new ContextMenu();
+
 			MenuItem item = new MenuItem();
+			item.Header = "Hydrus";
 
-			item.Header = "Write tags to text file";
-			item.ToolTip = "Tags will be written to a .txt file alonside the local file";
-			item.Tag = "writeTagsToFiles";
-			item.IsEnabled = hasTags;
-			item.Click += this.ContextMenu_MenuItem_Click;
+				MenuItem sub = new MenuItem();
+				sub.Header = "Import file with tags";
+				sub.ToolTip = "Imports the local file and its tags into Hydrus";
+				sub.Tag = "sendTagsToHydrus";
+				sub.IsEnabled = hasTags;
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
+
+				sub = new MenuItem();
+				sub.Header = "Send match image URL";
+				sub.ToolTip = "Sends matched image URL" + (Options.Default.SendUrlWithTags ? " and tags " : " ") + "to Hydrus for downloading";
+				sub.Tag = "sendImageUrlsToHydrus";
+				sub.IsEnabled = hasFull;
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
+
+				if (hasFull) {
+					int urlCount = 0;
+
+					foreach (Result result in this.ListBox_Files.SelectedItems) {
+						if (result.Full == null) {
+							continue;
+						}
+
+						if (urlCount == 0) {
+							sub.ToolTip += "\n" + result.Full;
+						}
+
+						urlCount++;
+					}
+
+					if (urlCount > 1) {
+						sub.ToolTip += "\nand " + (urlCount - 1) + " other URLs";
+					}
+				}
+
+				sub = new MenuItem();
+				sub.Header = "Send match page URL";
+				sub.ToolTip = "Sends matched booru page URL" + (Options.Default.SendUrlWithTags ? " and tags " : " ") + "to Hydrus for processing";
+				sub.Tag = "sendPageUrlsToHydrus";
+				sub.IsEnabled = hasUrl;
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
+
+				if (hasUrl) {
+					int urlCount = 0;
+
+					foreach (Result result in this.ListBox_Files.SelectedItems) {
+						if (result.Url == null) {
+							continue;
+						}
+
+						if (urlCount == 0) {
+							sub.ToolTip += "\n" + result.Url;
+						}
+
+						urlCount++;
+					}
+
+					if (urlCount > 1) {
+						sub.ToolTip += "\nand " + (urlCount - 1) + " other URLs";
+					}
+				}
+
+				if (singleSelected) {
+					sub = new MenuItem();
+					sub.Header = "Send this URL to Hydrus...";
+					sub.IsEnabled = hasMatchUrls;
+					item.Items.Add(sub);
+
+					if (hasMatchUrls) {
+						this.AttachMatchUrlsSubmenuToMenuItem(sub, "sendThisUrlToHydrus", "This URL will be sent to Hydrus for processing using the API");
+					}
+				}
+
 			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Send tags to Hydrus";
-			item.ToolTip = "The local file and its tags will be imported into Hydrus using the API";
-			item.Tag = "sendTagsToHydrus";
-			item.IsEnabled = hasTags;
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Send match URL to Hydrus";
-			item.ToolTip = "The matched URL and its tags will be sent to Hydrus for downloading using the API";
-			item.Tag = "sendUrlsToHydrus";
-			item.IsEnabled = hasUrl;
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			if (singleSelected && hasUrl) {
-				item.ToolTip += ":\n" + this.SelectedResult.Url;
-			}
 
 			if (singleSelected) {
 				item = new MenuItem();
-				item.Header = "Send this URL to Hydrus";
-				item.IsEnabled = hasMatchUrls;
+				item.Header = "Search";
+
+					sub = new MenuItem();
+					sub.Header = "IQDB";
+					sub.Tag = "searchIqdb";
+					sub.Click += this.ContextMenu_MenuItem_Click;
+					item.Items.Add(sub);
+
+					sub = new MenuItem();
+					sub.Header = "SauceNAO";
+					sub.Tag = "searchSauceNao";
+					sub.Click += this.ContextMenu_MenuItem_Click;
+					item.Items.Add(sub);
+
 				context.Items.Add(item);
-
-				if (hasMatchUrls) {
-					this.AttachMatchUrlsSubmenuToMenuItem(item, "sendThisUrlToHydrus", "This URL will be sent to Hydrus for processing using the API");
-				}
 			}
-
-			context.Items.Add(new Separator());
 
 			item = new MenuItem();
 			item.Header = "Copy";
 
-				MenuItem sub = new MenuItem();
+				sub = new MenuItem();
 
 				if (singleSelected) {
 					sub = new MenuItem();
@@ -2161,7 +2213,7 @@ namespace Hatate
 
 				if (singleSelected) {
 					sub = new MenuItem();
-					sub.Header = "This URL";
+					sub.Header = "This URL...";
 					sub.IsEnabled = hasMatchUrls;
 					item.Items.Add(sub);
 
@@ -2196,7 +2248,7 @@ namespace Hatate
 
 				if (singleSelected) {
 					sub = new MenuItem();
-					sub.Header = "This URL";
+					sub.Header = "This URL...";
 					sub.IsEnabled = hasMatchUrls;
 					item.Items.Add(sub);
 
@@ -2207,25 +2259,6 @@ namespace Hatate
 
 			context.Items.Add(item);
 
-			if (singleSelected) {
-				item = new MenuItem();
-				item.Header = "Search";
-
-					sub = new MenuItem();
-					sub.Header = "IQDB";
-					sub.Tag = "searchIqdb";
-					sub.Click += this.ContextMenu_MenuItem_Click;
-					item.Items.Add(sub);
-
-					sub = new MenuItem();
-					sub.Header = "SauceNAO";
-					sub.Tag = "searchSauceNao";
-					sub.Click += this.ContextMenu_MenuItem_Click;
-					item.Items.Add(sub);
-
-				context.Items.Add(item);
-			}
-
 			context.Items.Add(new Separator());
 
 			item = new MenuItem();
@@ -2235,8 +2268,16 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
+			item.Header = "Write tags";
+			item.ToolTip = "Tags will be written to a .txt file alongside each selected file(s)";
+			item.Tag = "writeTagsToFiles";
+			item.IsEnabled = hasTags;
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
 			item.Header = "Reset result";
-			item.ToolTip = "Tags, URLs and other search results will be cleared for the selected file(s)";
+			item.ToolTip = "Tags, URLs and other search results will be cleared for each selected file(s)";
 			item.Tag = "resetResult";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);

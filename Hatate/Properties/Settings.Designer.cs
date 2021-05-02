@@ -478,5 +478,17 @@ namespace Hatate.Properties {
                 this["SearchEngine"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RemoveResultAfter {
+            get {
+                return ((bool)(this["RemoveResultAfter"]));
+            }
+            set {
+                this["RemoveResultAfter"] = value;
+            }
+        }
     }
 }

@@ -130,9 +130,11 @@ namespace Hatate
 		/// <summary>
 		/// Send a URL to Hydrus using a Result object.
 		/// </summary>
-		public async Task<bool> SendUrl(Result result)
+		public async Task<bool> SendUrl(Result result, bool sendPageUrlInsteadOfImageUrl)
 		{
-			if (result.Url == null) {
+			string url = sendPageUrlInsteadOfImageUrl ? result.Url : result.Full;
+
+			if (url == null) {
 				result.AddWarning("Hydrus: URL not sent - no URL found for this file");
 
 				return false;
@@ -154,7 +156,7 @@ namespace Hatate
 				}";
 			}
 
-			return await this.SendUrl(result.Url, tagsPart);
+			return await this.SendUrl(url, tagsPart);
 		}
 
 		/// <summary>

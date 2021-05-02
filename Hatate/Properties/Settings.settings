@@ -116,5 +116,8 @@
     <Setting Name="SearchEngine" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="RemoveResultAfter" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
