@@ -10,6 +10,7 @@ namespace Hatate
 	class SauceNao
 	{
 		private List<Match> matches = new List<Match>();
+		private bool dailyLimitExceeded = false;
 
 		/*
 		============================================
@@ -78,6 +79,13 @@ namespace Hatate
 			Supremes.Nodes.Elements results = doc.Select("#middle > .result");
 
 			if (results.Count < 1) {
+				// Check if search limit was exceeded
+				Supremes.Nodes.Element strong = doc.Select("strong").First;
+
+				if (strong != null && strong.Text == "Daily Search Limit Exceeded.") {
+					this.dailyLimitExceeded = true;
+				}
+
 				return;
 			}
 
@@ -151,6 +159,11 @@ namespace Hatate
 		public ImmutableList<Match> Matches
 		{
 			get { return ImmutableList.Create(this.matches.ToArray()); }
+		}
+
+		public bool DailyLimitExceeded
+		{
+			get { return this.dailyLimitExceeded; }
 		}
 
 		#endregion Accessor

@@ -39,7 +39,7 @@ namespace Hatate
 		private int found = 0;
 		private int notFound = 0;
 		private int delay = 0;
-		private Timer timer;
+		private Timer timer = new Timer();
 
 		// List of accepted image extentions
 		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp", ".jfif" };
@@ -328,7 +328,11 @@ namespace Hatate
 				this.delay += new Random().Next(half * -1, half);
 			}
 
-			this.timer = new Timer();
+			// Timer was not recreated
+			if (this.timer == null) {
+				return;
+			}
+
 			this.timer.Interval = 1000;
 			this.timer.Tick += new EventHandler(Timer_Tick);
 			this.timer.Start();
@@ -446,6 +450,19 @@ namespace Hatate
 				await sauceNao.SearchFile(result.ThumbPath);
 			} catch (Exception) {
 				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
+			}
+
+			if (sauceNao.DailyLimitExceeded) {
+				MessageBox.Show(
+					"Daily Search Limit Exceeded.",
+					"SauceNAO error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Warning
+				);
+
+				this.StopSearches();
+
+				return;
 			}
 
 			this.lastSearchedInSeconds = 1;
@@ -1811,6 +1828,18 @@ namespace Hatate
 			}
 		}
 
+		private void StopSearches()
+		{
+			if (this.timer != null) {
+				this.timer.Stop();
+			}
+
+			this.timer = null;
+			
+			this.SetStatus("Stopped.");
+			this.SetStartButton("Start", "#FF3CB21A");
+		}
+
 		#endregion Private
 
 		/*
@@ -1896,13 +1925,11 @@ namespace Hatate
 		{
 			// Start searching
 			if (!this.IsRunning && this.ListBox_Files.Items.Count > 0) {
+				this.timer = new Timer();
 				this.SetStartButton("Stop", "#FFE82B0D");
 				this.NextSearch();
 			} else { // Stop the search
-				this.timer.Stop();
-
-				this.SetStatus("Stopped.");
-				this.SetStartButton("Start", "#FF3CB21A");
+				this.StopSearches();
 			}
 		}
 
@@ -2592,6 +2619,10 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void Timer_Tick(object sender, EventArgs e)
 		{
+			if (this.timer == null) {
+				return;
+			}
+
 			this.delay--;
 
 			// The delay has reached the end, start the next search
