@@ -806,12 +806,12 @@ namespace Hatate
 		/// <param name="item"></param>
 		private bool WriteTagsToFilesForResult(Result result)
 		{
-			// No searched result, remove the item from the selection
-			if (result == null || !result.Searched) {
+			// Not tags
+			if (result == null || !result.HasTags) {
 				return false;
 			}
 
-			if (result.Tags.Count > 0 && File.Exists(result.ImagePath)) {
+			if (File.Exists(result.ImagePath)) {
 				// Warn a user trying to write a txt file into the Hydrus' "client_files" folder
 				if (this.IsHydrusOwnedFolder(result.ImagePath) && !App.AskUser("This image is located inside the Hydrus' \"client_files\" folder. Writing a txt files there might not be a good idea, do you really want to do that?")) {
 					return false;
@@ -834,8 +834,7 @@ namespace Hatate
 		/// <param name="item"></param>
 		private async Task<bool> SendTagsToHydrusForResult(Result result)
 		{
-			// Not a searched result
-			if (result == null || !result.Searched) {
+			if (result == null) {
 				return false;
 			}
 
@@ -866,8 +865,13 @@ namespace Hatate
 			}
 
 			// Link matched URL
-			if (Options.Default.AssociateUrl && result.HasMatch) {
-				bool success = await App.hydrusApi.AssociateUrl(result.Local.Hash, result.Url);
+			if (Options.Default.AssociateUrl) {
+				string url = result.Url;
+				bool success = true;
+
+				if (url != null) {
+					success = await App.hydrusApi.AssociateUrl(result.Local.Hash, result.Url);
+				}
 
 				if (!success) {
 					result.AddWarning("Hydrus: failed to associate URL");
