@@ -105,7 +105,7 @@ namespace Hatate
 					Supremes.Nodes.Element originalSourceLink = result.Select(".resultcontent .resultcontentcolumn a").First;
 
 					if (originalSourceLink != null) {
-						match.OriginalSourceUrl = originalSourceLink.Attr("href");
+						match.SourceUrl = originalSourceLink.Attr("href");
 					}
 
 					this.matches.Add(match);

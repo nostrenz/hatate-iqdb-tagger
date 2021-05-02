@@ -128,7 +128,7 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Send a URL to Hydrus.
+		/// Send a URL to Hydrus using a Result object.
 		/// </summary>
 		public async Task<bool> SendUrl(Result result)
 		{
@@ -154,8 +154,16 @@ namespace Hatate
 				}";
 			}
 
+			return await this.SendUrl(result.Url, tagsPart);
+		}
+
+		/// <summary>
+		/// Send a single URL to Hydrus.
+		/// </summary>
+		public async Task<bool> SendUrl(string url, string tagsPart="")
+		{
 			string postData = @"{
-				""url"" : """ + result.Url + "\"" + tagsPart + @"
+				""url"" : """ + url + "\"" + tagsPart + @"
 			}";
 
 			return await this.PostRequestAsync("/add_urls/add_url", postData) != null;

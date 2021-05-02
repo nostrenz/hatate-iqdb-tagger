@@ -306,7 +306,7 @@ namespace Hatate
 				return;
 			}
 
-			await this.SearchFile(progress);
+			await this.SearchFile(progress, this.SearchEngine);
 
 			// Refresh the items to update the foreground color from the Result objets
 			this.ListBox_Files.Items.Refresh();
@@ -339,7 +339,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		private async Task SearchFile(int index)
+		private async Task SearchFile(int index, SearchEngine searchEngine)
 		{
 			Result result = this.GetResultAt(index);
 
@@ -355,7 +355,7 @@ namespace Hatate
 			}
 
 			// Search the image
-			switch (this.SearchEngine) {
+			switch (searchEngine) {
 				case SearchEngine.IQDB:
 					this.SetStatus("Searching file with IQDB...");
 					await this.SearchWithIqdb(result);
@@ -686,82 +686,8 @@ namespace Hatate
 		private void CreateFilesListContextMenu()
 		{
 			ContextMenu context = new ContextMenu();
-			MenuItem item = new MenuItem();
 
-			item.Header = "Write tags to text file";
-			item.Tag = "writeTagsToFiles";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Send tags to Hydrus";
-			item.Tag = "sendTagsToHydrus";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Send URL to Hydrus";
-			item.Tag = "sendUrlsToHydrus";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			context.Items.Add(new Separator());
-
-			item = new MenuItem();
-			item.Header = "Copy hash";
-			item.Tag = "copyHashes";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Copy URL";
-			item.Tag = "copyUrls";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Add tags";
-			item.Tag = "addTagsForSelectedResults";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Search now";
-			item.Tag = "searchNow";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Reset result";
-			item.Tag = "resetResult";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Remove from list";
-			item.Tag = "removeFiles";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			context.Items.Add(new Separator());
-
-			item = new MenuItem();
-			item.Header = "Copy path";
-			item.Tag = "copyFilePath";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Open folder";
-			item.Tag = "openFolder";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			item = new MenuItem();
-			item.Header = "Delete file";
-			item.Tag = "deleteFiles";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
+			// Empty context menu as we'll populate it when opened
 
 			this.ListBox_Files.ContextMenu = context;
 		}
@@ -1113,7 +1039,7 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Copy matched URLs for all the selected files
+		/// Copy matched URLs for all the selected files.
 		/// </summary>
 		private void CopySelectedUrls()
 		{
@@ -1127,6 +1053,36 @@ namespace Hatate
 				}
 
 				text += url;
+
+				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
+					text += "\n";
+				}
+			}
+
+			Clipboard.SetText(text);
+		}
+
+		/// <summary>
+		/// Copy matched source URLs for all the selected files.
+		/// </summary>
+		private void CopySelectedSourceUrls()
+		{
+			string text = "";
+
+			for (int i = 0; i < this.ListBox_Files.SelectedItems.Count; i++) {
+				Match match = (this.ListBox_Files.SelectedItems[i] as Result).Match;
+
+				if (match == null) {
+					continue;
+				}
+
+				string sourceUrl = match.SourceUrl;
+
+				if (String.IsNullOrEmpty(sourceUrl)) {
+					continue;
+				}
+
+				text += sourceUrl;
 
 				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
 					text += "\n";
@@ -1405,7 +1361,7 @@ namespace Hatate
 		/// <param name="path"></param>
 		private void StartProcess(string path)
 		{
-			Process myProcess = Process.Start(new ProcessStartInfo(path));
+			Process.Start(new ProcessStartInfo(path));
 		}
 
 		/// <summary>
@@ -1427,7 +1383,15 @@ namespace Hatate
 		/// </summary>
 		private void SetContextMenuItemEnabled(ListBox listBox, int index, bool enabled)
 		{
-			((MenuItem)listBox.ContextMenu.Items[index]).IsEnabled = enabled;
+			if (listBox.ContextMenu.Items.Count < 1) {
+				return;
+			}
+
+			try {
+				((MenuItem)listBox.ContextMenu.Items[index]).IsEnabled = enabled;
+			} catch (Exception) {
+				return;
+			}
 		}
 
 		/// <summary>
@@ -1758,6 +1722,53 @@ namespace Hatate
 			this.ComboBox_Matches.SelectedItem = result.Match;
 		}
 
+		private void AttachMatchUrlsSubmenuToMenuItem(MenuItem sub, string tag, string tooltip=null)
+		{
+			byte similarity = 0;
+			List<string> addedUrls = new List<string>();
+
+			foreach (Match match in this.SelectedResult.Matches) {
+				MenuItem sub2 = new MenuItem();
+
+				if (match.Similarity != similarity) {
+					sub2 = new MenuItem();
+					sub2.Header = "- " + match.Similarity + "% similarity -";
+					sub2.Foreground = (Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FF808080");
+					sub.Items.Add(sub2);
+				}
+
+				if (match.Url != null && !addedUrls.Contains(match.Url)) {
+					sub2 = new MenuItem();
+					sub2.Header = match.Url;
+					sub2.Tag = tag;
+					sub2.Click += this.ContextMenu_MenuItem_Click;
+					sub.Items.Add(sub2);
+
+					addedUrls.Add(match.Url);
+
+					if (tooltip != null) {
+						sub2.ToolTip = tooltip;
+					}
+				}
+
+				if (match.SourceUrl != null && !addedUrls.Contains(match.SourceUrl)) {
+					sub2 = new MenuItem();
+					sub2.Header = match.SourceUrl;
+					sub2.Tag = tag;
+					sub2.Click += this.ContextMenu_MenuItem_Click;
+					sub.Items.Add(sub2);
+
+					addedUrls.Add(match.SourceUrl);
+
+					if (tooltip != null) {
+						sub2.ToolTip = tooltip;
+					}
+				}
+
+				similarity = match.Similarity;
+			}
+		}
+
 		#endregion Private
 
 		/*
@@ -1977,8 +1988,14 @@ namespace Hatate
 				case "helpUnknownTag":
 					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
-				case "searchNow":
-					await this.SearchFile(this.ListBox_Files.SelectedIndex);
+				case "searchIqdb":
+					this.SelectedResult.Reset();
+					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.IQDB);
+					this.ListBox_Files.Items.Refresh();
+				break;
+				case "searchSauceNao":
+					this.SelectedResult.Reset();
+					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.SauceNAO);
 					this.ListBox_Files.Items.Refresh();
 				break;
 				case "resetResult":
@@ -1996,6 +2013,36 @@ namespace Hatate
 				case "copyUrls":
 					this.CopySelectedUrls();
 				break;
+				case "copySourceUrls":
+					this.CopySelectedSourceUrls();
+				break;
+				case "openMatchedUrl":
+					if (this.ListBox_Files.SelectedItem == null) {
+						return;
+					}
+
+					if (this.SelectedResult.Match != null) {
+						this.StartProcess(this.SelectedResult.Match.Url);
+					}
+				break;
+				case "openSourceUrl":
+					if (this.ListBox_Files.SelectedItem == null) {
+						return;
+					}
+
+					if (this.SelectedResult.Match != null) {
+						this.StartProcess(this.SelectedResult.Match.SourceUrl);
+					}
+				break;
+				case "sendThisUrlToHydrus":
+					await App.hydrusApi.SendUrl(mi.Header.ToString());
+				break;
+				case "copyThisUrl":
+					Clipboard.SetText(mi.Header.ToString());
+				break;
+				case "openThisUrl":
+					this.StartProcess(mi.Header.ToString());
+				break;
 			}
 		}
 
@@ -2008,29 +2055,205 @@ namespace Hatate
 		{
 			int countSelected = this.ListBox_Files.SelectedItems.Count;
 
-			bool hasSelecteds = (countSelected > 0);
-			bool singleSelected = (countSelected == 1);
-			bool searched = true;
-			Result result = this.SelectedResult;
-
-			if (singleSelected) {
-				searched = result.Searched;
+			// Nothing selected, don't display the context menu
+			if (countSelected < 1) {
+				return;
 			}
 
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 0, hasSelecteds && searched); // Write tags to files
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 1, hasSelecteds && searched); // Send tags to Hydrus
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 2, hasSelecteds && searched); // Send URLs to Hydrus
-															// 3 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 4, hasSelecteds); // Copy hash
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 5, hasSelecteds && searched); // Copy URL
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 6, hasSelecteds); // Add tags
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 7, singleSelected); // Search now
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 8, hasSelecteds); // Reset result
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 9, hasSelecteds); // Remove from list
-															// 10 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 11, singleSelected); // Copy path
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 12, singleSelected); // Open folder
-			this.SetContextMenuItemEnabled(this.ListBox_Files, 13, hasSelecteds); // Delete file
+			bool singleSelected = (countSelected == 1);
+			bool multipleSelecteds = (countSelected > 1);
+
+			bool hasTags = false;
+			bool hasUrl = false;
+			bool hasMatchUrls = false;
+
+			foreach (Result result in this.ListBox_Files.SelectedItems) {
+				if (result.HasTags) {
+					hasTags = true;
+				}
+
+				if (result.Url != null) {
+					hasUrl = true;
+				}
+
+				if (result.HasMatches) {
+					foreach (Match match in result.Matches) {
+						if (match.Url != null || match.SourceUrl != null) {
+							hasMatchUrls = true;
+						}
+					}
+				}
+			}
+
+			ContextMenu context = new ContextMenu();
+			MenuItem item = new MenuItem();
+
+			item.Header = "Write tags to text file";
+			item.ToolTip = "Tags will be written to a .txt file alonside the local file";
+			item.Tag = "writeTagsToFiles";
+			item.IsEnabled = hasTags;
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Send tags to Hydrus";
+			item.ToolTip = "The local file and its tags will be imported into Hydrus using the API";
+			item.Tag = "sendTagsToHydrus";
+			item.IsEnabled = hasTags;
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Send match URL to Hydrus";
+			item.ToolTip = "The matched URL and its tags will be sent to Hydrus for downloading using the API";
+			item.Tag = "sendUrlsToHydrus";
+			item.IsEnabled = hasUrl;
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			if (singleSelected && hasUrl) {
+				item.ToolTip += ":\n" + this.SelectedResult.Url;
+			}
+
+			if (singleSelected) {
+				item = new MenuItem();
+				item.Header = "Send this URL to Hydrus";
+				item.IsEnabled = hasMatchUrls;
+				context.Items.Add(item);
+
+				if (hasMatchUrls) {
+					this.AttachMatchUrlsSubmenuToMenuItem(item, "sendThisUrlToHydrus", "This URL will be sent to Hydrus for processing using the API");
+				}
+			}
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Copy";
+
+				MenuItem sub = new MenuItem();
+
+				if (singleSelected) {
+					sub = new MenuItem();
+					sub.Header = "File path";
+					sub.ToolTip = this.SelectedResult.ImagePath;
+					sub.Tag = "copyFilePath";
+					sub.Click += this.ContextMenu_MenuItem_Click;
+					item.Items.Add(sub);
+				}
+
+				sub = new MenuItem();
+				sub.Header = "File hash";
+				sub.Tag = "copyHashes";
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
+
+				sub = new MenuItem();
+				sub.Header = "Match URL";
+				sub.Tag = "copyUrls";
+				sub.IsEnabled = hasUrl;
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
+
+				if (singleSelected && hasUrl) {
+					sub.ToolTip = this.SelectedResult.Url;
+				}
+
+				if (singleSelected) {
+					sub = new MenuItem();
+					sub.Header = "This URL";
+					sub.IsEnabled = hasMatchUrls;
+					item.Items.Add(sub);
+
+					if (hasMatchUrls) {
+						this.AttachMatchUrlsSubmenuToMenuItem(sub, "copyThisUrl");
+					}
+				}
+
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Open";
+
+				if (singleSelected) {
+					sub = new MenuItem();
+					sub.Header = "Containing folder";
+					sub.Tag = "openFolder";
+					sub.Click += this.ContextMenu_MenuItem_Click;
+					item.Items.Add(sub);
+				}
+
+				sub = new MenuItem();
+				sub.Header = "Match URL";
+				sub.Tag = "openMatchUrls";
+				sub.IsEnabled = hasUrl;
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
+
+				if (singleSelected && hasUrl) {
+					sub.ToolTip = this.SelectedResult.Url;
+				}
+
+				if (singleSelected) {
+					sub = new MenuItem();
+					sub.Header = "This URL";
+					sub.IsEnabled = hasMatchUrls;
+					item.Items.Add(sub);
+
+					if (hasMatchUrls) {
+						this.AttachMatchUrlsSubmenuToMenuItem(sub, "openThisUrl");
+					}
+				}
+
+			context.Items.Add(item);
+
+			if (singleSelected) {
+				item = new MenuItem();
+				item.Header = "Search";
+
+					sub = new MenuItem();
+					sub.Header = "IQDB";
+					sub.Tag = "searchIqdb";
+					sub.Click += this.ContextMenu_MenuItem_Click;
+					item.Items.Add(sub);
+
+					sub = new MenuItem();
+					sub.Header = "SauceNAO";
+					sub.Tag = "searchSauceNao";
+					sub.Click += this.ContextMenu_MenuItem_Click;
+					item.Items.Add(sub);
+
+				context.Items.Add(item);
+			}
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Add tags";
+			item.Tag = "addTagsForSelectedResults";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Reset result";
+			item.ToolTip = "Tags, URLs and other search results will be cleared for the selected file(s)";
+			item.Tag = "resetResult";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Remove from list";
+			item.Tag = "removeFiles";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Delete file";
+			item.Tag = "deleteFiles";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			this.ListBox_Files.ContextMenu = context;
 		}
 
 		/// <summary>

@@ -76,6 +76,6 @@ namespace Hatate
 		/// <summary>
 		/// URL of the original image before being uploaded to a booru, generally from Pixiv or Twitter.
 		/// </summary>
-		public string OriginalSourceUrl { get; internal set; }
+		public string SourceUrl { get; internal set; }
 	}
 }

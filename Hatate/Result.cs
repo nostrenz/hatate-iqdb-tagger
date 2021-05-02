@@ -110,7 +110,10 @@ namespace Hatate
 
 			this.Tags.Clear();
 			this.Ignoreds.Clear();
-			this.Matches.Clear();
+			
+			if (this.HasMatches) {
+				this.Matches.Clear();
+			}
 		}
 
 		/// <summary>
