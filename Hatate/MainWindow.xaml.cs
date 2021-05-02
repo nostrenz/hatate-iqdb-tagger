@@ -1593,7 +1593,7 @@ namespace Hatate
 					this.SendFileToRecycleBin(result.ImagePath);
 				}
 
-				bool success = await App.hydrusApi.SendUrl(result, sendPageUrlInsteadOfImageUrl);
+				bool success = await App.hydrusApi.SendUrl(result, sendPageUrlInsteadOfImageUrl ? result.Url : result.Full);
 				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
 
 				this.SetStatus("Sending URLs to Hydrus... " + counts);
@@ -1602,6 +1602,36 @@ namespace Hatate
 			this.ListBox_Files.Items.Refresh();
 			this.ListBox_Files.IsEnabled = true;
 			this.SetStatus("URLs sent to Hydrus for all the selected files. " + counts);
+		}
+
+		/// <summary>
+		/// Send a single URL to Hydrus for a result.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <param name="url"></param>
+		private async void SendUrlToHydrus(Result result, string url)
+		{
+			App.hydrusApi.ResetUnreachableFlag();
+			this.ListBox_Files.IsEnabled = false;
+
+			if (result == null) {
+				return;
+			}
+
+			// Move file to recycle bin
+			if (Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath) && File.Exists(result.ImagePath)) {
+				this.SendFileToRecycleBin(result.ImagePath);
+			}
+
+			int successes = 0;
+			int failures = 0;
+
+			bool success = await App.hydrusApi.SendUrl(result, url);
+			this.HandleProcessedResult(result, success, ref successes, ref failures);
+
+			this.ListBox_Files.Items.Refresh();
+			this.ListBox_Files.IsEnabled = true;
+			this.SetStatus("URL sent to Hydrus.");
 		}
 
 		/// <summary>
@@ -2024,7 +2054,7 @@ namespace Hatate
 					this.CopySelectedSourceUrls();
 				break;
 				case "sendThisUrlToHydrus":
-					await App.hydrusApi.SendUrl(mi.Header.ToString());
+					this.SendUrlToHydrus(this.SelectedResult, mi.Header.ToString());
 				break;
 				case "copyThisUrl":
 					Clipboard.SetText(mi.Header.ToString());
