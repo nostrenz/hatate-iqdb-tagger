@@ -27,11 +27,7 @@ namespace Hatate
 	public partial class MainWindow : Window
 	{
 		const int MAX_PATH_LENGTH = 260;
-
-		const string DIR_THUMBS    = @"\thumbs\";
-		const string DIR_IMGS      = @"\imgs\";
-		const string DIR_NOT_FOUND = @"notfound\";
-		const string DIR_TAGGED    = @"tagged\";
+		const string DIR_THUMBS = @"\thumbs\";
 
 		const string TXT_IGNOREDS     = "ignoreds.txt";
 		const string TXT_MATCHED_URLS = "matched_urls.txt";
@@ -417,7 +413,7 @@ namespace Hatate
 			IqdbApi.Models.SearchResult iqdbResult = null;
 
 			try {
-				iqdbResult = await new IqdbApi.IqdbApi().SearchFile(fs);
+				iqdbResult = await new IqdbApi.IqdbClient().SearchFile(fs);
 			} catch (Exception) {
 				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
 			}
