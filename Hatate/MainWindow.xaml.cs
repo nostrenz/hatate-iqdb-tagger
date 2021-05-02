@@ -328,6 +328,11 @@ namespace Hatate
 				this.delay += new Random().Next(half * -1, half);
 			}
 
+			// For SauceNAO, enforce a minimum delay of 5 seconds
+			if (this.SearchEngine == SearchEngine.SauceNAO && this.delay < 5) {
+				this.delay = 5;
+			}
+
 			// Timer was not recreated
 			if (this.timer == null) {
 				return;
