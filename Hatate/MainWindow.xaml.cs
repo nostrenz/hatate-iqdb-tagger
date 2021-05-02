@@ -1767,14 +1767,12 @@ namespace Hatate
 			if (result.Remote.Width > 0 && result.Remote.Height > 0) {
 				this.Label_MatchInfos.Content += "(" + result.Remote.Width + "x" + result.Remote.Height + ")";
 			}
-
+			
 			// Set match image
-			if (result.PreviewUrl != null) {
-				try {
-					this.Image_Match.Source = new BitmapImage(new Uri(result.PreviewUrl));
-				} catch (Exception) {
-					// UriFormatException may happen if the uri is incorrect
-				}
+			try {
+				this.Image_Match.Source = (result.PreviewUrl != null ? new BitmapImage(new Uri(result.PreviewUrl)) : null);
+			} catch (Exception) {
+				// UriFormatException may happen if the uri is incorrect
 			}
 
 			// Set borders

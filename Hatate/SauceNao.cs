@@ -105,34 +105,45 @@ namespace Hatate
 
 				// There were no booru links for this result but we have the link to pixiv/etc
 				if (sourceLinks.Count == 0 && originalSourceLink != null) {
-					Match match = new Match();
-
-					match.Url = originalSourceLink.Attr("href");
-					match.PreviewUrl = resultimage.Attr("src");
-					match.Similarity = this.ParseSimilarity(resultsimilarityinfo.Text);
-					match.DetermineSourceFromUrl();
-
-					this.matches.Add(match);
+					this.AddMatch(
+						originalSourceLink.Attr("href"),
+						resultimage.Attr("src"),
+						resultsimilarityinfo.Text
+					);
 
 					continue;
 				}
 
 				// We have booru links for this result
 				foreach (Supremes.Nodes.Element sourceLink in sourceLinks) {
-					Match match = new Match();
-
-					match.Url = sourceLink.Attr("href");
-					match.PreviewUrl = resultimage.Attr("src");
-					match.Similarity = this.ParseSimilarity(resultsimilarityinfo.Text);
-					match.DetermineSourceFromUrl();
-
-					if (originalSourceLink != null) {
-						match.SourceUrl = originalSourceLink.Attr("href");
-					}
-
-					this.matches.Add(match);
+					this.AddMatch(
+						sourceLink.Attr("href"),
+						resultimage.Attr("src"),
+						resultsimilarityinfo.Text,
+						originalSourceLink != null ? originalSourceLink.Attr("href") : null
+					);
 				}
 			}
+		}
+
+		private void AddMatch(string url, string previewUrl, string similarity, string sourceUrl=null)
+		{
+			Match match = new Match();
+
+			match.Url = url;
+			match.PreviewUrl = previewUrl;
+			match.Similarity = this.ParseSimilarity(similarity);
+			match.DetermineSourceFromUrl();
+
+			if (match.PreviewUrl == "images/static/blocked.gif") {
+				match.PreviewUrl = null;
+			}
+
+			if (sourceUrl != null) {
+				match.SourceUrl = sourceUrl;
+			}
+
+			this.matches.Add(match);
 		}
 
 		/// <summary>
