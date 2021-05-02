@@ -89,6 +89,7 @@
 			<MenuItem Header="Settings" Height="18">
 				<MenuItem Header="Options" Height="18" Click="MenuItem_Options_Click" />
 				<MenuItem Header="Hydrus API" Height="18" Click="MenuItem_HydrusApi_Click" />
+				<MenuItem Header="SauceNAO" Height="18" Click="MenuItem_SauceNao_Click" />
 			</MenuItem>
 		</Menu>
 		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}">

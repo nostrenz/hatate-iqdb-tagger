@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
+using Hatate.Properties;
 
 namespace Hatate
 {
@@ -54,8 +55,15 @@ namespace Hatate
 			MultipartFormDataContent form = new MultipartFormDataContent();
 			form.Add(new StreamContent(fs), "file", "image.jpg");
 
+			string url = "https://saucenao.com/search.php";
+
+			// Add API key if available
+			if (!string.IsNullOrWhiteSpace(Settings.Default.SauceNaoApiKey)) {
+				url += "?api_key=" + Settings.Default.SauceNaoApiKey;
+			}
+
 			HttpClient httpClient = new HttpClient(new HttpClientHandler());
-			HttpResponseMessage response = await httpClient.PostAsync("https://saucenao.com/search.php", form);
+			HttpResponseMessage response = await httpClient.PostAsync(url, form);
 
 			fs.Close();
 			fs.Dispose();

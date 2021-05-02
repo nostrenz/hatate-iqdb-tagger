@@ -142,6 +142,9 @@
     <Compile Include="Parser\Yandere.cs" />
     <Compile Include="Parser\Zerochan.cs" />
     <Compile Include="Result.cs" />
+    <Compile Include="SauceNaoSettings.xaml.cs">
+      <DependentUpon>SauceNaoSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SearchEngine.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="SauceNao.cs" />
@@ -180,6 +183,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Option.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SauceNaoSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

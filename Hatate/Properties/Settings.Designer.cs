@@ -538,5 +538,17 @@ namespace Hatate.Properties {
                 this["Source_Seiga"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SauceNaoApiKey {
+            get {
+                return ((string)(this["SauceNaoApiKey"]));
+            }
+            set {
+                this["SauceNaoApiKey"] = value;
+            }
+        }
     }
 }

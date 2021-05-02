@@ -1959,6 +1959,16 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Opens a window for setting the SauceNAO's API key.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_SauceNao_Click(object sender, RoutedEventArgs e)
+		{
+			new SauceNaoSettings().ShowDialog();
+		}
+
+		/// <summary>
 		/// Called when selecting a row in the files list.
 		/// </summary>
 		/// <param name="sender"></param>
