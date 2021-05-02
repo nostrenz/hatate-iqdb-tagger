@@ -64,6 +64,12 @@
 						}
 					} else if (content.StartsWith("Rating:")) {
 						this.rating = content.Substring("Rating:".Length);
+					} else if (content.StartsWith("Source:")) {
+						Supremes.Nodes.Element link = li.Select("a").First;
+
+						if (link != null) {
+							this.source = link.Attr("href");
+						}
 					}
 				}
 			}

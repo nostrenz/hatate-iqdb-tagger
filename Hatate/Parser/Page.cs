@@ -18,6 +18,7 @@ namespace Hatate.Parser
 		protected int width = 0;
 		protected int height = 0;
 		protected string rating = null;
+		protected string source = null;
 
 		/*
 		============================================
@@ -172,6 +173,11 @@ namespace Hatate.Parser
 		protected string Url
 		{
 			get { return this.url; }
+		}
+
+		protected string Source
+		{
+			get { return this.source; }
 		}
 	}
 }

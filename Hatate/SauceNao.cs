@@ -97,13 +97,15 @@ namespace Hatate
 					match.PreviewUrl = resultimage.Attr("src");
 					match.Similarity = this.ParseSimilarity(resultsimilarityinfo.Text);
 
-					if (match.Url.Contains("danbooru.donmai.us")) {
-						match.Source = IqdbApi.Enums.Source.Danbooru;
-					} else if (match.Url.Contains("gelbooru.com")) {
-						match.Source = IqdbApi.Enums.Source.Gelbooru;
-					} else {
-						// Unrecognized source
+					// Unsupported source
+					if (!match.DetermineSourceFromUrl()) {
 						continue;
+					}
+
+					Supremes.Nodes.Element originalSourceLink = result.Select(".resultcontent .resultcontentcolumn a").First;
+
+					if (originalSourceLink != null) {
+						match.OriginalSourceUrl = originalSourceLink.Attr("href");
 					}
 
 					this.matches.Add(match);
