@@ -83,5 +83,26 @@ namespace Hatate
 		/// original source URL to Hydrus with those tags instead of the booru URL.
 		/// </summary>
 		public string SourceUrl { get; internal set; }
+
+		/// <summary>
+		/// Used in the GUI.
+		/// </summary>
+		public string ComboBoxLabel
+		{
+			get
+			{
+				string label = this.Source.ToString();
+
+				if (this.Similarity > 0) {
+					label += " " + this.Similarity + "%";
+				}
+
+				if (this.Resolution.Width > 0 && this.Resolution.Height > 0) {
+					label += " " + this.Resolution.Width + "x" + this.Resolution.Height;
+				}
+
+				return label;
+			}
+		}
 	}
 }

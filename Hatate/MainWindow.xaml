@@ -31,16 +31,7 @@
 				<ComboBox x:Name="ComboBox_Matches" Text="Match" Margin="122,74,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" Padding="0" FontSize="11" SelectionChanged="ComboBox_Matches_SelectionChanged" Background="Transparent" BorderBrush="Transparent" Height="15" IsEnabled="False">
 					<ComboBox.ItemTemplate>
 						<DataTemplate>
-							<TextBlock Foreground="Red">
-								<TextBlock.Text>
-									<MultiBinding StringFormat="{}{0} ({1}% {2}x{3})">
-										<Binding Path="Source" />
-										<Binding Path="Similarity" />
-										<Binding Path="Resolution.Width" />
-										<Binding Path="Resolution.Height" />
-									</MultiBinding>
-								</TextBlock.Text>
-							</TextBlock>
+							<TextBlock Text="{Binding ComboBoxLabel}" Foreground="Red"/>
 						</DataTemplate>
 					</ComboBox.ItemTemplate>
 				</ComboBox>
