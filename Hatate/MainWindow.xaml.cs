@@ -471,8 +471,8 @@ namespace Hatate
 					continue;
 				}
 
-				// Check match type if enabled
-				if (Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
+				// Check match type if enabled (only for IQDB)
+				if (this.SearchEngine == SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
 					continue;
 				}
 
