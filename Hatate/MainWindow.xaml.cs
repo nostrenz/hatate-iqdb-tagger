@@ -1841,6 +1841,7 @@ namespace Hatate
 		{
 			if (this.timer != null) {
 				this.timer.Stop();
+				this.timer.Tick -= new EventHandler(Timer_Tick);
 			}
 
 			this.timer = null;
@@ -2647,6 +2648,8 @@ namespace Hatate
 			// The delay has reached the end, start the next search
 			if (this.delay <= 0) {
 				this.timer.Stop();
+				this.timer.Tick -= new EventHandler(Timer_Tick);
+				this.timer = new Timer();
 				this.NextSearch();
 			} else {
 				this.SetStatus("Next search in " + this.delay + " seconds");
