@@ -29,6 +29,10 @@
 				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_AnimePictures" Content="AnimePictures" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,10,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Pixiv" Content="Pivix" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,48,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Twitter" Content="Twitter" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,66,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Other" Content="Other sources" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,102,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Seiga" Content="Seiga (nicovideo)" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,84,0,0"/>
 			</Grid>
 		</GroupBox>
 		<CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top" Height="14"/>

@@ -133,9 +133,9 @@ namespace Hatate
 				match.Rating = iqdbMatch.Rating;
 				match.Score = iqdbMatch.Score;
 				match.Tags = iqdbMatch.Tags;
-				match.Source = iqdbMatch.Source;
+				match.Source = (Source)iqdbMatch.Source;
 				match.Resolution = iqdbMatch.Resolution;
-				match.Similarity = iqdbMatch.Similarity;
+				match.Similarity = (float)iqdbMatch.Similarity;
 
 				matches.Add(match);
 			}
@@ -180,13 +180,13 @@ namespace Hatate
 		{
 			get
 			{
-				if (this.Match == null) {
+				if (this.Match == null || this.Match.Url == null) {
 					return null;
 				}
 
 				// Fix the URL
 				if (this.Match.Url.StartsWith("//")) {
-					return (this.Match.Source == IqdbApi.Enums.Source.Eshuushuu ? "http" : "https") + ':' + this.Match.Url;
+					return (this.Match.Source == Source.Eshuushuu ? "http" : "https") + ':' + this.Match.Url;
 				}
 
 				return this.Match.Url;
@@ -198,7 +198,7 @@ namespace Hatate
 			get { return this.Match.PreviewUrl; }
 		}
 
-		public IqdbApi.Enums.Source Source
+		public Source Source
 		{
 			get { return this.Match.Source; }
 		}

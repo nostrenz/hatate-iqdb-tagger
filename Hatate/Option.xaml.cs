@@ -50,6 +50,10 @@ namespace Hatate
 			this.CheckBox_Source_TheAnimeGallery.IsChecked = Options.Default.Source_TheAnimeGallery;
 			this.CheckBox_Source_Zerochan.IsChecked = Options.Default.Source_Zerochan;
 			this.CheckBox_Source_AnimePictures.IsChecked = Options.Default.Source_AnimePictures;
+			this.CheckBox_Source_Pixiv.IsChecked = Options.Default.Source_Pixiv;
+			this.CheckBox_Source_Twitter.IsChecked = Options.Default.Source_Twitter;
+			this.CheckBox_Source_Seiga.IsChecked = Options.Default.Source_Seiga;
+			this.CheckBox_Source_Other.IsChecked = Options.Default.Source_Other;
 
 			// Tags
 			this.CheckBox_AddFoundTag.IsChecked = Options.Default.AddFoundTag;
@@ -116,6 +120,10 @@ namespace Hatate
 			Options.Default.Source_TheAnimeGallery = (bool)this.CheckBox_Source_TheAnimeGallery.IsChecked;
 			Options.Default.Source_Zerochan = (bool)this.CheckBox_Source_Zerochan.IsChecked;
 			Options.Default.Source_AnimePictures = (bool)this.CheckBox_Source_AnimePictures.IsChecked;
+			Options.Default.Source_Pixiv = (bool)this.CheckBox_Source_Pixiv.IsChecked;
+			Options.Default.Source_Twitter = (bool)this.CheckBox_Source_Twitter.IsChecked;
+			Options.Default.Source_Seiga = (bool)this.CheckBox_Source_Seiga.IsChecked;
+			Options.Default.Source_Other = (bool)this.CheckBox_Source_Other.IsChecked;
 
 			// Tags
 			Options.Default.AddFoundTag = (bool)this.CheckBox_AddFoundTag.IsChecked;

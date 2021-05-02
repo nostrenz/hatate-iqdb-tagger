@@ -537,15 +537,15 @@ namespace Hatate
 			Parser.IParser booru = null;
 
 			switch (result.Source) {
-				case IqdbApi.Enums.Source.Danbooru: booru = new Parser.Danbooru(); break;
-				case IqdbApi.Enums.Source.Gelbooru: booru = new Parser.Gelbooru(); break;
-				case IqdbApi.Enums.Source.Konachan: booru = new Parser.Konachan(); break;
-				case IqdbApi.Enums.Source.Yandere: booru = new Parser.Yandere(); break;
-				case IqdbApi.Enums.Source.SankakuChannel: booru = new Parser.SankakuChannel(); break;
-				case IqdbApi.Enums.Source.Eshuushuu: booru = new Parser.Eshuushuu(); break;
-				case IqdbApi.Enums.Source.TheAnimeGallery: booru = new Parser.TheAnimeGallery(); break;
-				case IqdbApi.Enums.Source.Zerochan: booru = new Parser.Zerochan(); break;
-				case IqdbApi.Enums.Source.AnimePictures: booru = new Parser.AnimePictures(); break;
+				case Source.Danbooru: booru = new Parser.Danbooru(); break;
+				case Source.Gelbooru: booru = new Parser.Gelbooru(); break;
+				case Source.Konachan: booru = new Parser.Konachan(); break;
+				case Source.Yandere: booru = new Parser.Yandere(); break;
+				case Source.SankakuChannel: booru = new Parser.SankakuChannel(); break;
+				case Source.Eshuushuu: booru = new Parser.Eshuushuu(); break;
+				case Source.TheAnimeGallery: booru = new Parser.TheAnimeGallery(); break;
+				case Source.Zerochan: booru = new Parser.Zerochan(); break;
+				case Source.AnimePictures: booru = new Parser.AnimePictures(); break;
 				default: return false;
 			}
 
@@ -626,27 +626,35 @@ namespace Hatate
 		/// </summary>
 		/// <param name=""></param>
 		/// <returns></returns>
-		private bool CheckSource(IqdbApi.Enums.Source source)
+		private bool CheckSource(Source source)
 		{
 			switch (source) {
-				case IqdbApi.Enums.Source.Danbooru:
+				case Source.Danbooru:
 					return Options.Default.Source_Danbooru;
-				case IqdbApi.Enums.Source.Konachan:
+				case Source.Konachan:
 					return Options.Default.Source_Konachan;
-				case IqdbApi.Enums.Source.Yandere:
+				case Source.Yandere:
 					return Options.Default.Source_Yandere;
-				case IqdbApi.Enums.Source.Gelbooru:
+				case Source.Gelbooru:
 					return Options.Default.Source_Gelbooru;
-				case IqdbApi.Enums.Source.SankakuChannel:
+				case Source.SankakuChannel:
 					return Options.Default.Source_SankakuChannel;
-				case IqdbApi.Enums.Source.Eshuushuu:
+				case Source.Eshuushuu:
 					return Options.Default.Source_Eshuushuu;
-				case IqdbApi.Enums.Source.TheAnimeGallery:
+				case Source.TheAnimeGallery:
 					return Options.Default.Source_TheAnimeGallery;
-				case IqdbApi.Enums.Source.Zerochan:
+				case Source.Zerochan:
 					return Options.Default.Source_Zerochan;
-				case IqdbApi.Enums.Source.AnimePictures:
+				case Source.AnimePictures:
 					return Options.Default.Source_AnimePictures;
+				case Source.Pixiv:
+					return Options.Default.Source_Pixiv;
+				case Source.Twitter:
+					return Options.Default.Source_Twitter;
+				case Source.Seiga:
+					return Options.Default.Source_Seiga;
+				case Source.Other:
+					return Options.Default.Source_Other;
 			}
 
 			return false;
@@ -1758,7 +1766,7 @@ namespace Hatate
 
 		private void AttachMatchUrlsSubmenuToMenuItem(MenuItem sub, string tag, string tooltip=null)
 		{
-			byte similarity = 0;
+			float similarity = 0;
 			List<string> addedUrls = new List<string>();
 
 			foreach (Match match in this.SelectedResult.Matches) {
@@ -2152,7 +2160,7 @@ namespace Hatate
 
 				sub = new MenuItem();
 				sub.Header = "Send match page URL";
-				sub.ToolTip = "Sends matched booru page URL" + (Options.Default.SendUrlWithTags ? " and tags " : " ") + "to Hydrus for processing";
+				sub.ToolTip = "Sends matched page URL" + (Options.Default.SendUrlWithTags ? " and tags " : " ") + "to Hydrus for processing";
 				sub.Tag = "sendPageUrlsToHydrus";
 				sub.IsEnabled = hasUrl;
 				sub.Click += this.ContextMenu_MenuItem_Click;

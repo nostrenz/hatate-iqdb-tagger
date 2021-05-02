@@ -20,10 +20,12 @@ namespace Hatate
 		/// <returns>
 		/// True if source was determined, false otherwise.
 		/// </returns>
-		public bool DetermineSourceFromUrl()
+		public void DetermineSourceFromUrl()
 		{
+			this.Source = Source.Other;
+
 			if (this.Url == null) {
-				return false;
+				return;
 			}
 
 			if (this.Url.Contains("danbooru.donmai.us")) {
@@ -42,11 +44,13 @@ namespace Hatate
 				this.Source = Source.Zerochan;
 			} else if (this.Url.Contains("e-shuushuu.net")) {
 				this.Source = Source.Eshuushuu;
-			} else {
-				return false;
+			} else if (this.Url.Contains("pixiv.net")) {
+				this.Source = Source.Pixiv;
+			} else if (this.Url.Contains("twitter.com")) {
+				this.Source = Source.Twitter;
+			} else if (this.Url.Contains("seiga.nicovideo.jp")) {
+				this.Source = Source.Seiga;
 			}
-
-			return true;
 		}
 
 		/*
@@ -71,10 +75,12 @@ namespace Hatate
 
 		public IqdbApi.Models.Resolution Resolution { get; internal set; }
 
-		public byte Similarity { get; internal set; }
+		public float Similarity { get; internal set; }
 
 		/// <summary>
-		/// URL of the original image before being uploaded to a booru, generally from Pixiv or Twitter.
+		/// If this.Url is set with the URL of a booru (Danbooru, ect) then this can be set with the URL to the original source
+		/// (like Pixiv, Twitter, etc). This allows to retrieve tags from the booru but then having the possibility to send the
+		/// original source URL to Hydrus with those tags instead of the booru URL.
 		/// </summary>
 		public string SourceUrl { get; internal set; }
 	}

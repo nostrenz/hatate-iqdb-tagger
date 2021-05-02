@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 
 namespace Hatate
 {
@@ -82,27 +83,32 @@ namespace Hatate
 
 			foreach (Supremes.Nodes.Element result in results) {
 				Supremes.Nodes.Elements sourceLinks = result.Select(".resultmiscinfo > a");
+				Supremes.Nodes.Element resultimage = result.Select(".resultimage img").First;
+				Supremes.Nodes.Element resultsimilarityinfo = result.Select(".resultsimilarityinfo").First;
+				Supremes.Nodes.Element originalSourceLink = result.Select(".resultcontent .resultcontentcolumn a").First;
 
-				if (sourceLinks.Count < 1) {
+				// There were no booru links for this result but we have the link to pixiv/etc
+				if (sourceLinks.Count == 0 && originalSourceLink != null) {
+					Match match = new Match();
+
+					match.Url = originalSourceLink.Attr("href");
+					match.PreviewUrl = resultimage.Attr("src");
+					match.Similarity = this.ParseSimilarity(resultsimilarityinfo.Text);
+					match.DetermineSourceFromUrl();
+
+					this.matches.Add(match);
+
 					continue;
 				}
 
-				Supremes.Nodes.Element resultimage = result.Select(".resultimage img").First;
-				Supremes.Nodes.Element resultsimilarityinfo = result.Select(".resultsimilarityinfo").First;
-
+				// We have booru links for this result
 				foreach (Supremes.Nodes.Element sourceLink in sourceLinks) {
 					Match match = new Match();
 
 					match.Url = sourceLink.Attr("href");
 					match.PreviewUrl = resultimage.Attr("src");
 					match.Similarity = this.ParseSimilarity(resultsimilarityinfo.Text);
-
-					// Unsupported source
-					if (!match.DetermineSourceFromUrl()) {
-						continue;
-					}
-
-					Supremes.Nodes.Element originalSourceLink = result.Select(".resultcontent .resultcontentcolumn a").First;
+					match.DetermineSourceFromUrl();
 
 					if (originalSourceLink != null) {
 						match.SourceUrl = originalSourceLink.Attr("href");
@@ -118,20 +124,18 @@ namespace Hatate
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns></returns>
-		private byte ParseSimilarity(string text)
+		private float ParseSimilarity(string text)
 		{
-			text = text.Trim();
+			text = text.Replace("%", "").Trim();
 
-			if (text.Contains(".")) {
-				text = text.Substring(0, text.IndexOf('.'));
-			} else {
-				text = text.Replace("%", "");
+			CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+			culture.NumberFormat.NumberDecimalSeparator = ".";
+
+			try {
+				return float.Parse(text, culture);
+			} catch (System.Exception) {
+				return 0;
 			}
-
-			byte similarity = 0;
-			byte.TryParse(text, out similarity);
-
-			return similarity;
 		}
 
 		#endregion Private

@@ -145,6 +145,7 @@
     <Compile Include="SearchEngine.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="SauceNao.cs" />
+    <Compile Include="Source.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="EditTag.xaml">
       <SubType>Designer</SubType>

@@ -490,5 +490,53 @@ namespace Hatate.Properties {
                 this["RemoveResultAfter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Pixiv {
+            get {
+                return ((bool)(this["Source_Pixiv"]));
+            }
+            set {
+                this["Source_Pixiv"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Source_Twitter {
+            get {
+                return ((bool)(this["Source_Twitter"]));
+            }
+            set {
+                this["Source_Twitter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_Other {
+            get {
+                return ((bool)(this["Source_Other"]));
+            }
+            set {
+                this["Source_Other"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_Seiga {
+            get {
+                return ((bool)(this["Source_Seiga"]));
+            }
+            set {
+                this["Source_Seiga"] = value;
+            }
+        }
     }
 }
