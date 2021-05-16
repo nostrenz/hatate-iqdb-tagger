@@ -886,8 +886,8 @@ namespace Hatate
 			}
 
 			// The file was imported into Hydrus, we can now delete it
-			if (imported && Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath)) {
-				this.SendFileToRecycleBin(result.ImagePath);
+			if (imported && Options.Default.DeleteImported) {
+				this.SendFileToRecycleBin(result);
 			}
 
 			return true;
@@ -1017,9 +1017,7 @@ namespace Hatate
 			while (this.ListBox_Files.SelectedItems.Count > 0) {
 				Result result = this.GetSelectedResultAt(0);
 
-				if (!this.IsHydrusOwnedFolder(result.ImagePath)) {
-					await Task.Run(() => this.SendFileToRecycleBin(result.ImagePath));
-				}
+				await Task.Run(() => this.SendFileToRecycleBin(result));
 
 				this.RemoveResultFromFilesListbox(result);
 			}
@@ -1622,13 +1620,13 @@ namespace Hatate
 					continue;
 				}
 
-				// Move file to recycle bin
-				if (Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath) && File.Exists(result.ImagePath)) {
-					this.SendFileToRecycleBin(result.ImagePath);
-				}
-
 				bool success = await App.hydrusApi.SendUrl(result, sendPageUrlInsteadOfImageUrl ? result.Url : result.Full);
 				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
+
+				// Move file to recycle bin
+				if (success && Options.Default.DeleteImported) {
+					this.SendFileToRecycleBin(result);
+				}
 
 				this.SetStatus("Sending URLs to Hydrus... " + counts);
 			}
@@ -1652,16 +1650,16 @@ namespace Hatate
 				return;
 			}
 
-			// Move file to recycle bin
-			if (Options.Default.DeleteImported && !this.IsHydrusOwnedFolder(result.ImagePath) && File.Exists(result.ImagePath)) {
-				this.SendFileToRecycleBin(result.ImagePath);
-			}
-
 			int successes = 0;
 			int failures = 0;
 
 			bool success = await App.hydrusApi.SendUrl(result, url);
 			this.HandleProcessedResult(result, success, ref successes, ref failures);
+
+			// Move file to recycle bin
+			if (success && Options.Default.DeleteImported) {
+				this.SendFileToRecycleBin(result);
+			}
 
 			this.ListBox_Files.Items.Refresh();
 			this.ListBox_Files.IsEnabled = true;
@@ -1715,11 +1713,20 @@ namespace Hatate
 		/// <summary>
 		/// Delete a file by sending it to the recycle bin.
 		/// </summary>
-		/// <param name="filePath"></param>
-		private void SendFileToRecycleBin(string filePath)
+		/// <param name="result"></param>
+		private void SendFileToRecycleBin(Result result)
 		{
+			if (!File.Exists(result.ImagePath)) {
+				return;
+			}
+
+			// Don't delete file if it's one of Hydrus client files
+			if (this.IsHydrusOwnedFolder(result.ImagePath)) {
+				return;
+			}
+
 			try {
-				FileIO.FileSystem.DeleteFile(filePath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin);
+				FileIO.FileSystem.DeleteFile(result.ImagePath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin);
 			} catch (Exception) { }
 		}
 
