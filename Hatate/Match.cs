@@ -8,6 +8,10 @@ namespace Hatate
 {
 	public class Match
 	{
+		private string url = null;
+		private string previewUrl = null;
+		private string sourceUrl = null;
+
 		/*
 		============================================
 		Public
@@ -55,15 +59,43 @@ namespace Hatate
 
 		/*
 		============================================
+		Private
+		============================================
+		*/
+
+		/// <summary>
+		/// Prepends the protocol to a URL if missing one.
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		public string FixUrl(string url)
+		{
+			if (url != null && url.StartsWith("//")) {
+				return "https:" + url;
+			}
+
+			return url;
+		}
+
+		/*
+		============================================
 		Accessor
 		============================================
 		*/
 
 		public MatchType MatchType { get; internal set; }
 
-		public string Url { get; internal set; }
+		public string Url
+		{
+			get { return this.FixUrl(this.url); }
+			internal set { this.url = value; }
+		}
 
-		public string PreviewUrl { get; internal set; }
+		public string PreviewUrl
+		{
+			get { return this.FixUrl(this.previewUrl); }
+			internal set { this.previewUrl = value; }
+		}
 
 		public Rating Rating { get; internal set; }
 
@@ -82,7 +114,11 @@ namespace Hatate
 		/// (like Pixiv, Twitter, etc). This allows to retrieve tags from the booru but then having the possibility to send the
 		/// original source URL to Hydrus with those tags instead of the booru URL.
 		/// </summary>
-		public string SourceUrl { get; internal set; }
+		public string SourceUrl
+		{
+			get { return this.FixUrl(this.sourceUrl); }
+			internal set { this.sourceUrl = value; }
+		}
 
 		/// <summary>
 		/// Used in the GUI.

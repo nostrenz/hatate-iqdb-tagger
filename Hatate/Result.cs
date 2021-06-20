@@ -180,19 +180,7 @@ namespace Hatate
 
 		public string Url
 		{
-			get
-			{
-				if (this.Match == null || this.Match.Url == null) {
-					return null;
-				}
-
-				// Fix the URL
-				if (this.Match.Url.StartsWith("//")) {
-					return (this.Match.Source == Source.Eshuushuu ? "http" : "https") + ':' + this.Match.Url;
-				}
-
-				return this.Match.Url;
-			}
+			get { return this.Match != null ? this.Match.Url : null; }
 		}
 
 		public string PreviewUrl
