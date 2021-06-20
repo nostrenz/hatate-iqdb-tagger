@@ -54,6 +54,14 @@ namespace Hatate
 				this.Source = Source.Twitter;
 			} else if (this.Url.Contains("seiga.nicovideo.jp")) {
 				this.Source = Source.Seiga;
+			} else if (this.Url.Contains("deviantart.com")) {
+				this.Source = Source.DeviantArt;
+			} else if (this.Url.Contains("artstation.com")) {
+				this.Source = Source.ArtStation;
+			} else if (this.Url.Contains("pawoo.net")) {
+				this.Source = Source.Pawoo;
+			} else if (this.Url.Contains("mangadex.org")) {
+				this.Source = Source.MangaDex;
 			}
 		}
 
@@ -127,7 +135,18 @@ namespace Hatate
 		{
 			get
 			{
-				string label = this.Source.ToString();
+				string label = "";
+				string url = this.Url;
+
+				if (this.Source != Source.Other) {
+					label = this.Source.ToString();
+				} else if (url != null) {
+					int start = url.IndexOf("://") + 3;
+					int end = url.IndexOf('/', start);
+
+					// We don't recognize the source so we'll display the URL's domain instead
+					label = url.Substring(start, end - start);
+				}
 
 				if (this.Similarity > 0) {
 					label += " " + this.Similarity + "%";
