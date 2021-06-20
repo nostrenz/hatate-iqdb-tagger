@@ -66,6 +66,8 @@ namespace Hatate
 				case "image/jpeg": this.local.Format = "jpg"; break;
 				case "image/png": this.local.Format = "png"; break;
 				case "image/bmp": this.local.Format = "bmp"; break;
+				case "image/webp": this.local.Format = "webp"; break;
+				case "image/tiff": this.local.Format = "tiff"; break;
 			}
 		}
 

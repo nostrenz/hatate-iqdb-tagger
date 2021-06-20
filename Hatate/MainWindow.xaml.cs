@@ -42,7 +42,7 @@ namespace Hatate
 		private Timer timer = new Timer();
 
 		// List of accepted image extentions
-		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp", ".jfif" };
+		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp", ".jfif", ".webp", ".tiff" };
 
 
 		public MainWindow()
@@ -76,7 +76,7 @@ namespace Hatate
 		private void AddFiles()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.Filter = "Image files|*.jpg;*.png;*.bmp;*.jpeg";
+			dlg.Filter = "Image files|*.jpg;*.png;*.bmp;*.jpeg;*.webp,*.tiff";
 			dlg.Multiselect = true;
 
 			if (!(bool)dlg.ShowDialog()) {
@@ -2015,8 +2015,11 @@ namespace Hatate
 			}
 
 			this.Image_Local.Source = this.CreateBitmapImage(result.ThumbPath);
-			this.Label_Local.Content = "Local " + result.Local.Format.ToUpper();
 			this.Label_SourceInfos.Content = this.HumanReadableFileSize(result.Local.Size) + " (" + result.Local.Width + "x" + result.Local.Height + ")";
+
+			if (result.Local.Format != null) {
+				this.Label_Local.Content = "Local " + result.Local.Format.ToUpper();
+			}
 
 			this.UpdateRightView(result);
 		}
