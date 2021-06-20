@@ -1744,9 +1744,12 @@ namespace Hatate
 
 			this.GroupBox_Tags.Header = "Tags (" + result.Tags.Count + ")";
 			this.GroupBox_Ignoreds.Header = "Ignoreds (" + result.Ignoreds.Count + ")";
+			this.Label_MatchTips.Text = "";
 
 			// No matches, nothing to update
 			if (!result.HasMatches) {
+				this.Label_MatchTips.Text = "No matches";
+
 				return;
 			}
 
@@ -1756,6 +1759,8 @@ namespace Hatate
 
 			// No match found, nothing to update
 			if (!result.HasMatch) {
+				this.Label_MatchTips.Text = result.Matches.Count + " possible matches available in the dropdown below";
+
 				return;
 			}
 
