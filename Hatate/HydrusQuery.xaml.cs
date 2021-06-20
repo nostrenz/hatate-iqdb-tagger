@@ -232,13 +232,28 @@ namespace Hatate
 
 			// Fill the HydrusMetadata list from the JTokens
 			this.hydrusMetadataList = new List<HydrusMetadata>();
+			List<string> unsupportedMimetypes = new List<string>();
 
 			foreach (JToken jToken in jTokens) {
 				HydrusMetadata hydrusMetadata = new HydrusMetadata(jToken);
 
 				if (hydrusMetadata.IsImage) {
 					this.hydrusMetadataList.Add(hydrusMetadata);
+
+					continue;
 				}
+
+				if (!unsupportedMimetypes.Contains(hydrusMetadata.Mime)) {
+					unsupportedMimetypes.Add(hydrusMetadata.Mime);
+				}
+			}
+
+			// Warn about files not imported due to unsupported type
+			if (unsupportedMimetypes.Count > 0) {
+				MessageBox.Show(
+					jTokens.Count + " files were found from the query but only " + this.hydrusMetadataList.Count + " will be imported due to some file types not being supported:\n\n"
+					+ String.Join(", ", unsupportedMimetypes.ToArray())
+				);
 			}
 
 			this.Close();
