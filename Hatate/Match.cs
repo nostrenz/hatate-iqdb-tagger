@@ -135,17 +135,17 @@ namespace Hatate
 		{
 			get
 			{
-				string label = "";
+				string label = this.Source.ToString();
 				string url = this.Url;
 
-				if (this.Source != Source.Other) {
-					label = this.Source.ToString();
-				} else if (url != null) {
-					int start = url.IndexOf("://") + 3;
-					int end = url.IndexOf('/', start);
-
+				if (this.Source == Source.Other && url != null) {
 					// We don't recognize the source so we'll display the URL's domain instead
-					label = url.Substring(start, end - start);
+					try {
+						int start = url.IndexOf("://") + 3;
+						int end = url.IndexOf('/', start);
+
+						label = url.Substring(start, end - start);
+					} catch (System.ArgumentOutOfRangeException) { }
 				}
 
 				if (this.Similarity > 0) {
