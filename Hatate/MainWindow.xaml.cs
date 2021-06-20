@@ -393,6 +393,11 @@ namespace Hatate
 				}
 			}
 
+			// Update informations on the right if the image is selected in the list
+			if (this.ListBox_Files.SelectedItem == result) {
+				this.UpdateRightView(result);
+			}
+
 			// Update counters (remaining, found, not found)
 			this.UpdateLabels();
 		}
