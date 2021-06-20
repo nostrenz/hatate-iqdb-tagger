@@ -2574,7 +2574,7 @@ namespace Hatate
 			foreach (HydrusMetadata hydrusMetadata in hydrusMetadataList) {
 				count++;
 
-				string thumbnailPath = await App.hydrusApi.DownloadThumbnailAsync(hydrusMetadata.FileId, this.ThumbsDirPath);
+				string thumbnailPath = await App.hydrusApi.DownloadThumbnailAsync(hydrusMetadata, this.ThumbsDirPath);
 
 				this.SetStatus("Adding query file " + count + " / " + hydrusMetadataList.Count);
 				this.AddFileToList(thumbnailPath, null, hydrusMetadata);

@@ -193,12 +193,12 @@ namespace Hatate
 		/// <summary>
 		/// Retrieve a file's thumbnail and store it in the thumbs folder.
 		/// </summary>
-		/// <param name="fileId"></param>
+		/// <param name="hydrusMetadata"></param>
 		/// <param name="thumbsDir"></param>
 		/// <returns></returns>
-		public Task<string> DownloadThumbnailAsync(string fileId, string thumbsDir)
+		public Task<string> DownloadThumbnailAsync(HydrusMetadata hydrusMetadata, string thumbsDir)
 		{
-			return Task.Run(() => this.DownloadThumbnail(fileId, thumbsDir));
+			return Task.Run(() => this.DownloadThumbnail(hydrusMetadata, thumbsDir));
 		}
 
 		/// <summary>
@@ -315,15 +315,15 @@ namespace Hatate
 		/// <summary>
 		/// Write a thumbnail from Hydrus into the thumbs folder.
 		/// </summary>
-		/// <param name="fileId"></param>
+		/// <param name="hydrusMetadata"></param>
 		/// <returns></returns>
-		private string DownloadThumbnail(string fileId, string thumbsDir)
+		private string DownloadThumbnail(HydrusMetadata hydrusMetadata, string thumbsDir)
 		{
-			HttpWebRequest request = this.CreateRequest("/get_files/thumbnail?file_id=" + fileId);
+			HttpWebRequest request = this.CreateRequest("/get_files/thumbnail?file_id=" + hydrusMetadata.FileId);
 			request.AutomaticDecompression = DecompressionMethods.GZip;
 
 			Directory.CreateDirectory(thumbsDir);
-			string filePath = thumbsDir + "hydrus-file-" + fileId + ".jpg";
+			string filePath = thumbsDir + "hydrus-file-" + hydrusMetadata.FileId + "." + hydrusMetadata.Extension;
 
 			using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
 				using (var fileStream = File.Create(filePath)) {
