@@ -45,7 +45,7 @@ namespace Hatate
 
 		public bool IsImage
 		{
-			get { return this.Mime == "image/png" || this.Mime == "image/jpg"; }
+			get { return this.Mime == "image/png" || this.Mime == "image/jpg" || this.Mime == "image/jpeg"; }
 		}
 
 		#endregion Accessor
