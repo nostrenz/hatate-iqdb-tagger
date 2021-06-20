@@ -20,6 +20,10 @@ namespace Hatate
         Other, // To be used if we can't determine the source
         Pixiv,
         Seiga, // https://seiga.nicovideo.jp
-        Twitter
+        Twitter,
+        DeviantArt,
+        ArtStation,
+        Pawoo,
+        MangaDex
     }
 }

@@ -550,5 +550,53 @@ namespace Hatate.Properties {
                 this["SauceNaoApiKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_DeviantArt {
+            get {
+                return ((bool)(this["Source_DeviantArt"]));
+            }
+            set {
+                this["Source_DeviantArt"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_ArtStation {
+            get {
+                return ((bool)(this["Source_ArtStation"]));
+            }
+            set {
+                this["Source_ArtStation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_Pawoo {
+            get {
+                return ((bool)(this["Source_Pawoo"]));
+            }
+            set {
+                this["Source_Pawoo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Source_MangaDex {
+            get {
+                return ((bool)(this["Source_MangaDex"]));
+            }
+            set {
+                this["Source_MangaDex"] = value;
+            }
+        }
     }
 }

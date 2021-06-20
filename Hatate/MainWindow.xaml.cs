@@ -675,6 +675,14 @@ namespace Hatate
 					return Options.Default.Source_Twitter;
 				case Source.Seiga:
 					return Options.Default.Source_Seiga;
+				case Source.DeviantArt:
+					return Options.Default.Source_DeviantArt;
+				case Source.ArtStation:
+					return Options.Default.Source_ArtStation;
+				case Source.Pawoo:
+					return Options.Default.Source_Pawoo;
+				case Source.MangaDex:
+					return Options.Default.Source_MangaDex;
 				case Source.Other:
 					return Options.Default.Source_Other;
 			}

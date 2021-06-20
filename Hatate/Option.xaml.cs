@@ -53,6 +53,10 @@ namespace Hatate
 			this.CheckBox_Source_Pixiv.IsChecked = Options.Default.Source_Pixiv;
 			this.CheckBox_Source_Twitter.IsChecked = Options.Default.Source_Twitter;
 			this.CheckBox_Source_Seiga.IsChecked = Options.Default.Source_Seiga;
+			this.CheckBox_Source_DeviantArt.IsChecked = Options.Default.Source_DeviantArt;
+			this.CheckBox_Source_ArtStation.IsChecked = Options.Default.Source_ArtStation;
+			this.CheckBox_Source_Pawoo.IsChecked = Options.Default.Source_Pawoo;
+			this.CheckBox_Source_MangaDex.IsChecked = Options.Default.Source_MangaDex;
 			this.CheckBox_Source_Other.IsChecked = Options.Default.Source_Other;
 
 			// Tags
@@ -123,6 +127,10 @@ namespace Hatate
 			Options.Default.Source_Pixiv = (bool)this.CheckBox_Source_Pixiv.IsChecked;
 			Options.Default.Source_Twitter = (bool)this.CheckBox_Source_Twitter.IsChecked;
 			Options.Default.Source_Seiga = (bool)this.CheckBox_Source_Seiga.IsChecked;
+			Options.Default.Source_DeviantArt = (bool)this.CheckBox_Source_DeviantArt.IsChecked;
+			Options.Default.Source_ArtStation = (bool)this.CheckBox_Source_ArtStation.IsChecked;
+			Options.Default.Source_Pawoo = (bool)this.CheckBox_Source_Pawoo.IsChecked;
+			Options.Default.Source_MangaDex = (bool)this.CheckBox_Source_MangaDex.IsChecked;
 			Options.Default.Source_Other = (bool)this.CheckBox_Source_Other.IsChecked;
 
 			// Tags

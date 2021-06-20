@@ -18,21 +18,25 @@
 		<CheckBox x:Name="CheckBox_MatchType" HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top" Click="CheckBox_MatchType_Click" Height="14" Width="13"/>
 		<Label x:Name="Label_Delay" Content="Delay (600secs / 10mins):" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" ToolTip="Time between each search, please don't lower it too much to prevent from abusing the search engines" Width="149" Padding="5,0,0,0" VerticalContentAlignment="Center" Height="18"/>
 		<Slider x:Name="Slider_Delay" HorizontalAlignment="Left" Margin="164,108,0,0" VerticalAlignment="Top" Width="139" ValueChanged="Sliders_ValueChanged" SmallChange="1" Minimum="1" Maximum="600" Value="60"/>
-		<GroupBox Header="Sources" Height="192" Margin="323,10,10,0" VerticalAlignment="Top" ToolTip="Search results from unchecked sources will be ignored">
+		<GroupBox Header="Sources" Height="211" Margin="323,10,10,0" VerticalAlignment="Top" ToolTip="Search results from unchecked sources will be ignored">
 			<Grid>
 				<CheckBox x:Name="CheckBox_Source_Danbooru" Content="Danbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Konachan" Content="Konachan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,50,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Yandere" Content="Yandere" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,90,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Gelbooru" Content="Gelbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,30,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,110,0,0" IsEnabled="False"/>
-				<CheckBox x:Name="CheckBox_Source_Eshuushuu" Content="Eshuushuu" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,30,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Konachan" Content="Konachan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Yandere" Content="Yandere" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,82,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Gelbooru" Content="Gelbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,28,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,100,0,0" IsEnabled="False"/>
+				<CheckBox x:Name="CheckBox_Source_Eshuushuu" Content="Eshuushuu" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,28,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,118,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,64,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_AnimePictures" Content="AnimePictures" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,10,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Pixiv" Content="Pivix" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,48,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Twitter" Content="Twitter" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,66,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Other" Content="Other sources" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,102,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Seiga" Content="Seiga (nicovideo)" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,84,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Pixiv" Content="Pivix" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,46,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Twitter" Content="Twitter" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,64,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Seiga" Content="Nico Nico Seiga" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,82,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_DeviantArt" Content="DeviantArt" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,100,0,0" RenderTransformOrigin="0.493,0.692"/>
+				<CheckBox x:Name="CheckBox_Source_Pawoo" Content="Pawoo" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,136,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_MangaDex" Content="MangaDex" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,136,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_ArtStation" Content="ArtStation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,118,0,0"/>
+				<CheckBox x:Name="CheckBox_Source_Other" Content="Other sources" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,154,0,0"/>
 			</Grid>
 		</GroupBox>
 		<CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top" Height="14"/>
