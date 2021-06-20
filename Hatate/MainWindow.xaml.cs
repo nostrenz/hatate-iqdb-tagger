@@ -347,6 +347,13 @@ namespace Hatate
 		{
 			Result result = this.GetResultAt(index);
 
+			// Some file format aren't supported by some search engines
+			if (!this.ImageFormatIsSupported(result.Local, searchEngine)) {
+				this.SetStatus("Image of type " + result.Local.Format + " not supported by " + searchEngine.ToString() + ", skipping.");
+
+				return;
+			}
+
 			// Generate a smaller image for uploading
 			this.SetStatus("Generating thumbnail...");
 			bool read = this.ReadLocalImage(result);
@@ -1866,6 +1873,27 @@ namespace Hatate
 
 			this.SetStatus("Stopped.");
 			this.SetStartButton("Start", "#FF3CB21A");
+		}
+
+		/// <summary>
+		/// Checks if the format of an image is supported by a search engine.
+		/// </summary>
+		/// <param name="image"></param>
+		/// <param name="searchEngine"></param>
+		/// <returns></returns>
+		private bool ImageFormatIsSupported(Image image, SearchEngine searchEngine)
+		{
+			// webp not supported by IQDB
+			if (searchEngine == SearchEngine.IQDB && image.Format == "webp") {
+				return false;
+			}
+
+			// tiff not supported by SauceNao
+			if (searchEngine == SearchEngine.SauceNAO && image.Format == "tiff") {
+				return false;
+			}
+
+			return true;
 		}
 
 		#endregion Private
