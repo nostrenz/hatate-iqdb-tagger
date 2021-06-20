@@ -191,7 +191,7 @@ namespace Hatate
 			this.Button_ExecuteQuery.Content = "Executing query...";
 
 			// Get files
-			JArray fileIds = await App.hydrusApi.SearchFiles(this.Tags);
+			JArray fileIds = await App.hydrusApi.SearchFiles(this.Tags, (bool)this.CheckBox_InboxOnly.IsChecked, (bool)this.CheckBox_ArchiveOnly.IsChecked);
 
 			if (fileIds == null || fileIds.Count < 1) {
 				this.NoResult();

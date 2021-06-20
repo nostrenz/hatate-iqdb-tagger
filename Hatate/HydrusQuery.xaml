@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hydrus query" Height="335" Width="300" MinWidth="230" MinHeight="200" WindowStartupLocation="CenterOwner">
+        Title="Hydrus query" Height="328" Width="300" MinWidth="300" MinHeight="200" WindowStartupLocation="CenterOwner">
 	<Grid Background="{DynamicResource WindowBackground}">
-		<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="10,38,10,76" MouseDoubleClick="ListBox_Tags_MouseDoubleClick">
+		<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="10,38,10,93" MouseDoubleClick="ListBox_Tags_MouseDoubleClick">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>
@@ -19,5 +19,7 @@
 		<Button Content="Add tag" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="47" Height="23" Click="Button_AddTag_Click"/>
 		<Label Content="Limit results (0 for no limit) :" HorizontalAlignment="Left" Margin="10,0,0,44" Width="164" Height="26" VerticalAlignment="Bottom"/>
 		<TextBox x:Name="TextBox_Limit" Height="26" Margin="179,0,10,44" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom"/>
+		<CheckBox x:Name="CheckBox_InboxOnly" Content="Limit to inbox files" HorizontalAlignment="Left" Margin="10,0,0,75" Height="13" VerticalAlignment="Bottom"/>
+		<CheckBox x:Name="CheckBox_ArchiveOnly" Content="Limit to archived files" Margin="0,0,10,75" Height="13" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="123"/>
 	</Grid>
 </Window>
