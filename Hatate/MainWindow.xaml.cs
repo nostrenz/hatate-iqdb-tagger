@@ -575,6 +575,7 @@ namespace Hatate
 				case Source.TheAnimeGallery: booru = new Parser.TheAnimeGallery(); break;
 				case Source.Zerochan: booru = new Parser.Zerochan(); break;
 				case Source.AnimePictures: booru = new Parser.AnimePictures(); break;
+				case Source.Pixiv: booru = new Parser.Pixiv(); break;
 				default: return false;
 			}
 

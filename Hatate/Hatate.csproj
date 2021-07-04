@@ -140,6 +140,7 @@
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="Parser\Konachan.cs" />
     <Compile Include="Parser\Page.cs" />
+    <Compile Include="Parser\Pixiv.cs" />
     <Compile Include="Parser\SankakuChannel.cs" />
     <Compile Include="Parser\TheAnimeGallery.cs" />
     <Compile Include="Parser\Yandere.cs" />
