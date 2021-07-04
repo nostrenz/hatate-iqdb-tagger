@@ -11,6 +11,9 @@ namespace Hatate
 	/// </summary>
 	public partial class App : Application
 	{
+		public const string GITHUB_REPOSITORY_URL = "https://github.com/nostrenz/hatate-iqdb-tagger";
+		public const int RELEASE_NUMBER = 2;
+
 		public static string appDir = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 		public static HydrusApi hydrusApi = new HydrusApi();
 

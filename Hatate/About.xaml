@@ -1,0 +1,14 @@
+﻿<Window x:Class="Hatate.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hatate"
+        mc:Ignorable="d"
+        Title="About" Height="137" Width="299" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+	<Grid Background="{DynamicResource WindowBackground}">
+		<Label x:Name="label" Content="Hatate" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
+		<TextBlock x:Name="TextBlock_GithubUrl" Margin="10,0,10,10" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" TextDecorations="Underline" MouseDown="TextBlock_GithubUrl_MouseDown" Height="15" VerticalAlignment="Bottom">github_repository_url</TextBlock>
+		<Label x:Name="Label_Release" Content="release" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" FontSize="10"/>
+	</Grid>
+</Window>

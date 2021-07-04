@@ -96,6 +96,7 @@
 			</MenuItem>
 			<MenuItem Header="Help" Height="18">
 				<MenuItem Header="Open GitHub repository" Height="18" Click="MenuItem_Github_Click" />
+				<MenuItem Header="About" Height="18" Click="MenuItem_About_Click" />
 			</MenuItem>
 		</Menu>
 		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}">
