@@ -23,7 +23,16 @@
 					continue;
 				}
 
+				if (tagRow.Text.Length < 1) {
+					continue;
+				}
+
 				string value = link.Text.Replace(tagRow.Text, "").Trim();
+
+				if (value.Length < 1) {
+					continue;
+				}
+
 				string nameSpace = tagRow.Text.Replace(value, "").Trim();
 
 				switch (nameSpace) {
