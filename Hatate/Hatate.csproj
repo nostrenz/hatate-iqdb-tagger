@@ -139,6 +139,7 @@
     <Compile Include="Parser\Gelbooru.cs" />
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="Parser\Konachan.cs" />
+    <Compile Include="Parser\NicoNicoSeiga.cs" />
     <Compile Include="Parser\Page.cs" />
     <Compile Include="Parser\Pixiv.cs" />
     <Compile Include="Parser\SankakuChannel.cs" />
