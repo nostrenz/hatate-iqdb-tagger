@@ -24,7 +24,7 @@
 				<CheckBox x:Name="CheckBox_Source_Konachan" Content="Konachan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Yandere" Content="Yandere" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,82,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Gelbooru" Content="Gelbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,28,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,100,0,0" IsEnabled="False"/>
+				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,100,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Eshuushuu" Content="Eshuushuu" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,28,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,118,0,0"/>
 				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,64,0,0"/>
