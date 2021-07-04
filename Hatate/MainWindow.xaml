@@ -94,6 +94,9 @@
 				<MenuItem Header="Hydrus API" Height="18" Click="MenuItem_HydrusApi_Click" />
 				<MenuItem Header="SauceNAO" Height="18" Click="MenuItem_SauceNao_Click" />
 			</MenuItem>
+			<MenuItem Header="Help" Height="18">
+				<MenuItem Header="Open GitHub repository" Height="18" Click="MenuItem_Github_Click" />
+			</MenuItem>
 		</Menu>
 		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}">
 			<Label x:Name="Label_Status" Content="Status"/>

@@ -32,6 +32,8 @@ namespace Hatate
 		const string TXT_IGNOREDS     = "ignoreds.txt";
 		const string TXT_MATCHED_URLS = "matched_urls.txt";
 
+		const string GITHUB_REPOSITORY_URL = "https://github.com/nostrenz/hatate-iqdb-tagger";
+
 		// Tags list
 		private List<string> ignoreds;
 
@@ -2813,6 +2815,11 @@ namespace Hatate
 
 			this.AddAutoTags(result);
 			this.UpdateRightView(result);
+		}
+
+		private void MenuItem_Github_Click(object sender, RoutedEventArgs e)
+		{
+			Process.Start(GITHUB_REPOSITORY_URL);
 		}
 
 		#endregion Event
