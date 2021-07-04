@@ -135,6 +135,7 @@
     </Compile>
     <Compile Include="Parser\AnimePictures.cs" />
     <Compile Include="Parser\Danbooru.cs" />
+    <Compile Include="Parser\DeviantArt.cs" />
     <Compile Include="Parser\Eshuushuu.cs" />
     <Compile Include="Parser\Gelbooru.cs" />
     <Compile Include="Parser\IParser.cs" />
