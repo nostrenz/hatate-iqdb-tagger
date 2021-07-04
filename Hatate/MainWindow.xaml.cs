@@ -1900,6 +1900,67 @@ namespace Hatate
 			return true;
 		}
 
+		/// <summary>
+		/// Checks if there's a new release on GitHub.
+		/// </summary>
+		/// <param name="messageWhenUpToDate"></param>
+		private void CheckForNewRelease(bool messageWhenUpToDate)
+		{
+			string latestReleaseUrl = App.GITHUB_REPOSITORY_URL + App.GITHUB_LATEST_RELEASE;
+
+			Supremes.Nodes.Document doc = Supremes.Dcsoup.Parse(new Uri(latestReleaseUrl), 5000);
+
+			if (doc == null) {
+				this.GitHubReleaseParsingErrorMessage();
+
+				return;
+			}
+
+			Supremes.Nodes.Element tag = doc.Select("div#repo-content-pjax-container div.release.label-latest a.Link--muted.css-truncate").First;
+
+			if (tag == null) {
+				this.GitHubReleaseParsingErrorMessage();
+
+				return;
+			}
+
+			ushort release;
+
+			// Release number is prefixed with 'r'
+			if (!ushort.TryParse(tag.Text.Remove(1), out release)) {
+				this.GitHubReleaseParsingErrorMessage();
+
+				return;
+			}
+
+			// Not a newer release
+			if (release <= App.RELEASE_NUMBER) {
+				if (messageWhenUpToDate) {
+					MessageBox.Show("You have the latest release (r" + release + ").");
+				}
+
+				return;
+			}
+
+			Supremes.Nodes.Element changelog = doc.Select("div.release-main-section div.markdown-body").First;
+
+			Release releaseWindow = new Release(release);
+
+			if (changelog != null) {
+				releaseWindow.Changelog = changelog.Html;
+			}
+
+			releaseWindow.ShowDialog();
+		}
+
+		/// <summary>
+		/// Displays a message warning about not being able to retrieve the latest release from GitHub.
+		/// </summary>
+		private void GitHubReleaseParsingErrorMessage()
+		{
+			System.Windows.Forms.MessageBox.Show("Unable to find the latest release.\nPlease check the Github repository to download it.\n\n" + App.GITHUB_REPOSITORY_URL);
+		}
+
 		#endregion Private
 
 		/*
@@ -2818,6 +2879,11 @@ namespace Hatate
 		private void MenuItem_Github_Click(object sender, RoutedEventArgs e)
 		{
 			Process.Start(App.GITHUB_REPOSITORY_URL);
+		}
+
+		private void MenuItem_CheckForUpdate_Click(object sender, RoutedEventArgs e)
+		{
+			this.CheckForNewRelease(true);
 		}
 
 		private void MenuItem_About_Click(object sender, RoutedEventArgs e)

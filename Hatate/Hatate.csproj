@@ -144,6 +144,9 @@
     <Compile Include="Parser\TheAnimeGallery.cs" />
     <Compile Include="Parser\Yandere.cs" />
     <Compile Include="Parser\Zerochan.cs" />
+    <Compile Include="Release.xaml.cs">
+      <DependentUpon>Release.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Result.cs" />
     <Compile Include="SauceNaoSettings.xaml.cs">
       <DependentUpon>SauceNaoSettings.xaml</DependentUpon>
@@ -190,6 +193,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Option.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Release.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
