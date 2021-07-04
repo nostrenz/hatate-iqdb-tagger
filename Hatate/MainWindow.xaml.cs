@@ -578,12 +578,16 @@ namespace Hatate
 				default: return false;
 			}
 
+			// Add tags from the parsed booru page
+			result.ClearTagsOfSource(Hatate.Tag.SOURCE_BOORU);
+
+			// Don't go further if we can't retrieve tags from the URL
 			if (!booru.FromUrl(result.Url)) {
+				this.ListBox_Tags.Items.Refresh();
+
 				return false;
 			}
 
-			// Add tags from the parsed booru page
-			result.ClearTagsOfSource(Hatate.Tag.SOURCE_BOORU);
 			this.AddTagsToResult(booru.Tags, result);
 
 			result.Full = booru.Full;
