@@ -8,7 +8,7 @@
         Title="New release available" Height="258" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Label Content="A new release is available to download on GitHub." Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="289"/>
-		<Label x:Name="Label_Release" Content="release" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="289" FontSize="10"/>
+		<Label x:Name="Label_Release" Content="release" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="289" FontSize="11"/>
 		<WebBrowser x:Name="WebBrowser_Changelog" Margin="0,71,0,0" />
 		<Button Content="Open download page" HorizontalAlignment="Right" Width="120" RenderTransformOrigin="0.227,0.467" Height="25" Margin="0,41,68,0" VerticalAlignment="Top" Click="Button_Open_Click"/>
 		<Button Content="Close" Margin="0,41,10,0" Height="25" VerticalAlignment="Top" HorizontalAlignment="Right" Width="53" Click="Button_Close_Click"/>

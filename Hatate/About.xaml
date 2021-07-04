@@ -9,6 +9,6 @@
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Label x:Name="label" Content="Hatate" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
 		<TextBlock x:Name="TextBlock_GithubUrl" Margin="10,0,10,10" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" TextDecorations="Underline" MouseDown="TextBlock_GithubUrl_MouseDown" Height="15" VerticalAlignment="Bottom">github_repository_url</TextBlock>
-		<Label x:Name="Label_Release" Content="release" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" FontSize="10"/>
+		<Label x:Name="Label_Release" Content="release" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" FontSize="11"/>
 	</Grid>
 </Window>

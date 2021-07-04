@@ -1904,7 +1904,7 @@ namespace Hatate
 		/// Checks if there's a new release on GitHub.
 		/// </summary>
 		/// <param name="messageWhenUpToDate"></param>
-		private void CheckForNewRelease(bool messageWhenUpToDate)
+		private async Task CheckForNewRelease(bool messageWhenUpToDate)
 		{
 			string latestReleaseUrl = App.GITHUB_REPOSITORY_URL + App.GITHUB_LATEST_RELEASE;
 
@@ -1916,9 +1916,9 @@ namespace Hatate
 				return;
 			}
 
-			Supremes.Nodes.Element tag = doc.Select("div#repo-content-pjax-container div.release.label-latest a.Link--muted.css-truncate").First;
+			Supremes.Nodes.Element tag = doc.Select("div#repo-content-pjax-container div.release.label-latest a.Link--muted.css-truncate > span.css-truncate-target").First;
 
-			if (tag == null) {
+			if (tag == null || String.IsNullOrEmpty(tag.Text) || tag.Text[0] != 'r') {
 				this.GitHubReleaseParsingErrorMessage();
 
 				return;
@@ -1927,7 +1927,7 @@ namespace Hatate
 			ushort release;
 
 			// Release number is prefixed with 'r'
-			if (!ushort.TryParse(tag.Text.Remove(1), out release)) {
+			if (!ushort.TryParse(tag.Text.Remove(0, 1), out release)) {
 				this.GitHubReleaseParsingErrorMessage();
 
 				return;
@@ -1944,13 +1944,16 @@ namespace Hatate
 
 			Supremes.Nodes.Element changelog = doc.Select("div.release-main-section div.markdown-body").First;
 
-			Release releaseWindow = new Release(release);
+			Application.Current.Dispatcher.Invoke(new Action(() =>
+			{
+				Release releaseWindow = new Release(release);
 
-			if (changelog != null) {
-				releaseWindow.Changelog = changelog.Html;
-			}
+				if (changelog != null) {
+					releaseWindow.Changelog = changelog.Html;
+				}
 
-			releaseWindow.ShowDialog();
+				releaseWindow.ShowDialog();
+			}));
 		}
 
 		/// <summary>
@@ -2881,14 +2884,23 @@ namespace Hatate
 			Process.Start(App.GITHUB_REPOSITORY_URL);
 		}
 
-		private void MenuItem_CheckForUpdate_Click(object sender, RoutedEventArgs e)
+		private async void MenuItem_CheckForUpdate_Click(object sender, RoutedEventArgs e)
 		{
-			this.CheckForNewRelease(true);
+			await Task.Run(() => this.CheckForNewRelease(true));
 		}
 
 		private void MenuItem_About_Click(object sender, RoutedEventArgs e)
 		{
 			new About().ShowDialog();
+		}
+
+		// Triggered when the MainWindow is fully loaded.
+		private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+		{
+			// Check for new release
+			if (Options.Default.StartupReleaseCheck) {
+				await Task.Run(() => this.CheckForNewRelease(false));
+			}
 		}
 
 		#endregion Event

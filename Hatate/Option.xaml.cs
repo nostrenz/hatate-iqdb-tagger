@@ -39,6 +39,7 @@ namespace Hatate
 			this.TextBox_ThumbWidth.Text = Options.Default.ThumbWidth.ToString();
 			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
 			this.CheckBox_RemoveResultAfter.IsChecked = Options.Default.RemoveResultAfter;
+			this.CheckBox_StartupReleaseCheck.IsChecked = Options.Default.StartupReleaseCheck;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -113,6 +114,7 @@ namespace Hatate
 			Options.Default.ResizeImage = (bool)this.CheckBox_ResizeImage.IsChecked;
 			Options.Default.SearchEngine = (byte)(SearchEngine)this.Combo_SearchEngines.SelectedItem;
 			Options.Default.RemoveResultAfter = (bool)this.CheckBox_RemoveResultAfter.IsChecked;
+			Options.Default.StartupReleaseCheck = (bool)this.CheckBox_StartupReleaseCheck.IsChecked;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
