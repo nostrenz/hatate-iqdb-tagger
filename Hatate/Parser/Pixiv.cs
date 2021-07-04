@@ -37,7 +37,13 @@ namespace Hatate.Parser
 				// By setting the language to English the Pixiv API will return tags with english translations
 				webClient.Headers.Add("Accept-Language", "en-us;q=0.5,en;q=0.3");
 
-				string json = webClient.DownloadString(jsonUrl);
+				string json = null;
+
+				try {
+					json = webClient.DownloadString(jsonUrl);
+				} catch {
+					return false;
+				}
 				
 				if (string.IsNullOrWhiteSpace(json)) {
 					return false;
