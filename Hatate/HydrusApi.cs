@@ -183,11 +183,9 @@ namespace Hatate
 				result.AddWarning("Hydrus: not imported - failed to import");
 			} else if (status == 7) {
 				result.AddWarning("Hydrus: not imported - vetoed");
-			} else {
-				return data.hash;
 			}
 
-			return null;
+			return data.hash;
 		}
 
 		/// <summary>
@@ -212,6 +210,109 @@ namespace Hatate
 			string postData = @"{""url_to_add"": """ + url + @""", ""hash"": """ + fileHash + @"""}";
 
 			return await this.PostRequestAsync("/add_urls/associate_url", postData) != null;
+		}
+
+		/// <summary>
+		/// Get client pages.
+		/// </summary>
+		/// <returns></returns>
+		public async Task<JArray> GetPages()
+		{
+			string json = await this.GetRequestAsync("/manage_pages/get_pages");
+
+			if (string.IsNullOrEmpty(json)) {
+				return null;
+			}
+
+			dynamic pages = JObject.Parse(json);
+
+			if (pages == null || pages.pages == null) {
+				return null;
+			}
+			
+			// Returns pages contained in the top page
+			return pages.pages.pages;
+		}
+
+		/// <summary>
+		/// Focus a page by its page key.
+		/// </summary>
+		/// <param name="pageKey"></param>
+		/// <returns></returns>
+		public async Task<bool> FocusPage(string pageKey)
+		{
+			string postData = @"{""page_key"": """ + pageKey + @"""}";
+
+			return await this.PostRequestAsync("/manage_pages/focus_page", postData) != null;
+		}
+
+		/// <summary>
+		/// Try to get a page with a given name, return its page key if found.
+		/// </summary>
+		/// <param name="pageName"></param>
+		/// <returns></returns>
+		public async Task<string> GetPageNamed(string pageName, bool focus=false)
+		{
+			JArray pages = await App.hydrusApi.GetPages();
+
+			if (pages == null || pages.Count < 1) {
+				return null;
+			}
+
+			foreach (JToken jToken in pages) {
+				JObject page = jToken.Value<JObject>();
+				string name = page.GetValue("name").ToString();
+
+				if (name != pageName) {
+					continue;
+				}
+
+				string pageKey = page.GetValue("page_key").ToString();
+
+				if (focus && pageKey != null) {
+					await this.FocusPage(pageKey);
+				}
+
+				return pageKey;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Display a single file in a page.
+		/// </summary>
+		/// <param name="pageKey"></param>
+		/// <param name="fileIds"></param>
+		/// <returns></returns>
+		public async Task<bool> AddFileToPage(string pageKey, string fileHash)
+		{
+			string postData = @"{""page_key"": """ + pageKey + @""", ""hashes"": [""" + fileHash + @"""]}";
+
+			return await this.PostRequestAsync("/manage_pages/add_files", postData) != null;
+		}
+
+		/// <summary>
+		/// Display multiple files in a page.
+		/// </summary>
+		/// <param name="pageKey"></param>
+		/// <param name="fileIds"></param>
+		/// <returns></returns>
+		public async Task<bool> AddFilesToPage(string pageKey, List<string> fileHashes)
+		{
+			string hashes = "";
+
+			for (int i = 0; i < fileHashes.Count; i++) {
+				hashes += @"""" + fileHashes[i] + @"""";
+
+				if (i < fileHashes.Count - 1) {
+					hashes += ", ";
+				}
+			}
+
+			string postData = @"{""page_key"": """ + pageKey + @""", ""hashes"": [" + hashes + @"]}";
+
+			return await this.PostRequestAsync("/manage_pages/add_files", postData) != null;
 		}
 
 		public void ShowApiUnreachableMessage(string exceptionMessage)

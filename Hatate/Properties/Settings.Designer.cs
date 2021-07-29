@@ -610,5 +610,29 @@ namespace Hatate.Properties {
                 this["StartupReleaseCheck"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AddImagesToHydrusPage {
+            get {
+                return ((bool)(this["AddImagesToHydrusPage"]));
+            }
+            set {
+                this["AddImagesToHydrusPage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("files")]
+        public string HydrusPageName {
+            get {
+                return ((string)(this["HydrusPageName"]));
+            }
+            set {
+                this["HydrusPageName"] = value;
+            }
+        }
     }
 }

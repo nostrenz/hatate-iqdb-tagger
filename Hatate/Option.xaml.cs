@@ -40,6 +40,8 @@ namespace Hatate
 			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
 			this.CheckBox_RemoveResultAfter.IsChecked = Options.Default.RemoveResultAfter;
 			this.CheckBox_StartupReleaseCheck.IsChecked = Options.Default.StartupReleaseCheck;
+			this.CheckBox_AddImagesToHydrusPage.IsChecked = Options.Default.AddImagesToHydrusPage;
+			this.TextBox_HydrusPageName.Text = Options.Default.HydrusPageName;
 
 			// Sources
 			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
@@ -115,6 +117,8 @@ namespace Hatate
 			Options.Default.SearchEngine = (byte)(SearchEngine)this.Combo_SearchEngines.SelectedItem;
 			Options.Default.RemoveResultAfter = (bool)this.CheckBox_RemoveResultAfter.IsChecked;
 			Options.Default.StartupReleaseCheck = (bool)this.CheckBox_StartupReleaseCheck.IsChecked;
+			Options.Default.AddImagesToHydrusPage = (bool)this.CheckBox_AddImagesToHydrusPage.IsChecked;
+			Options.Default.HydrusPageName = this.TextBox_HydrusPageName.Text;
 
 			// Sources
 			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;

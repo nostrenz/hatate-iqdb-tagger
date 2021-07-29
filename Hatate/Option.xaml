@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Options" Height="470" Width="608" MinWidth="608" MinHeight="470" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Options" Height="490" Width="608" MinWidth="608" MinHeight="490" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
 		<CheckBox x:Name="CheckBox_AddRating" Content="Add rating to tags" HorizontalAlignment="Left" Margin="10,207,0,0" VerticalAlignment="Top" Height="14"/>
@@ -44,16 +44,18 @@
 		<CheckBox x:Name="CheckBox_AddFoundTag" Content="Add this tag to files successfully found" HorizontalAlignment="Left" Margin="10,250,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
 		<CheckBox x:Name="CheckBox_AddNotfoundTag" Content="Add this tag to files not found" HorizontalAlignment="Left" Margin="10,278,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
 		<CheckBox x:Name="CheckBox_AddTaggedTag" Content="Add this tag to files tagged from a booru" HorizontalAlignment="Left" Margin="10,306,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
-		<TextBox x:Name="TextBox_FoundTag" Height="23" Margin="243,245,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
-		<TextBox x:Name="TextBox_NotfoundTag" Height="23" Margin="243,273,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
-		<TextBox x:Name="TextBox_TaggedTag" Height="23" Margin="243,301,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
+		<TextBox x:Name="TextBox_FoundTag" Height="23" Margin="281,245,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
+		<TextBox x:Name="TextBox_NotfoundTag" Height="23" Margin="281,273,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
+		<TextBox x:Name="TextBox_TaggedTag" Height="23" Margin="281,301,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
 		<CheckBox x:Name="CheckBox_LogMatchedUrls" Content="Log matched URLs into a text file" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top" Height="14"/>
 		<CheckBox x:Name="CheckBox_ParseTags" Content="Parse booru page" HorizontalAlignment="Left" Margin="10,188,0,0" VerticalAlignment="Top" Height="14" xml:space="preserve" ToolTip="If enabled, will try to parse the booru page found by the search engine,&#x0d;&#x0a;allowing to retrieve tags and other infos about the image"/>
 		<CheckBox x:Name="CheckBox_ResizeImage" Content="Resized image width for uploading" HorizontalAlignment="Left" Margin="10,334,0,0" VerticalAlignment="Top" Width="228" Height="14" ToolTip="If enabled, images will be resized to this width before being uploaded to a search engine"/>
-		<TextBox x:Name="TextBox_ThumbWidth" Height="23" Margin="243,329,10,0" TextWrapping="Wrap" Text="150" VerticalAlignment="Top"/>
+		<TextBox x:Name="TextBox_ThumbWidth" Height="23" Margin="281,329,10,0" TextWrapping="Wrap" Text="150" VerticalAlignment="Top"/>
 		<Label Content="Search engine" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="149" Height="20" Padding="0" VerticalContentAlignment="Center"/>
 		<ComboBox x:Name="Combo_SearchEngines" Margin="164,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" SelectionChanged="Combo_SearchEngines_SelectionChanged"/>
 		<CheckBox x:Name="CheckBox_RemoveResultAfter" Content="Remove file from list after writing tags or sending to Hydrus" HorizontalAlignment="Left" Margin="10,226,0,0" VerticalAlignment="Top" Height="14"/>
-		<CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,358,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
+		<CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,385,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
+		<CheckBox x:Name="CheckBox_AddImagesToHydrusPage" Content="Display imported images in an Hydrus page named" HorizontalAlignment="Left" Margin="10,362,0,0" VerticalAlignment="Top" ToolTip="If enabled, images imported into Hydrus using the 'Import file with tags' context menu option will be displayed in an Hydrus page"/>
+		<TextBox x:Name="TextBox_HydrusPageName" Height="23" Margin="281,357,10,0" TextWrapping="Wrap" Text="files" VerticalAlignment="Top"/>
 	</Grid>
 </Window>

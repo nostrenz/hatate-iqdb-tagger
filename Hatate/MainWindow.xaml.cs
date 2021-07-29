@@ -391,7 +391,13 @@ namespace Hatate
 
 			// Send to Hydrus
 			if (hasTags && Options.Default.AutoSend) {
-				bool success = await this.SendTagsToHydrusForResult(result);
+				string hydrusPageKey = null;
+
+				if (Options.Default.AddImagesToHydrusPage) {
+					hydrusPageKey = await App.hydrusApi.GetPageNamed(Options.Default.HydrusPageName);
+				}
+
+				bool success = await this.SendTagsToHydrusForResult(result, hydrusPageKey);
 
 				if (success) {
 					this.RemoveResultFromFilesListbox(result);
@@ -854,7 +860,7 @@ namespace Hatate
 		/// Send tags to Hydrus for a given file and remove the row.
 		/// </summary>
 		/// <param name="item"></param>
-		private async Task<bool> SendTagsToHydrusForResult(Result result)
+		private async Task<bool> SendTagsToHydrusForResult(Result result, string hydrusPageKey=null)
 		{
 			if (result == null) {
 				return false;
@@ -900,6 +906,11 @@ namespace Hatate
 
 					return false;
 				}
+			}
+
+			// Display in a Hydrus page
+			if (Options.Default.AddImagesToHydrusPage && hydrusPageKey != null && !String.IsNullOrEmpty(result.Local.Hash)) {
+				await App.hydrusApi.AddFileToPage(hydrusPageKey, result.Local.Hash);
 			}
 
 			// Write the ignored tags to txt
@@ -1606,14 +1617,19 @@ namespace Hatate
 			int successes = 0;
 			int failures = 0;
 			string counts = null;
+			string hydrusPageKey = null;
 
 			App.hydrusApi.ResetUnreachableFlag();
 			this.ListBox_Files.IsEnabled = false;
 
+			if (Options.Default.AddImagesToHydrusPage) {
+				hydrusPageKey = await App.hydrusApi.GetPageNamed(Options.Default.HydrusPageName, true);
+			}
+
 			// Process each selected file until no one remain or the API becomes unreachable
 			while (this.ListBox_Files.SelectedItems.Count > 0 && !App.hydrusApi.Unreachable) {
 				Result result = this.GetSelectedResultAt(0);
-				bool success = await this.SendTagsToHydrusForResult(result);
+				bool success = await this.SendTagsToHydrusForResult(result, hydrusPageKey);
 				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
 
 				this.SetStatus("Sending tags to Hydrus... " + counts);
