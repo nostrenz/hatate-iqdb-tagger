@@ -1935,9 +1935,17 @@ namespace Hatate
 				return;
 			}
 
-			Supremes.Nodes.Element tag = doc.Select("div#repo-content-pjax-container div.release.label-latest a.Link--muted.css-truncate > span.css-truncate-target").First;
+			Supremes.Nodes.Element tag = doc.Select("div.release.label-latest a.Link--muted.css-truncate").First;
 
-			if (tag == null || String.IsNullOrEmpty(tag.Text) || tag.Text[0] != 'r') {
+			if (tag == null) {
+				this.GitHubReleaseParsingErrorMessage();
+
+				return;
+			}
+
+			string title = tag.Attr("title");
+
+			if (title == null || title[0] != 'r') {
 				this.GitHubReleaseParsingErrorMessage();
 
 				return;
@@ -1946,7 +1954,7 @@ namespace Hatate
 			ushort release;
 
 			// Release number is prefixed with 'r'
-			if (!ushort.TryParse(tag.Text.Remove(0, 1), out release)) {
+			if (!ushort.TryParse(title.Remove(0, 1), out release)) {
 				this.GitHubReleaseParsingErrorMessage();
 
 				return;
