@@ -190,6 +190,17 @@ namespace Hatate
 			this.Button_ExecuteQuery.IsEnabled = false;
 			this.Button_ExecuteQuery.Content = "Executing query...";
 
+			int limit = this.Limit;
+
+			// Add limit tag
+			if (limit > 0) {
+				Tag tag = new Tag("limit = " + limit, "system");
+
+				if (!this.ListBox_Tags.Items.Contains(tag)) {
+					this.ListBox_Tags.Items.Add(tag);
+				}
+			}
+
 			// Get files
 			JArray fileIds = await App.hydrusApi.SearchFiles(this.Tags, (bool)this.CheckBox_InboxOnly.IsChecked, (bool)this.CheckBox_ArchiveOnly.IsChecked);
 
@@ -199,10 +210,9 @@ namespace Hatate
 				return;
 			}
 
-			int limit = this.Limit;
-
 			// Create a smaller array according to the limit
-			if (Limit > 0 && limit < fileIds.Count) {
+			// As of Hydrus version 448 this should not be needed anymore thanks to the "system:limit" tag
+			if (limit > 0 && limit < fileIds.Count) {
 				JArray limitedFileIds = new JArray();
 
 				for (int i = 0; i < limit; i++) {
