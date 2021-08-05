@@ -2923,6 +2923,9 @@ namespace Hatate
 
 			this.AddAutoTags(result);
 			this.UpdateRightView(result);
+
+			// Refresh the items to update the foreground color from the Result objets
+			this.ListBox_Files.Items.Refresh();
 		}
 
 		private void MenuItem_Github_Click(object sender, RoutedEventArgs e)
