@@ -2285,6 +2285,8 @@ namespace Hatate
 			bool hasUrl = false;
 			bool hasFull = false;
 			bool hasMatchUrls = false;
+			bool hasHydrusFiles = false;
+			bool areHydrusFiles = true;
 
 			foreach (Result result in this.ListBox_Files.SelectedItems) {
 				if (result.HasTags) {
@@ -2297,6 +2299,14 @@ namespace Hatate
 
 				if (result.Full != null) {
 					hasFull = true;
+				}
+
+				if (hasHydrusFiles == false && result.HydrusFileId != null) {
+					hasHydrusFiles = true;
+				}
+
+				if (areHydrusFiles == true && result.HydrusFileId == null) {
+					areHydrusFiles = false;
 				}
 
 				if (result.HasMatches) {
@@ -2319,6 +2329,15 @@ namespace Hatate
 				sub.Tag = "sendTagsToHydrus";
 				sub.IsEnabled = hasTags;
 				sub.Click += this.ContextMenu_MenuItem_Click;
+
+				// All the selected files are from a Hydrus query
+				if (areHydrusFiles) {
+					sub.Header = "Send tags";
+					sub.ToolTip = "Tags will be sent to Hydrus for this client file";
+				} else if (hasHydrusFiles) { // some of the selected files are from a Hydrus query
+					sub.ToolTip += "\n(only tags will be sent for client files imported from a Hydrus query)";
+				}
+
 				item.Items.Add(sub);
 
 				sub = new MenuItem();
