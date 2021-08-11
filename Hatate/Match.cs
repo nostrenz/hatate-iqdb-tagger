@@ -72,14 +72,24 @@ namespace Hatate
 		*/
 
 		/// <summary>
-		/// Prepends the protocol to a URL if missing one.
+		/// Modify a URL to be usable by Hatate and Hydrus.
 		/// </summary>
 		/// <param name="url"></param>
 		/// <returns></returns>
 		public string FixUrl(string url)
 		{
-			if (url != null && url.StartsWith("//")) {
-				return "https:" + url;
+			if (url == null) {
+				return url;
+			}
+
+			// Prepend protocol when missing
+			if (url.StartsWith("//")) {
+				url = "https:" + url;
+			}
+
+			// Fix danbooru URL from a SauceNAO search
+			if (this.Source == Source.Danbooru) {
+				url = url.Replace("/post/show/", "/posts/");
 			}
 
 			return url;
