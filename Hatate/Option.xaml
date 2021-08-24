@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Options" Height="490" Width="608" MinWidth="608" MinHeight="490" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Options" Width="608" MinWidth="608" Height="470" MinHeight="470" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
 		<CheckBox x:Name="CheckBox_AddRating" Content="Add rating to tags" HorizontalAlignment="Left" Margin="10,207,0,0" VerticalAlignment="Top" Height="14"/>
@@ -54,8 +54,6 @@
 		<Label Content="Search engine" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="149" Height="20" Padding="0" VerticalContentAlignment="Center"/>
 		<ComboBox x:Name="Combo_SearchEngines" Margin="164,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" SelectionChanged="Combo_SearchEngines_SelectionChanged"/>
 		<CheckBox x:Name="CheckBox_RemoveResultAfter" Content="Remove file from list after writing tags or sending to Hydrus" HorizontalAlignment="Left" Margin="10,226,0,0" VerticalAlignment="Top" Height="14"/>
-		<CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,385,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
-		<CheckBox x:Name="CheckBox_AddImagesToHydrusPage" Content="Display imported images in an Hydrus page named" HorizontalAlignment="Left" Margin="10,362,0,0" VerticalAlignment="Top" ToolTip="If enabled, images imported into Hydrus using the 'Import file with tags' context menu option will be displayed in an Hydrus page"/>
-		<TextBox x:Name="TextBox_HydrusPageName" Height="23" Margin="281,357,10,0" TextWrapping="Wrap" Text="files" VerticalAlignment="Top"/>
+		<CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,362,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
 	</Grid>
 </Window>

@@ -27,6 +27,8 @@ namespace Hatate
 			this.CheckBox_DeleteImported.IsChecked = Settings.Default.DeleteImported;
 			this.CheckBox_AssociateUrl.IsChecked = Settings.Default.AssociateUrl;
 			this.CheckBox_SendUrlWithTags.IsChecked = Settings.Default.SendUrlWithTags;
+			this.CheckBox_AddImagesToHydrusPage.IsChecked = Settings.Default.AddImagesToHydrusPage;
+			this.TextBox_HydrusPageName.Text = Settings.Default.HydrusPageName;
 
 			if (this.HasValidConnectionInfos()) {
 				this.RetrieveTagServices();
@@ -99,6 +101,8 @@ namespace Hatate
 			Settings.Default.DeleteImported = (bool)this.CheckBox_DeleteImported.IsChecked;
 			Settings.Default.AssociateUrl = (bool)this.CheckBox_AssociateUrl.IsChecked;
 			Settings.Default.SendUrlWithTags = (bool)this.CheckBox_SendUrlWithTags.IsChecked;
+			Settings.Default.AddImagesToHydrusPage = (bool)this.CheckBox_AddImagesToHydrusPage.IsChecked;
+			Settings.Default.HydrusPageName = this.TextBox_HydrusPageName.Text;
 
 			Settings.Default.Save();
 

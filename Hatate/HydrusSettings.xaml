@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hydrus settings" Height="280" MinHeight="268" MaxHeight="280" Width="550" WindowStartupLocation="CenterOwner" MinWidth="550">
+        Title="Hydrus settings" Width="550" MinWidth="550" Height="305" MinHeight="305" MaxHeight="305" WindowStartupLocation="CenterOwner">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Label Content="API URL" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
 		<Label Content="API access key" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
@@ -20,5 +20,7 @@
 		<Separator Height="25" Margin="101,103,10,0" VerticalAlignment="Top"/>
 		<CheckBox x:Name="CheckBox_AssociateUrl" Content="Associate found URL with file when sending tags" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top"/>
 		<CheckBox x:Name="CheckBox_SendUrlWithTags" Content="Send tags alongside a URL" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top"/>
+		<CheckBox x:Name="CheckBox_AddImagesToHydrusPage" Content="Display imported images in a Hydrus page named" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top" ToolTip="If enabled, images imported into Hydrus using the 'Import file with tags' context menu option will be displayed in an Hydrus page" Height="20"/>
+		<TextBox x:Name="TextBox_HydrusPageName" Height="20" Margin="281,202,10,0" TextWrapping="Wrap" Text="files" VerticalAlignment="Top"/>
 	</Grid>
 </Window>
