@@ -634,5 +634,17 @@ namespace Hatate.Properties {
                 this["HydrusPageName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public byte SearchedParenthesisValue {
+            get {
+                return ((byte)(this["SearchedParenthesisValue"]));
+            }
+            set {
+                this["SearchedParenthesisValue"] = value;
+            }
+        }
     }
 }

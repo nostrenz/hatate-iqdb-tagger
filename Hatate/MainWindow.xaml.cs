@@ -2091,7 +2091,12 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_Options_Click(object sender, RoutedEventArgs e)
 		{
-			Option potion = new Option();
+			Option option = new Option();
+			option.ShowDialog();
+			
+			if (option.ListRefreshRequired) {
+				this.ListBox_Files.Items.Refresh();
+			}
 		}
 
 		/// <summary>

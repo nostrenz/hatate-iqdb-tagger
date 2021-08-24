@@ -9,6 +9,15 @@ namespace Hatate
 	/// </summary>
 	public partial class Option : Window
 	{
+		public const byte PARENTHESIS_VALUE_NUMBER_OF_TAGS      = 1;
+		public const byte PARENTHESIS_VALUE_NUMBER_OF_MATCHES   = 2;
+		public const byte PARENTHESIS_VALUE_MATCH_SOURCE        = 3;
+		public const byte PARENTHESIS_VALUE_MATCH_SIMILARITY    = 4;
+		public const byte PARENTHESIS_VALUE_HIGHEST_SIMILARITY  = 5;
+
+		// If the list of results needs to be refreshed after closing the options window
+		private bool listRefreshRequired = false;
+
 		public Option()
 		{
 			InitializeComponent();
@@ -23,6 +32,15 @@ namespace Hatate
 			// Add search engines
 			foreach (var item in Enum.GetValues(typeof(SearchEngine))) {
 				Combo_SearchEngines.Items.Add(item);
+			}
+
+			// Parenthesis value
+			switch (Options.Default.SearchedParenthesisValue) {
+				case PARENTHESIS_VALUE_NUMBER_OF_TAGS: this.RadioButton_Parenthesis_NumberOfTags.IsChecked = true; break;
+				case PARENTHESIS_VALUE_NUMBER_OF_MATCHES: this.RadioButton_Parenthesis_NumberOfMatches.IsChecked = true; break;
+				case PARENTHESIS_VALUE_MATCH_SOURCE: this.RadioButton_Parenthesis_MatchSource.IsChecked = true; break;
+				case PARENTHESIS_VALUE_MATCH_SIMILARITY: this.RadioButton_Parenthesis_MatchSimilarity.IsChecked = true; break;
+				case PARENTHESIS_VALUE_HIGHEST_SIMILARITY: this.RadioButton_Parenthesis_HighestSimilarity.IsChecked = true; break;
 			}
 
 			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
@@ -72,7 +90,6 @@ namespace Hatate
 			this.TextBox_TaggedTag.IsEnabled = Options.Default.AddTaggedTag;
 
 			this.UpdateLabels();
-			this.ShowDialog();
 		}
 
 		/*
@@ -91,6 +108,17 @@ namespace Hatate
 			this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
 			this.Label_Delay.Content = "Delay (" + delay + "secs / " + (delay / 60) + "mins)";
 			this.CheckBox_Randomize.Content = "Randomize the delay (" + min + "~" + max + " secs / " + (min / 60) + "~" + (max / 60) + " mins)";
+		}
+
+		/*
+		============================================
+		Accessor
+		============================================
+		*/
+
+		public bool ListRefreshRequired
+		{
+			get { return this.listRefreshRequired; } 
 		}
 
 		/*
@@ -155,6 +183,26 @@ namespace Hatate
 			if (string.IsNullOrEmpty(Options.Default.TaggedTag)) {
 				Options.Default.TaggedTag = "hatate:tagged";
 				Options.Default.AddTaggedTag = false;
+			}
+
+			byte previousParenthesisValue = Options.Default.SearchedParenthesisValue;
+
+			// Parenthesis value
+			if ((bool)this.RadioButton_Parenthesis_NumberOfTags.IsChecked) {
+				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_NUMBER_OF_TAGS;
+			} else if ((bool)this.RadioButton_Parenthesis_NumberOfMatches.IsChecked) {
+				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_NUMBER_OF_MATCHES;
+			} else if ((bool)this.RadioButton_Parenthesis_MatchSource.IsChecked) {
+				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_MATCH_SOURCE;
+			} else if ((bool)this.RadioButton_Parenthesis_MatchSimilarity.IsChecked) {
+				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_MATCH_SIMILARITY;
+			} else if ((bool)this.RadioButton_Parenthesis_HighestSimilarity.IsChecked) {
+				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_HIGHEST_SIMILARITY;
+			}
+
+			// We'll need to refresh the list
+			if (previousParenthesisValue != Options.Default.SearchedParenthesisValue) {
+				this.listRefreshRequired = true;
 			}
 
 			int thumbWidth = 0;

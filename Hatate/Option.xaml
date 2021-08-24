@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Options" Width="608" MinWidth="608" Height="470" MinHeight="470" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Options" Width="608" MinWidth="608" Height="510" MinHeight="510" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
 		<CheckBox x:Name="CheckBox_AddRating" Content="Add rating to tags" HorizontalAlignment="Left" Margin="10,207,0,0" VerticalAlignment="Top" Height="14"/>
@@ -55,5 +55,11 @@
 		<ComboBox x:Name="Combo_SearchEngines" Margin="164,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" SelectionChanged="Combo_SearchEngines_SelectionChanged"/>
 		<CheckBox x:Name="CheckBox_RemoveResultAfter" Content="Remove file from list after writing tags or sending to Hydrus" HorizontalAlignment="Left" Margin="10,226,0,0" VerticalAlignment="Top" Height="14"/>
 		<CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,362,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
+		<Label Content="Display this value in parenthesis before a file name after searching:" Margin="10,380,10,0" VerticalAlignment="Top"/>
+		<RadioButton x:Name="RadioButton_Parenthesis_NumberOfTags" Content="Number of tags" HorizontalAlignment="Left" Margin="10,406,0,0" VerticalAlignment="Top"/>
+		<RadioButton x:Name="RadioButton_Parenthesis_NumberOfMatches" Content="Number of matches" HorizontalAlignment="Left" Margin="110,406,0,0" VerticalAlignment="Top"/>
+		<RadioButton x:Name="RadioButton_Parenthesis_HighestSimilarity" Content="Highest similarity" HorizontalAlignment="Left" Margin="420,406,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,0.577"/>
+		<RadioButton x:Name="RadioButton_Parenthesis_MatchSimilarity" Content="Match similarity" HorizontalAlignment="Left" Margin="319,406,0,0" VerticalAlignment="Top"/>
+		<RadioButton x:Name="RadioButton_Parenthesis_MatchSource" Content="Match source" HorizontalAlignment="Left" Margin="230,406,0,0" VerticalAlignment="Top"/>
 	</Grid>
 </Window>

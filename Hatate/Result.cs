@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Hatate.Properties;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using OptionsWindow = Hatate.Option;
 
 namespace Hatate
 {
@@ -143,6 +145,33 @@ namespace Hatate
 			}
 
 			this.Matches = ImmutableList.Create(matches.ToArray());
+		}
+
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		/// <summary>
+		/// Returns the highest similarity value across of matches.
+		/// </summary>
+		/// <returns></returns>
+		private float GetHighestMatchSimilarity()
+		{
+			if (!this.HasMatches) {
+				return 0;
+			}
+
+			float highestSimilarity = 0;
+
+			foreach (Match match in this.Matches) {
+				if (match.Similarity > highestSimilarity) {
+					highestSimilarity = match.Similarity;
+				}
+			}
+
+			return highestSimilarity;
 		}
 
 		/*
@@ -368,13 +397,35 @@ namespace Hatate
 		{
 			get
 			{
-				int count = this.Tags.Count;
-
-				if (count < 1) {
+				if (!this.Searched) {
 					return this.ImagePath;
 				}
 
-				return "(" + count + ") " + this.ImagePath;
+				string parenthesisText = null;
+
+				switch (Settings.Default.SearchedParenthesisValue) {
+					case OptionsWindow.PARENTHESIS_VALUE_NUMBER_OF_TAGS:
+						parenthesisText = this.Tags.Count.ToString();
+					break;
+					case OptionsWindow.PARENTHESIS_VALUE_NUMBER_OF_MATCHES:
+						parenthesisText = this.HasMatches ? this.Matches.Count.ToString() : "0";
+					break;
+					case OptionsWindow.PARENTHESIS_VALUE_MATCH_SOURCE:
+						parenthesisText = this.HasMatch ? this.Match.Source.ToString() : "unknown";
+					break;
+					case OptionsWindow.PARENTHESIS_VALUE_MATCH_SIMILARITY:
+						parenthesisText = (this.HasMatch ? ((int)this.Match.Similarity).ToString() : "0") + "%";
+					break;
+					case OptionsWindow.PARENTHESIS_VALUE_HIGHEST_SIMILARITY:
+						parenthesisText = ((int)this.GetHighestMatchSimilarity()).ToString() + "%";
+					break;
+				}
+
+				if (parenthesisText == null) {
+					return this.ImagePath;
+				}
+
+				return "(" + parenthesisText + ") " + this.ImagePath;
 			}
 		}
 

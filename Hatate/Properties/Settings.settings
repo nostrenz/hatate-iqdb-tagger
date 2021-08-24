@@ -155,5 +155,8 @@
     <Setting Name="HydrusPageName" Type="System.String" Scope="User">
       <Value Profile="(Default)">files</Value>
     </Setting>
+    <Setting Name="SearchedParenthesisValue" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
