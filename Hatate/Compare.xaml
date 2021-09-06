@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Compare" Width="800" MinWidth="400" Height="450" MinHeight="225" WindowStartupLocation="Manual" KeyDown="Window_KeyDown">
+        Title="Compare" Width="800" MinWidth="400" Height="450" MinHeight="225" WindowStartupLocation="Manual" KeyDown="Window_KeyDown" Closed="Window_Closed">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="133*"/>

@@ -12,6 +12,7 @@ namespace Hatate
 	public partial class Compare : Window
 	{
 		private Result result = null;
+		private BitmapImage bitmapImage = null;
 
 		public Compare()
 		{
@@ -53,8 +54,6 @@ namespace Hatate
 			this.Image_Local.Source = null;
 			this.Image_Remote.Source = null;
 
-			this.Status("Loading 0% " + this.result.Full);
-
 			try {
 				this.Image_Local.Source = App.CreateBitmapImage(result.ImagePath);
 				this.Image_Remote.Source = new BitmapImage(new Uri(result.PreviewUrl));
@@ -64,15 +63,20 @@ namespace Hatate
 				return;
 			}
 
-			BitmapImage bitmapImage = new BitmapImage();
+			this.bitmapImage = new BitmapImage();
 
-			bitmapImage.BeginInit();
-			bitmapImage.UriSource = new Uri(result.Full);
-			bitmapImage.CacheOption = BitmapCacheOption.OnDemand;
-			bitmapImage.DownloadProgress += this.FullImageLoadingProgress;
-			bitmapImage.DownloadCompleted += this.FullImageLoadingCompleted;
-			bitmapImage.DownloadFailed += this.FullImageLoadingCompleted;
-			bitmapImage.EndInit();
+			this.bitmapImage.BeginInit();
+			this.bitmapImage.UriSource = new Uri(result.Full);
+			this.bitmapImage.CacheOption = BitmapCacheOption.OnDemand;
+			this.bitmapImage.DownloadProgress += this.FullImageLoadingProgress;
+			this.bitmapImage.DownloadCompleted += this.FullImageLoadingCompleted;
+			this.bitmapImage.DownloadFailed += this.FullImageLoadingCompleted;
+			this.bitmapImage.EndInit();
+
+			// Image is already cached
+			if (!this.bitmapImage.IsDownloading) {
+				this.Image_Remote.Source = this.bitmapImage;
+			}
 
 			this.Show();
 		}
@@ -118,6 +122,11 @@ namespace Hatate
 			if (e.Key == Key.Escape) {
 				this.Close();
 			}
+		}
+
+		private void Window_Closed(object sender, EventArgs e)
+		{
+			this.bitmapImage = null;
 		}
 	}
 }
