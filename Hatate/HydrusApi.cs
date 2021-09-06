@@ -17,6 +17,9 @@ namespace Hatate
 		// Will turn true if the API is unreachable
 		private bool unreachable = false;
 
+		private ushort clientVersion = 0;
+		private ushort apiVersion = 0;
+
 		/*
 		============================================
 		Public
@@ -25,6 +28,23 @@ namespace Hatate
 
 		#region Public
 		
+		/// <summary>
+		/// Retrieves client and API versions.
+		/// </summary>
+		public async Task RetrieveVersions()
+		{
+			string json = await this.GetRequestAsync("/api_version");
+
+			if (string.IsNullOrEmpty(json)) {
+				return;
+			}
+
+			dynamic versions = JObject.Parse(json);
+
+			this.clientVersion = (ushort)versions.hydrus_version;
+			this.apiVersion = (ushort)versions.version;
+		}
+
 		/// <summary>
 		/// Get all the available tag services.
 		/// </summary>
@@ -43,17 +63,49 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Get all the available services.
+		/// </summary>
+		/// <returns></returns>
+		public async Task<JObject> GetServices()
+		{
+			string json = await this.GetRequestAsync("/get_services");
+
+			if (string.IsNullOrEmpty(json)) {
+				return null;
+			}
+
+			return JObject.Parse(json);
+		}
+
+		/// <summary>
 		/// Query Hydrus and obtain file IDs from a list of tags.
 		/// </summary>
 		/// <param name="tags"></param>
 		/// <param name="inbox"></param>
 		/// <param name="archive"></param>
 		/// <returns></returns>
-		public async Task<JArray> SearchFiles(string[] tags, bool inbox=false, bool archive=false)
+		public async Task<JArray> SearchFiles(string[] tags, bool inbox=false, bool archive=false, string tagServiceKey = null, string fileServiceKey=null)
 		{
-			string json = await this.GetRequestAsync("/get_files/search_files?system_inbox=" + this.BoolToString(inbox) + "&system_archive=" + this.BoolToString(archive) + "&tags=" + System.Uri.EscapeDataString(
+			string route = "/get_files/search_files?";
+
+			route += "system_inbox=" + this.BoolToString(inbox);
+			route += "&system_archive=" + this.BoolToString(archive);
+
+			if (this.SearchFilesSupportsServiceArguments) {
+				if (tagServiceKey != null) {
+					route += "&tag_service_key=" + tagServiceKey;
+				}
+
+				if (fileServiceKey != null) {
+					route += "&file_service_key=" + fileServiceKey;
+				}
+			}
+
+			route += "&tags=" + System.Uri.EscapeDataString(
 				Newtonsoft.Json.JsonConvert.SerializeObject(tags)
-			));
+			);
+
+			string json = await this.GetRequestAsync(route);
 
 			if (string.IsNullOrEmpty(json)) {
 				return null;
@@ -499,9 +551,29 @@ namespace Hatate
 		============================================
 		*/
 
+		public ushort ClientVersion
+		{
+			get { return this.clientVersion; }
+		}
+
+		public ushort ApiVersion
+		{
+			get { return this.apiVersion; }
+		}
+
 		public bool Unreachable
 		{
 			get { return this.unreachable; }
+		}
+
+		/// <summary>
+		/// Returns true if the /get_files/search_files API supports the following arguments:
+		/// file_service_name, file_service_key, tag_service_name and tag_service_key.
+		/// </summary>
+		/// <returns></returns>
+		public bool SearchFilesSupportsServiceArguments
+		{
+			get { return this.apiVersion >= 19; }
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using ContextMenu = System.Windows.Controls.ContextMenu;
@@ -36,7 +37,9 @@ namespace Hatate
 			DataObject.AddPastingHandler(this.TextBox_Tag, this.TextBox_Tag_Paste);
 
 			this.TextBox_Tag.Focus();
-			
+
+			this.GetHydrusServices();
+
 			this.ShowDialog();
 		}
 
@@ -115,6 +118,51 @@ namespace Hatate
 			this.hydrusMetadataList = null;
 			this.Button_ExecuteQuery.Content = "Execute query";
 			this.Button_ExecuteQuery.IsEnabled = true;
+		}
+
+		private async void GetHydrusServices()
+		{
+			await App.hydrusApi.RetrieveVersions();
+
+			// Hydrus API allows specifying the file and tag service in queries starting from API version 19
+			if (!App.hydrusApi.SearchFilesSupportsServiceArguments) {
+				return;
+			}
+
+			JObject services = await App.hydrusApi.GetServices();
+
+			foreach (var item in services) {
+				string key = (string)item.Key;
+				JArray jArray = (JArray)item.Value;
+
+				// File services
+				if (key == "local_files" || key == "file_repositories" || key == "all_local_files" || key == "all_known_files") {
+					foreach (JObject service in jArray) {
+						ComboBoxItem comboBoxItem = new ComboBoxItem();
+						comboBoxItem.Content = service.GetValue("name");
+						comboBoxItem.Tag = service.GetValue("service_key");
+
+						this.ComboBox_FileService.Items.Add(comboBoxItem);
+					}
+				} else if (key == "local_tags" || key == "tag_repositories" || key == "all_known_tags") { // Tag services
+					foreach (JObject service in jArray) {
+						ComboBoxItem comboBoxItem = new ComboBoxItem();
+						comboBoxItem.Content = service.GetValue("name");
+						comboBoxItem.Tag = service.GetValue("service_key");
+
+						this.ComboBox_TagService.Items.Add(comboBoxItem);
+					}
+				}
+			}
+
+			this.ComboBox_FileService.SelectedIndex = 0;
+			this.ComboBox_TagService.SelectedIndex = 0;
+
+			this.ComboBox_FileService.IsEnabled = true;
+			this.ComboBox_TagService.IsEnabled = true;
+
+			this.ComboBox_FileService.ToolTip = null;
+			this.ComboBox_TagService.ToolTip = null;
 		}
 
 		#endregion Private
@@ -201,8 +249,24 @@ namespace Hatate
 				}
 			}
 
+			string tagServiceKey = null;
+			string fileServiceKey = null;
+
+			if (App.hydrusApi.SearchFilesSupportsServiceArguments) {
+				ComboBoxItem selectedTagService = (ComboBoxItem)this.ComboBox_TagService.SelectedItem;
+				ComboBoxItem selectedFileService = (ComboBoxItem)this.ComboBox_FileService.SelectedItem;
+
+				if (selectedTagService != null) {
+					tagServiceKey = selectedTagService.Tag.ToString();
+				}
+
+				if (selectedFileService != null) {
+					fileServiceKey = selectedFileService.Tag.ToString();
+				}
+			}
+
 			// Get files
-			JArray fileIds = await App.hydrusApi.SearchFiles(this.Tags, (bool)this.CheckBox_InboxOnly.IsChecked, (bool)this.CheckBox_ArchiveOnly.IsChecked);
+			JArray fileIds = await App.hydrusApi.SearchFiles(this.Tags, (bool)this.CheckBox_InboxOnly.IsChecked, (bool)this.CheckBox_ArchiveOnly.IsChecked, tagServiceKey, fileServiceKey);
 
 			if (fileIds == null || fileIds.Count < 1) {
 				this.NoResult();
