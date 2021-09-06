@@ -53,7 +53,7 @@ namespace Hatate
 			this.Image_Local.Source = null;
 			this.Image_Remote.Source = null;
 
-			this.Status("Loading " + result.Full);
+			this.Status("Loading 0% " + this.result.Full);
 
 			try {
 				this.Image_Local.Source = App.CreateBitmapImage(result.ImagePath);
@@ -69,6 +69,7 @@ namespace Hatate
 			bitmapImage.BeginInit();
 			bitmapImage.UriSource = new Uri(result.Full);
 			bitmapImage.CacheOption = BitmapCacheOption.OnDemand;
+			bitmapImage.DownloadProgress += this.FullImageLoadingProgress;
 			bitmapImage.DownloadCompleted += this.FullImageLoadingCompleted;
 			bitmapImage.DownloadFailed += this.FullImageLoadingCompleted;
 			bitmapImage.EndInit();
@@ -92,6 +93,11 @@ namespace Hatate
 		Event
 		============================================
 		*/
+
+		private void FullImageLoadingProgress(object sender, DownloadProgressEventArgs e)
+		{
+			this.Status("Loading " + e.Progress + "% " + this.result.Full);
+		}
 
 		private void FullImageLoadingCompleted(object sender, EventArgs args)
 		{
