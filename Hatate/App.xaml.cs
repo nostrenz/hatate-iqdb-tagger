@@ -1,8 +1,11 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using Directory = System.IO.Directory;
 
 namespace Hatate
 {
@@ -79,6 +82,29 @@ namespace Hatate
 			}
 
 			textBox.Clear();
+		}
+
+		/// <summary>
+		/// Create a non-locked BitmapImage from a file path.
+		/// </summary>
+		/// <param name="filepath"></param>
+		public static BitmapImage CreateBitmapImage(string filepath)
+		{
+			BitmapImage bitmap = new BitmapImage();
+
+			try {
+				// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten)
+				bitmap.BeginInit();
+				bitmap.UriSource = new Uri(filepath);
+				bitmap.CacheOption = BitmapCacheOption.OnLoad;
+				bitmap.EndInit();
+			} catch (IOException) {
+				return null;
+			} catch (NotSupportedException) {
+				return null;
+			}
+
+			return bitmap;
 		}
 
 		/*

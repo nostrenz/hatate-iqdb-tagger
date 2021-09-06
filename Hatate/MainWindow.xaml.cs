@@ -40,6 +40,7 @@ namespace Hatate
 		private int notFound = 0;
 		private int delay = 0;
 		private Timer timer = new Timer();
+		private Compare compareWindow = null;
 
 		// List of accepted image extentions
 		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp", ".jfif", ".webp", ".tiff" };
@@ -1532,29 +1533,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Create a non-locked BitmapImage from a file path.
-		/// </summary>
-		/// <param name="filepath"></param>
-		private BitmapImage CreateBitmapImage(string filepath)
-		{
-			BitmapImage bitmap = new BitmapImage();
-
-			try {
-				// Specifying those options does not lock the file on disk (meaning it can be deleted or overwritten)
-				bitmap.BeginInit();
-				bitmap.UriSource = new Uri(filepath);
-				bitmap.CacheOption = BitmapCacheOption.OnLoad;
-				bitmap.EndInit();
-			} catch (IOException) {
-				return null;
-			} catch (NotSupportedException) {
-				return null;
-			}
-
-			return bitmap;
-		}
-
-		/// <summary>
 		/// Set a tag list as items source for a listbox.
 		/// </summary>
 		/// <param name="listBox"></param>
@@ -1991,6 +1969,24 @@ namespace Hatate
 			System.Windows.Forms.MessageBox.Show("Unable to find the latest release.\nPlease check the Github repository to download it.\n\n" + App.GITHUB_REPOSITORY_URL);
 		}
 
+		/// <summary>
+		/// Opens a window displaying the local and remote iamge for a result.
+		/// </summary>
+		/// <param name="result"></param>
+		private void OpenCompareWindowForResult(Result result)
+		{
+			if (result == null || !result.HasMatch) {
+				return;
+			}
+
+			if (this.compareWindow == null) {
+				this.compareWindow = new Compare();
+				this.compareWindow.Closed += this.CompareWindow_Closed;
+			}
+			
+			this.compareWindow.LoadResultImages(result);
+		}
+
 		#endregion Private
 
 		/*
@@ -2155,7 +2151,7 @@ namespace Hatate
 				return;
 			}
 
-			this.Image_Local.Source = this.CreateBitmapImage(result.ThumbPath);
+			this.Image_Local.Source = App.CreateBitmapImage(result.ThumbPath);
 			this.Label_SourceInfos.Content = this.HumanReadableFileSize(result.Local.Size) + " (" + result.Local.Width + "x" + result.Local.Height + ")";
 
 			if (result.Local.Format != null) {
@@ -2857,6 +2853,12 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void Image_Original_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			if (e.ChangedButton == System.Windows.Input.MouseButton.Right) {
+				this.OpenCompareWindowForResult(this.SelectedResult);
+
+				return;
+			}
+
 			string filepath = this.SelectedResult.ImagePath;
 
 			if (File.Exists(filepath)) {
@@ -2872,6 +2874,12 @@ namespace Hatate
 		private void Image_Match_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			Result result = this.SelectedResult;
+
+			if (e.ChangedButton == System.Windows.Input.MouseButton.Right) {
+				this.OpenCompareWindowForResult(result);
+
+				return;
+			}
 
 			if (result == null || String.IsNullOrEmpty(result.Url)) {
 				return;
@@ -2955,6 +2963,11 @@ namespace Hatate
 			if (Options.Default.StartupReleaseCheck) {
 				await Task.Run(() => this.CheckForNewRelease(false));
 			}
+		}
+
+		private void CompareWindow_Closed(object sender, EventArgs e)
+		{
+			this.compareWindow = null;
 		}
 
 		#endregion Event

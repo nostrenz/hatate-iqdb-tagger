@@ -1,0 +1,20 @@
+﻿<Window x:Class="Hatate.Compare"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hatate"
+        mc:Ignorable="d"
+        Title="Compare" Width="800" MinWidth="400" Height="450" MinHeight="225" WindowStartupLocation="Manual" KeyDown="Window_KeyDown">
+	<Grid Background="{DynamicResource WindowBackground}">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="133*"/>
+			<ColumnDefinition Width="131*"/>
+		</Grid.ColumnDefinitions>
+		<Image x:Name="Image_Local" Margin="10,10,10,38"/>
+		<Image x:Name="Image_Remote" Margin="10,10,10,38" Grid.Column="1"/>
+		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}" Grid.ColumnSpan="2">
+			<Label x:Name="Label_Status" Content="Status"/>
+		</StatusBar>
+	</Grid>
+</Window>
