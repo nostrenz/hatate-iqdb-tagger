@@ -1,4 +1,6 @@
-﻿namespace Hatate.Parser
+﻿using System.Text.RegularExpressions;
+
+namespace Hatate.Parser
 {
 	class Zerochan : Page, IParser
 	{
@@ -16,6 +18,7 @@
 				return false;
 			}
 
+			// Get tags
 			foreach (Supremes.Nodes.Element tagRow in tagRows) {
 				Supremes.Nodes.Elements link = tagRow.Select("a");
 
@@ -57,6 +60,31 @@
 				}
 
 				this.AddTag(value.ToLower(), nameSpace);
+			}
+
+			// Get informations
+			Supremes.Nodes.Element imageLink = doc.Select("#large > a.preview").First;
+			Supremes.Nodes.Elements paragraphs = doc.Select("#large > p");
+
+			if (imageLink != null) {
+				this.full = imageLink.Attr("href");
+			}
+
+			Regex resolutionnRegex = new Regex(@"\d+x\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+			foreach (Supremes.Nodes.Element paragraph in paragraphs) {
+				MatchCollection resolutionMatches = resolutionnRegex.Matches(paragraph.OwnText);
+
+				if (resolutionMatches.Count == 1) {
+					GroupCollection groups = resolutionMatches[0].Groups;
+					this.parseResolution(groups[0].Value);
+				}
+
+				Supremes.Nodes.Element span = paragraph.Select("> span").First;
+
+				if (span != null && !string.IsNullOrWhiteSpace(span.OwnText)) {
+					this.size = this.KbOrMbToBytes(span.OwnText);
+				}
 			}
 
 			return true;

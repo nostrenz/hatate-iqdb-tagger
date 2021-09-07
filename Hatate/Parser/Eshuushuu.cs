@@ -47,6 +47,11 @@
 
 			// Get informations
 			Supremes.Nodes.Element imageBlock = doc.Select("#content .image_block").First;
+
+			if (imageBlock == null) {
+				return true;
+			}
+
 			Supremes.Nodes.Element imageLink = imageBlock.Select(".thumb > a.thumb_image[href]").First;
 			Supremes.Nodes.Elements metas = imageBlock.Select(".meta > dl").Select("> *");
 
@@ -71,12 +76,7 @@
 						dimensions = dimensions.Substring(0, dimensions.IndexOf(" "));
 					}
 
-					string[] parts = dimensions.Split('x');
-
-					if (parts.Length == 2) {
-						int.TryParse(parts[0], out this.width);
-						int.TryParse(parts[1], out this.height);
-					}
+					this.parseResolution(dimensions);
 				}
 			}
 

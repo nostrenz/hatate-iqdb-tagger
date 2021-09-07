@@ -55,12 +55,7 @@
 						int end = content.LastIndexOf(')');
 
 						if (start > 0 && end > 0) {
-							string[] parts = content.Substring(start + 1, end - start - 1).Split('x');
-
-							if (parts.Length == 2) {
-								int.TryParse(parts[0], out this.width);
-								int.TryParse(parts[1], out this.height);
-							}
+							this.parseResolution(content.Substring(start + 1, end - start - 1));
 						}
 					} else if (content.StartsWith("Rating:")) {
 						this.rating = content.Substring("Rating:".Length);

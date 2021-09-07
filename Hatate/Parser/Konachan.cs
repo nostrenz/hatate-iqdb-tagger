@@ -18,6 +18,23 @@
 				this.GetRating(doc, "#stats li");
 			}
 
+			// Get informations
+			Supremes.Nodes.Elements statsLis = doc.Select("#stats li");
+			Supremes.Nodes.Element highresLink = doc.Select("#highres").First;
+			Supremes.Nodes.Element pngLink = doc.Select("#png").First;
+
+			foreach (Supremes.Nodes.Element li in statsLis) {
+				if (li.Text.StartsWith("Size: ")) {
+					this.parseResolution(li.Text.Substring(li.Text.IndexOf(' ') + 1));
+				}
+			}
+
+			if (pngLink != null) {
+				this.GetFullImageUrlAndSizeFromLink(pngLink);
+			} else if (highresLink != null) {
+				this.GetFullImageUrlAndSizeFromLink(highresLink);
+			}
+
 			return true;
 		}
 
@@ -53,6 +70,25 @@
 				}
 
 				this.tags.Add(tag);
+			}
+		}
+
+		/// <summary>
+		/// Extract the full image URL and the image size from a link element.
+		/// </summary>
+		/// <param name="link"></param>
+		private void GetFullImageUrlAndSizeFromLink(Supremes.Nodes.Element link)
+		{
+			this.full = link.Attr("href");
+
+			string linkText = link.Text;
+			linkText = linkText.Replace(" JPG", "");
+
+			int start = linkText.LastIndexOf('(');
+			int end = linkText.LastIndexOf(')');
+
+			if (start > 0 && end > 0) {
+				this.size = this.KbOrMbToBytes(linkText.Substring(start + 1, end - start - 1));
 			}
 		}
 	}

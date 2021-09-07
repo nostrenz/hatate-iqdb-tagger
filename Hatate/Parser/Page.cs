@@ -7,6 +7,9 @@ namespace Hatate.Parser
 	// Base class for the booru parsers.
 	abstract class Page
 	{
+		private const string KB = "KB";
+		private const string MB = "MB";
+
 		const string RATING = "Rating: ";
 
 		private string url;
@@ -117,11 +120,14 @@ namespace Hatate.Parser
 			float value = 0;
 			int multiplier = 0;
 
-			if (size.EndsWith("KB")) {
-				size = size.Substring(0, size.LastIndexOf("KB")).Trim();
+			// Ignore case
+			size = size.ToUpper();
+
+			if (size.EndsWith(KB)) {
+				size = size.Substring(0, size.LastIndexOf(KB)).Trim();
 				multiplier = 1000;
-			} else if (size.EndsWith("MB")) {
-				size = size.Substring(0, size.LastIndexOf("MB")).Trim();
+			} else if (size.EndsWith(MB)) {
+				size = size.Substring(0, size.LastIndexOf(MB)).Trim();
 				multiplier = 1000000;
 			}
 
@@ -132,6 +138,20 @@ namespace Hatate.Parser
 			}
 
 			return (long)(value * multiplier);
+		}
+
+		/// <summary>
+		/// Parse a string like "800x600" to extract width and height.
+		/// </summary>
+		/// <param name="resolution"></param>
+		protected void parseResolution(string resolution)
+		{
+			string[] parts = resolution.Split('x');
+
+			if (parts.Length == 2) {
+				int.TryParse(parts[0], out this.width);
+				int.TryParse(parts[1], out this.height);
+			}
 		}
 
 		/*

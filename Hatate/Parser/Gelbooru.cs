@@ -57,6 +57,12 @@
 						}
 					}
 				}
+
+				Supremes.Nodes.Element link = li.Select("> a").First;
+
+				if (link != null && link.Text == "Original image") {
+					this.full = link.Attr("href");
+				}
 			}
 
 			return true;
