@@ -64,9 +64,18 @@ namespace Hatate
 			}
 
 			this.bitmapImage = new BitmapImage();
+			Uri fullImageUri = null;
+
+			try {
+				fullImageUri = new Uri(result.Full);
+			} catch (UriFormatException) {
+				this.Status("Invalid image URL: " + result.Full);
+
+				return;
+			}
 
 			this.bitmapImage.BeginInit();
-			this.bitmapImage.UriSource = new Uri(result.Full);
+			this.bitmapImage.UriSource = fullImageUri;
 			this.bitmapImage.CacheOption = BitmapCacheOption.OnDemand;
 			this.bitmapImage.DownloadProgress += this.FullImageLoadingProgress;
 			this.bitmapImage.DownloadCompleted += this.FullImageLoadingCompleted;
