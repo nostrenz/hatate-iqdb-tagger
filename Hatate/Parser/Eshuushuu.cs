@@ -2,6 +2,8 @@
 {
 	class Eshuushuu : Page, IParser
 	{
+		private const string URL = "https://e-shuushuu.net";
+
 		/*
 		============================================
 		Protected
@@ -40,6 +42,41 @@
 
 				if (rating.Text != "N/A") {
 					this.AddTag(rating.Text, "rating");
+				}
+			}
+
+			// Get informations
+			Supremes.Nodes.Element imageBlock = doc.Select("#content .image_block").First;
+			Supremes.Nodes.Element imageLink = imageBlock.Select(".thumb > a.thumb_image[href]").First;
+			Supremes.Nodes.Elements metas = imageBlock.Select(".meta > dl").Select("> *");
+
+			if (imageLink != null) {
+				this.full = URL + imageLink.Attr("href");
+			}
+
+			for (byte i = 0; i < metas.Count; i += 2) {
+				if (i+1 >= metas.Count) {
+					break;
+				}
+
+				Supremes.Nodes.Element dt = metas[i];
+				Supremes.Nodes.Element dd = metas[i+1];
+
+				if (dt.Text == "File size:") {
+					this.size = this.KbOrMbToBytes(dd.Text);
+				} else if (dt.Text == "Dimensions:") {
+					string dimensions = dd.Text;
+
+					if (dimensions.Contains("(")) {
+						dimensions = dimensions.Substring(0, dimensions.IndexOf(" "));
+					}
+
+					string[] parts = dimensions.Split('x');
+
+					if (parts.Length == 2) {
+						int.TryParse(parts[0], out this.width);
+						int.TryParse(parts[1], out this.height);
+					}
 				}
 			}
 
