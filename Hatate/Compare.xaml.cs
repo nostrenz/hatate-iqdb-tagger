@@ -65,6 +65,28 @@ namespace Hatate
 				return;
 			}
 
+			if (result.Full != null) {
+				this.LoadResultFullImage(result);
+			} else {
+				this.Status("Full image not available for this match, displaying preview image instead.");
+			}
+
+			this.Show();
+		}
+
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		private void Status(string message)
+		{
+			this.Label_Status.Content = message;
+		}
+
+		private void LoadResultFullImage(Result result)
+		{
 			this.bitmapImage = new BitmapImage();
 			Uri fullImageUri = null;
 
@@ -89,19 +111,6 @@ namespace Hatate
 				this.Image_Remote.Source = this.bitmapImage;
 				this.Status(result.Full);
 			}
-
-			this.Show();
-		}
-
-		/*
-		============================================
-		Private
-		============================================
-		*/
-
-		private void Status(string message)
-		{
-			this.Label_Status.Content = message;
 		}
 
 		/*

@@ -1980,7 +1980,7 @@ namespace Hatate
 			}
 
 			// Missing images to be displayed in the window
-			if (result.ImagePath == null || result.PreviewUrl == null || result.Full == null) {
+			if (result.ImagePath == null || result.PreviewUrl == null) {
 				return;
 			}
 
