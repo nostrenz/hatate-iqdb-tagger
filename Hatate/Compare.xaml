@@ -14,7 +14,7 @@
 		<Image x:Name="Image_Local" Margin="10,10,10,38"/>
 		<Image x:Name="Image_Remote" Margin="10,10,10,38" Grid.Column="1"/>
 		<StatusBar Height="32" VerticalAlignment="Bottom" Background="{DynamicResource HeaderBackground}" Grid.ColumnSpan="2">
-			<Label x:Name="Label_Status" Content="Status"/>
+			<Label x:Name="Label_Status" Content="Full image not yet retrieved"/>
 		</StatusBar>
 	</Grid>
 </Window>

@@ -47,6 +47,8 @@ namespace Hatate
 		{
 			// Already loaded
 			if (this.result != null && result.ImagePath == this.result.ImagePath && result.Full == this.result.Full) {
+				this.Status(result.Full);
+
 				return;
 			}
 
@@ -85,6 +87,7 @@ namespace Hatate
 			// Image is already cached
 			if (!this.bitmapImage.IsDownloading) {
 				this.Image_Remote.Source = this.bitmapImage;
+				this.Status(result.Full);
 			}
 
 			this.Show();
