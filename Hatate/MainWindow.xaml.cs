@@ -2557,6 +2557,17 @@ namespace Hatate
 			item.Header = "Delete file";
 			item.Tag = "deleteFiles";
 			item.Click += this.ContextMenu_MenuItem_Click;
+
+			// Disable item if it's an Hydrus file
+			if (singleSelected) {
+				Result result = this.SelectedResult;
+
+				if (result != null && this.IsHydrusOwnedFolder(result.ImagePath)) {
+					item.IsEnabled = false;
+					item.ToolTip = "Can't delete this file as it's one of the Hydrus client files.";
+				}
+			}
+
 			context.Items.Add(item);
 
 			this.ListBox_Files.ContextMenu = context;
