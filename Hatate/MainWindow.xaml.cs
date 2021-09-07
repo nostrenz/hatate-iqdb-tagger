@@ -28,6 +28,7 @@ namespace Hatate
 	{
 		const int MAX_PATH_LENGTH = 260;
 		const string DIR_THUMBS = @"\thumbs\";
+		const string DIR_TEMP = @"\temp\";
 
 		const string TXT_IGNOREDS     = "ignoreds.txt";
 		const string TXT_MATCHED_URLS = "matched_urls.txt";
@@ -44,7 +45,6 @@ namespace Hatate
 
 		// List of accepted image extentions
 		private string[] imagesFilesExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp", ".jfif", ".webp", ".tiff" };
-
 
 		public MainWindow()
 		{
@@ -1992,6 +1992,15 @@ namespace Hatate
 			this.compareWindow.LoadResultImages(result);
 		}
 
+		private string GetFolderPath(string relativePath)
+		{
+			string path = App.appDir + relativePath;
+
+			this.CreateDirIfNeeded(path);
+
+			return path;
+		}
+
 		#endregion Private
 
 		/*
@@ -2007,13 +2016,15 @@ namespace Hatate
 		/// </summary>
 		private string ThumbsDirPath
 		{
-			get {
-				string path = App.appDir + DIR_THUMBS;
+			get { return this.GetFolderPath(DIR_THUMBS); }
+		}
 
-				this.CreateDirIfNeeded(path);
-
-				return path;
-			}
+		/// <summary>
+		/// Get the full path to the temp folder under the application directory.
+		/// </summary>
+		private string TempDirPath
+		{
+			get { return this.GetFolderPath(DIR_TEMP); }
 		}
 
 		/// <summary>
@@ -2692,7 +2703,6 @@ namespace Hatate
 			this.AddFiles();
 		}
 
-
 		/// <summary>
 		/// Called when clicking on the "Add files" menubar item, open a dialog to select a folder to add all its files to the list.
 		/// </summary>
@@ -2701,6 +2711,44 @@ namespace Hatate
 		private void MenuItem_AddFolder_Click(object sender, RoutedEventArgs e)
 		{
 			this.AddFolder();
+		}
+
+		/// <summary>
+		/// Add an image from the clipboard.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_AddFromClipboard_Click(object sender, RoutedEventArgs e)
+		{
+			if (!Clipboard.ContainsImage()) {
+				MessageBox.Show("The clipboard doesn't contains an image.");
+
+				return;
+			}
+
+			IDataObject clipboardData = Clipboard.GetDataObject();
+
+			if (clipboardData == null) {
+				MessageBox.Show("The clipboard is empty.");
+
+				return;
+			}
+
+			if (!clipboardData.GetDataPresent(System.Windows.Forms.DataFormats.Bitmap)) {
+				return;
+			}
+
+			System.Windows.Interop.InteropBitmap interopBitmap = (System.Windows.Interop.InteropBitmap)clipboardData.GetData(System.Windows.Forms.DataFormats.Bitmap);
+			string filePath = this.TempDirPath + DateTime.Now.ToString("yyyy-mm-dd-hh-mm-ss") + ".png";
+
+			// Save to file
+			using (var fileStream = new FileStream(filePath, FileMode.Create)) {
+				BitmapEncoder encoder = new PngBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(interopBitmap));
+				encoder.Save(fileStream);
+			}
+
+			this.AddFileToList(filePath);
 		}
 
 		/// <summary>
