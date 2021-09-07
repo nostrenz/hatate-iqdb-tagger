@@ -1979,6 +1979,11 @@ namespace Hatate
 				return;
 			}
 
+			// Missing images to be displayed in the window
+			if (result.ImagePath == null || result.PreviewUrl == null || result.Full == null) {
+				return;
+			}
+
 			if (this.compareWindow == null) {
 				this.compareWindow = new Compare();
 				this.compareWindow.Closed += this.CompareWindow_Closed;
