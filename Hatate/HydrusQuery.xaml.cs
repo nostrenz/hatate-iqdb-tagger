@@ -15,7 +15,6 @@ namespace Hatate
 	/// </summary>
 	public partial class HydrusQuery : Window
 	{
-		const int WARN_LIMIT = 1000;
 		private List<HydrusMetadata> hydrusMetadataList = null;
 
 		public HydrusQuery()
@@ -288,8 +287,7 @@ namespace Hatate
 			}
 
 			// Warn the user about a huge number of files being imported
-			if (fileIds.Count >= WARN_LIMIT && !App.AskUser("You're about to import " + fileIds.Count + " files, are you sure about that?")) {
-				this.TextBox_Limit.Text = (WARN_LIMIT - 1).ToString();
+			if ((bool)this.CheckBox_WarnBeforeImport.IsChecked && !App.AskUser("You're about to import " + fileIds.Count + " files, are you sure about that?")) {
 				this.CancelQuery();
 
 				return;
