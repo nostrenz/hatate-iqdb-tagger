@@ -2010,6 +2010,9 @@ namespace Hatate
 			}
 
 			this.AddFileToList(filePath);
+
+			this.UpdateLabels();
+			this.ChangeStartButtonEnabledValue();
 		}
 
 		#endregion Private
@@ -2738,9 +2741,14 @@ namespace Hatate
 		{
 			Capture captureWindow = new Capture();
 
-			if (captureWindow.FilePath != null) {
-				this.AddFileToList(captureWindow.FilePath);
+			if (captureWindow.FilePath == null) {
+				return;
 			}
+
+			this.AddFileToList(captureWindow.FilePath);
+
+			this.UpdateLabels();
+			this.ChangeStartButtonEnabledValue();
 		}
 
 		/// <summary>
