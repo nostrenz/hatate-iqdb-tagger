@@ -27,8 +27,6 @@ namespace Hatate
 	public partial class MainWindow : Window
 	{
 		const int MAX_PATH_LENGTH = 260;
-		const string DIR_THUMBS = @"\thumbs\";
-		const string DIR_TEMP = @"\temp\";
 
 		const string TXT_IGNOREDS     = "ignoreds.txt";
 		const string TXT_MATCHED_URLS = "matched_urls.txt";
@@ -170,7 +168,7 @@ namespace Hatate
 				return true;
 			}
 
-			string thumbsDir = this.ThumbsDirPath;
+			string thumbsDir = App.ThumbsDirPath;
 			result.ThumbPath = thumbsDir + this.GetFilenameFromPath(result.ImagePath);
 
 			// Get extension
@@ -1263,17 +1261,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Create a directory if it doesn't exists yet.
-		/// </summary>
-		/// <returns></returns>
-		private void CreateDirIfNeeded(string path)
-		{
-			if (!Directory.Exists(path)) {
-				Directory.CreateDirectory(path);
-			}
-		}
-
-		/// <summary>
 		/// Check if a file is an image using the extension.
 		/// </summary>
 		/// <param name="path"></param>
@@ -1992,15 +1979,6 @@ namespace Hatate
 			this.compareWindow.LoadResultImages(result);
 		}
 
-		private string GetFolderPath(string relativePath)
-		{
-			string path = App.appDir + relativePath;
-
-			this.CreateDirIfNeeded(path);
-
-			return path;
-		}
-
 		private void ImportImageFromClipboard()
 		{
 			if (!Clipboard.ContainsImage()) {
@@ -2022,7 +2000,7 @@ namespace Hatate
 			}
 
 			System.Windows.Interop.InteropBitmap interopBitmap = (System.Windows.Interop.InteropBitmap)clipboardData.GetData(System.Windows.Forms.DataFormats.Bitmap);
-			string filePath = this.TempDirPath + DateTime.Now.ToString("yyyy-mm-dd-hh-mm-ss") + ".png";
+			string filePath = App.TempPngFilePath;
 
 			// Save to file
 			using (var fileStream = new FileStream(filePath, FileMode.Create)) {
@@ -2043,22 +2021,6 @@ namespace Hatate
 		*/
 
 		#region Accessor
-
-		/// <summary>
-		/// Get the full path to the thumbs folder under the application directory.
-		/// </summary>
-		private string ThumbsDirPath
-		{
-			get { return this.GetFolderPath(DIR_THUMBS); }
-		}
-
-		/// <summary>
-		/// Get the full path to the temp folder under the application directory.
-		/// </summary>
-		private string TempDirPath
-		{
-			get { return this.GetFolderPath(DIR_TEMP); }
-		}
 
 		/// <summary>
 		/// Check if the search process is currently running.
@@ -2654,7 +2616,7 @@ namespace Hatate
 		{
 			this.SetStatus("Deleting thumbnails...");
 
-			string[] files = Directory.GetFiles(this.ThumbsDirPath);
+			string[] files = Directory.GetFiles(App.ThumbsDirPath);
 			int deleted = 0;
 			int locked = 0;
 
@@ -2775,6 +2737,10 @@ namespace Hatate
 		private void MenuItem_AddFromArea_Click(object sender, RoutedEventArgs e)
 		{
 			Capture captureWindow = new Capture();
+
+			if (captureWindow.FilePath != null) {
+				this.AddFileToList(captureWindow.FilePath);
+			}
 		}
 
 		/// <summary>
@@ -2796,7 +2762,7 @@ namespace Hatate
 			foreach (HydrusMetadata hydrusMetadata in hydrusMetadataList) {
 				count++;
 
-				string thumbnailPath = await App.hydrusApi.DownloadThumbnailAsync(hydrusMetadata, this.ThumbsDirPath);
+				string thumbnailPath = await App.hydrusApi.DownloadThumbnailAsync(hydrusMetadata, App.ThumbsDirPath);
 
 				this.SetStatus("Adding query file " + count + " / " + hydrusMetadataList.Count);
 				this.AddFileToList(thumbnailPath, null, hydrusMetadata);

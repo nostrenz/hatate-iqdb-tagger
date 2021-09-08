@@ -22,6 +22,9 @@ namespace Hatate
 		public static string appDir = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 		public static HydrusApi hydrusApi = new HydrusApi();
 
+		private const string DIR_THUMBS = @"\thumbs\";
+		private const string DIR_TEMP = @"\temp\";
+
 		public App() : base()
 		{
 			#if !DEBUG
@@ -105,6 +108,63 @@ namespace Hatate
 			}
 
 			return bitmap;
+		}
+
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		private static string GetFolderPath(string relativePath)
+		{
+			string path = App.appDir + relativePath;
+
+			App.CreateDirIfNeeded(path);
+
+			return path;
+		}
+
+		/// <summary>
+		/// Create a directory if it doesn't exists yet.
+		/// </summary>
+		/// <returns></returns>
+		private static void CreateDirIfNeeded(string path)
+		{
+			if (!Directory.Exists(path)) {
+				Directory.CreateDirectory(path);
+			}
+		}
+
+		/*
+		============================================
+		Accessor
+		============================================
+		*/
+
+		/// <summary>
+		/// Get the full path to the thumbs folder under the application directory.
+		/// </summary>
+		public static string ThumbsDirPath
+		{
+			get { return App.GetFolderPath(DIR_THUMBS); }
+		}
+
+		/// <summary>
+		/// Get the full path to the temp folder under the application directory.
+		/// </summary>
+		public static string TempDirPath
+		{
+			get { return App.GetFolderPath(DIR_TEMP); }
+		}
+
+		/// <summary>
+		/// Returns a filename usable for writing a temporary PNG file.
+		/// </summary>
+		/// <returns></returns>
+		public static string TempPngFilePath
+		{
+			get { return App.TempDirPath +  DateTime.Now.ToString("yyyymmddhhmmssffff") + ".png"; }
 		}
 
 		/*

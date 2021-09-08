@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Hatate
 {
@@ -25,6 +27,38 @@ namespace Hatate
 
 		private void CaptureArea()
 		{
+			// Set full opacity before capturing
+			this.Background.Opacity = 0;
+
+			// Same thickness on all sides
+			int borderThickness = (int)this.Border_Area.BorderThickness.Left;
+
+			int left = (int)this.Border_Area.Margin.Left + borderThickness;
+			int top = (int)this.Border_Area.Margin.Top + borderThickness;
+			int width = (int)this.Border_Area.Width - borderThickness*2;
+			int height = (int)this.Border_Area.Height - borderThickness*2;
+			this.FilePath = App.TempPngFilePath;
+
+			try {
+				Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+				Graphics graphics = Graphics.FromImage(bitmap);
+
+				graphics.CopyFromScreen(left, top, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
+				bitmap.Save(this.FilePath, ImageFormat.Png);
+			} catch (System.Exception) {
+				this.FilePath = null;
+			}
+		}
+
+		/*
+		============================================
+		Accessor
+		============================================
+		*/
+
+		public string FilePath
+		{
+			get; internal set;
 		}
 
 		/*
@@ -50,7 +84,7 @@ namespace Hatate
 				return;
 			}
 
-			Point point = e.GetPosition(this);
+			System.Windows.Point point = e.GetPosition(this);
 
 			this.xPos = point.X;
 			this.yPos = point.Y;
@@ -77,10 +111,32 @@ namespace Hatate
 				return;
 			}
 
-			Point point = e.GetPosition(this);
+			System.Windows.Point point = e.GetPosition(this);
+			double width = 0;
+			double height = 0;
+			double x = this.xPos;
+			double y = this.yPos;
 
-			this.Border_Area.Width = point.X - this.xPos;
-			this.Border_Area.Height = point.Y - this.yPos;
+			if (point.X >= this.xPos) {
+				width = point.X - this.xPos;
+			} else {
+				width = this.xPos - point.X;
+				x = point.X;
+			}
+
+			if (point.Y >= this.yPos) {
+				height = point.Y - this.yPos;
+			} else {
+				height = this.yPos - point.Y;
+				y = point.Y;
+			}
+
+			if (width < 0) width = 0;
+			if (height < 0) height = 0;
+
+			this.Border_Area.Width = width;
+			this.Border_Area.Height = height;
+			this.Border_Area.Margin = new Thickness(x, y, 0, 0);
 		}
 	}
 }
