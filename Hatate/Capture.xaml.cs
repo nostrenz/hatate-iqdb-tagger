@@ -35,9 +35,6 @@ namespace Hatate
 
 		private void CaptureArea()
 		{
-			// Set full opacity before capturing
-			this.Background.Opacity = 0;
-
 			// Same thickness on all sides
 			int borderThickness = (int)this.Border_Area.BorderThickness.Left;
 
@@ -109,8 +106,9 @@ namespace Hatate
 				return;
 			}
 
-			this.CaptureArea();
+			// We'll capture the area right after closing the window so it won't be in the way
 			this.Close();
+			this.CaptureArea();
 		}
 
 		private void Window_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
