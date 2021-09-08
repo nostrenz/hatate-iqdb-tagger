@@ -118,6 +118,9 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Capture.xaml.cs">
+      <DependentUpon>Capture.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Compare.xaml.cs">
       <DependentUpon>Compare.xaml</DependentUpon>
     </Compile>
@@ -163,6 +166,10 @@
     <Compile Include="Source.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Capture.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

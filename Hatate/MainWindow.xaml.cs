@@ -2768,6 +2768,16 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Add an image from capturing an area on the screen.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_AddFromArea_Click(object sender, RoutedEventArgs e)
+		{
+			Capture captureWindow = new Capture();
+		}
+
+		/// <summary>
 		/// Opens a window allowing to enter a Hydrus query and import the returned files.
 		/// </summary>
 		/// <param name="sender"></param>
