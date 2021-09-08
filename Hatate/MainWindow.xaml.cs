@@ -2001,6 +2001,39 @@ namespace Hatate
 			return path;
 		}
 
+		private void ImportImageFromClipboard()
+		{
+			if (!Clipboard.ContainsImage()) {
+				MessageBox.Show("The clipboard doesn't contains an image.");
+
+				return;
+			}
+
+			IDataObject clipboardData = Clipboard.GetDataObject();
+
+			if (clipboardData == null) {
+				MessageBox.Show("The clipboard is empty.");
+
+				return;
+			}
+
+			if (!clipboardData.GetDataPresent(System.Windows.Forms.DataFormats.Bitmap)) {
+				return;
+			}
+
+			System.Windows.Interop.InteropBitmap interopBitmap = (System.Windows.Interop.InteropBitmap)clipboardData.GetData(System.Windows.Forms.DataFormats.Bitmap);
+			string filePath = this.TempDirPath + DateTime.Now.ToString("yyyy-mm-dd-hh-mm-ss") + ".png";
+
+			// Save to file
+			using (var fileStream = new FileStream(filePath, FileMode.Create)) {
+				BitmapEncoder encoder = new PngBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(interopBitmap));
+				encoder.Save(fileStream);
+			}
+
+			this.AddFileToList(filePath);
+		}
+
 		#endregion Private
 
 		/*
@@ -2731,35 +2764,7 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_AddFromClipboard_Click(object sender, RoutedEventArgs e)
 		{
-			if (!Clipboard.ContainsImage()) {
-				MessageBox.Show("The clipboard doesn't contains an image.");
-
-				return;
-			}
-
-			IDataObject clipboardData = Clipboard.GetDataObject();
-
-			if (clipboardData == null) {
-				MessageBox.Show("The clipboard is empty.");
-
-				return;
-			}
-
-			if (!clipboardData.GetDataPresent(System.Windows.Forms.DataFormats.Bitmap)) {
-				return;
-			}
-
-			System.Windows.Interop.InteropBitmap interopBitmap = (System.Windows.Interop.InteropBitmap)clipboardData.GetData(System.Windows.Forms.DataFormats.Bitmap);
-			string filePath = this.TempDirPath + DateTime.Now.ToString("yyyy-mm-dd-hh-mm-ss") + ".png";
-
-			// Save to file
-			using (var fileStream = new FileStream(filePath, FileMode.Create)) {
-				BitmapEncoder encoder = new PngBitmapEncoder();
-				encoder.Frames.Add(BitmapFrame.Create(interopBitmap));
-				encoder.Save(fileStream);
-			}
-
-			this.AddFileToList(filePath);
+			this.ImportImageFromClipboard();
 		}
 
 		/// <summary>
@@ -3029,9 +3034,26 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Callend when the Compare window is closed.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void CompareWindow_Closed(object sender, EventArgs e)
 		{
 			this.compareWindow = null;
+		}
+
+		/// <summary>
+		/// Callend when pasting in the MainWindow by having it focused and hitting Ctrl + V.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MainWindow_Paste(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			this.ImportImageFromClipboard();
+
+			e.Handled = true;
 		}
 
 		#endregion Event

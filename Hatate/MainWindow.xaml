@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Hatate - iqdb images tagger" Height="475" Width="610" MinWidth="610" MinHeight="475" WindowStartupLocation="CenterScreen" Loaded="MainWindow_Loaded">
+	<Window.CommandBindings>
+		<CommandBinding Command="ApplicationCommands.Paste" Executed="MainWindow_Paste" />
+	</Window.CommandBindings>
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Grid Margin="0,18,0,95">
 			<Grid.ColumnDefinitions>
