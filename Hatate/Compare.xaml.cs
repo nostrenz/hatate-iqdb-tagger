@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Forms;
 
 namespace Hatate
 {
@@ -19,14 +19,15 @@ namespace Hatate
 			InitializeComponent();
 
 			this.Owner = App.Current.MainWindow;
+			Screen screen = Screen.FromPoint(new System.Drawing.Point((int)this.Left, (int)this.Top));
 
-			if (App.Current.MainWindow.Left + App.Current.MainWindow.Width + this.Width < SystemParameters.WorkArea.Width) { // Right
+			if (App.Current.MainWindow.Left + App.Current.MainWindow.Width + this.Width < screen.WorkingArea.Width) { // Right
 				this.Left = App.Current.MainWindow.Left + App.Current.MainWindow.Width;
 				this.Top = App.Current.MainWindow.Top;
 			} else if (App.Current.MainWindow.Left - this.Width > 0) { // Left
 				this.Left = App.Current.MainWindow.Left - this.Width;
 				this.Top = App.Current.MainWindow.Top;
-			} else if (App.Current.MainWindow.Top + App.Current.MainWindow.Height + this.Height < SystemParameters.WorkArea.Height) { // Bottom
+			} else if (App.Current.MainWindow.Top + App.Current.MainWindow.Height + this.Height < screen.WorkingArea.Height) { // Bottom
 				this.Left = App.Current.MainWindow.Left;
 				this.Top = App.Current.MainWindow.Top + App.Current.MainWindow.Height;
 			} else if (App.Current.MainWindow.Top - this.Height > 0) { // Top
@@ -138,9 +139,9 @@ namespace Hatate
 			this.Status("Higher quality image loading failed.");
 		}
 
-		private void Window_KeyDown(object sender, KeyEventArgs e)
+		private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
-			if (e.Key == Key.Escape) {
+			if (e.Key == System.Windows.Input.Key.Escape) {
 				this.Close();
 			}
 		}
