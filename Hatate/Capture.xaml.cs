@@ -16,6 +16,14 @@ namespace Hatate
 		{
 			InitializeComponent();
 
+			this.Owner = App.Current.MainWindow;
+
+			// Make the window fill the whole screen, including all connected displays
+			this.Left = 0;
+			this.Top = 0;
+			this.Width = System.Windows.Forms.SystemInformation.VirtualScreen.Width;
+			this.Height = System.Windows.Forms.SystemInformation.VirtualScreen.Height;
+
 			this.ShowDialog();
 		}
 

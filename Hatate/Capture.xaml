@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
         Title="Capture" Height="300" Width="300"
-		AllowsTransparency="True" WindowStyle="None" KeyDown="Window_KeyDown" WindowStartupLocation="CenterScreen" WindowState="Maximized" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" Cursor="Cross" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseMove="Window_MouseMove">
+		AllowsTransparency="True" WindowStyle="None" KeyDown="Window_KeyDown" WindowStartupLocation="Manual" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" Cursor="Cross" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseMove="Window_MouseMove">
 	<Window.Background>
 		<SolidColorBrush Opacity="0.2" Color="Black"/>
 	</Window.Background>
