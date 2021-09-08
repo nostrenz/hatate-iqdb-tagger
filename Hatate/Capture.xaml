@@ -16,19 +16,19 @@
 				<DrawingBrush Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile">
 					<DrawingBrush.Drawing>
 						<DrawingGroup>
-							<GeometryDrawing Brush="#D440D6">
+							<GeometryDrawing Brush="#4B124D">
 								<GeometryDrawing.Geometry>
 									<GeometryGroup>
-										<RectangleGeometry Rect="-100,0,250,100" />
-										<RectangleGeometry Rect="100,100,100,100" />
+										<RectangleGeometry Rect="-100,0,200,100" />
+										<RectangleGeometry Rect="100,100,200,100" />
 									</GeometryGroup>
 								</GeometryDrawing.Geometry>
 							</GeometryDrawing>
 							<GeometryDrawing Brush="#AB30A3">
 								<GeometryDrawing.Geometry>
 									<GeometryGroup>
-										<RectangleGeometry Rect="100,0,100,100" />
-										<RectangleGeometry Rect="-100,100,250,100" />
+										<RectangleGeometry Rect="100,0,200,100" />
+										<RectangleGeometry Rect="-100,100,200,100" />
 									</GeometryGroup>
 								</GeometryDrawing.Geometry>
 							</GeometryDrawing>
