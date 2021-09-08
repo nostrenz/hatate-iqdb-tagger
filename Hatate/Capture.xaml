@@ -11,6 +11,31 @@
 		<SolidColorBrush Opacity="0.2" Color="Black"/>
 	</Window.Background>
 	<Grid>
-		<Border x:Name="Border_Area" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden"/>
+		<Border x:Name="Border_Area" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+			<Border.BorderBrush>
+				<DrawingBrush Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile">
+					<DrawingBrush.Drawing>
+						<DrawingGroup>
+							<GeometryDrawing Brush="#D440D6">
+								<GeometryDrawing.Geometry>
+									<GeometryGroup>
+										<RectangleGeometry Rect="-100,0,250,100" />
+										<RectangleGeometry Rect="100,100,100,100" />
+									</GeometryGroup>
+								</GeometryDrawing.Geometry>
+							</GeometryDrawing>
+							<GeometryDrawing Brush="#AB30A3">
+								<GeometryDrawing.Geometry>
+									<GeometryGroup>
+										<RectangleGeometry Rect="100,0,100,100" />
+										<RectangleGeometry Rect="-100,100,250,100" />
+									</GeometryGroup>
+								</GeometryDrawing.Geometry>
+							</GeometryDrawing>
+						</DrawingGroup>
+					</DrawingBrush.Drawing>
+				</DrawingBrush>
+			</Border.BorderBrush>
+		</Border>
 	</Grid>
 </Window>
