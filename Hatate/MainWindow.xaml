@@ -93,6 +93,7 @@
 					<MenuItem Header="Manage" Click="MenuItem_ManageIgnoreds_Click"/>
 				</MenuItem>
 				<MenuItem Header="Delete thumbnails" Click="MenuItem_DeleteThumbs_Click"/>
+				<MenuItem Header="Delete temporary images" Click="MenuItem_DeleteTemporary_Click"/>
 			</MenuItem>
 			<MenuItem Header="Settings" Height="18">
 				<MenuItem Header="Options" Height="18" Click="MenuItem_Options_Click" />

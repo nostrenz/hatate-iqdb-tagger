@@ -2015,6 +2015,66 @@ namespace Hatate
 			this.ChangeStartButtonEnabledValue();
 		}
 
+		/// <summary>
+		/// Delete all files in a directory.
+		/// </summary>
+		/// <param name="folderPath"></param>
+		private void DeleteFilesInFolder(string folderPath, bool checkUsage = false)
+		{
+			this.SetStatus("Deleting files in \"" + folderPath + "\"...");
+
+			string[] files = Directory.GetFiles(folderPath);
+			int deleted = 0;
+			int locked = 0;
+
+			foreach (string file in files) {
+				// Checks if this file is in the list
+				if (checkUsage && this.IsFileInList(file)) {
+					MessageBoxResult result = MessageBox.Show(
+						"This temporary image is currently in the list:\n\n" + file + "\n\nDelete it anyway? It will be removed from the list.",
+						"Delete this file?",
+						MessageBoxButton.YesNoCancel
+					);
+
+					// Skip this file or cancel deleting the other files
+					if (result == MessageBoxResult.No) {
+						continue;
+					} else if (result == MessageBoxResult.Cancel) {
+						break;
+					}
+				}
+
+				try {
+					File.Delete(file);
+
+					deleted++;
+				} catch (Exception) {
+					locked++;
+				}
+			}
+
+			this.SetStatus(deleted + " files deleted (" + locked + " in use).");
+		}
+
+		/// <summary>
+		/// Check if a given file is in the list.
+		/// </summary>
+		/// <returns></returns>
+		private bool IsFileInList(string filePath)
+		{
+			if (this.ListBox_Files.Items.Count == 0) {
+				return false;
+			}
+
+			foreach (Result result in this.ListBox_Files.Items) {
+				if (filePath == (string)result.ImagePath) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		#endregion Private
 
 		/*
@@ -2617,23 +2677,17 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_DeleteThumbs_Click(object sender, RoutedEventArgs e)
 		{
-			this.SetStatus("Deleting thumbnails...");
+			this.DeleteFilesInFolder(App.ThumbsDirPath);
+		}
 
-			string[] files = Directory.GetFiles(App.ThumbsDirPath);
-			int deleted = 0;
-			int locked = 0;
-
-			foreach (string file in files) {
-				try {
-					File.Delete(file);
-
-					deleted++;
-				} catch (Exception) {
-					locked++;
-				}
-			}
-
-			this.SetStatus(deleted + " thumbnails deleted (" + locked + " in use).");
+		/// <summary>
+		/// Delete all images in the "temp" subfolder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_DeleteTemporary_Click(object sender, RoutedEventArgs e)
+		{
+			this.DeleteFilesInFolder(App.TempDirPath, true);
 		}
 
 		/// <summary>
