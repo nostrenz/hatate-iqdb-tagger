@@ -1621,14 +1621,17 @@ namespace Hatate
 
 				// Not a searched result, skip
 				if (result == null || !result.Searched || !result.HasMatch) {
+					counts = this.HandleProcessedResult(result, false, ref successes, ref failures);
+
 					continue;
 				}
 
 				// Image is deleted on the source page
 				if (result.Unavailable) {
 					result.AddWarning("Not sent as the image is no longer available on the source page, Hydrus downloader would ignore it");
+					counts = this.HandleProcessedResult(result, false, ref successes, ref failures);
 
-					return;
+					continue;
 				}
 
 				bool success = await App.hydrusApi.SendUrl(result, sendPageUrlInsteadOfImageUrl ? result.Url : result.Full);
@@ -1700,21 +1703,20 @@ namespace Hatate
 		/// <returns></returns>
 		private string HandleProcessedResult(Result result, bool success, ref int successes, ref int failures)
 		{
+			bool unselected = false;
+
 			if (success) {
 				if (Options.Default.RemoveResultAfter) {
 					this.RemoveResultFromFilesListbox(result);
+					unselected = true;
 				}
 
 				successes++;
 			} else {
-				if (Options.Default.RemoveResultAfter) {
-					this.ListBox_Files.SelectedItems.Remove(result);
-				}
-
 				failures++;
 			}
 
-			if (!Options.Default.RemoveResultAfter) {
+			if (!unselected) {
 				this.ListBox_Files.SelectedItems.Remove(result);
 			}
 
