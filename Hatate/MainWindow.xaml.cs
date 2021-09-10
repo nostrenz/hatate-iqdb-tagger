@@ -525,7 +525,7 @@ namespace Hatate
 
 				// We want to retrieve tags from a booru
 				if (Options.Default.ParseTags) {
-					bool success = this.RetrieveTags(result);
+					bool success = this.ParseBooruPage(result);
 
 					// Unable to retrieve tags for this match, we'll try another one
 					if (!success) {
@@ -566,7 +566,12 @@ namespace Hatate
 			}
 		}
 
-		private bool RetrieveTags(Result result)
+		/// <summary>
+		/// Parse the matched booru page to retrieve tags and other informations about the image.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		private bool ParseBooruPage(Result result)
 		{
 			Parser.IParser booru = null;
 
@@ -3046,9 +3051,10 @@ namespace Hatate
 			}
 
 			result.Match = match;
+			result.ClearWarnings();
 
 			if (Options.Default.ParseTags) {
-				this.RetrieveTags(result);
+				this.ParseBooruPage(result);
 			}
 
 			this.AddAutoTags(result);

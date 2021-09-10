@@ -115,6 +115,7 @@ namespace Hatate
 
 			this.Tags.Clear();
 			this.Ignoreds.Clear();
+			this.warnings.Clear();
 			
 			if (this.HasMatches) {
 				this.Matches.Clear();
@@ -146,6 +147,14 @@ namespace Hatate
 			}
 
 			this.Matches = ImmutableList.Create(matches.ToArray());
+		}
+
+		/// <summary>
+		/// Removes all added warning messages.
+		/// </summary>
+		public void ClearWarnings()
+		{
+			this.warnings.Clear();
 		}
 
 		/*
