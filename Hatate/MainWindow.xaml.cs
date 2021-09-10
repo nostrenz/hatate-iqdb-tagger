@@ -599,6 +599,7 @@ namespace Hatate
 			this.AddTagsToResult(booru.Tags, result);
 
 			result.Full = booru.Full;
+			result.Unavailable = booru.Unavailable;
 			result.Remote = new Image();
 			result.Remote.Size = booru.Size;
 			result.Remote.Width = booru.Width;
@@ -1621,6 +1622,13 @@ namespace Hatate
 				// Not a searched result, skip
 				if (result == null || !result.Searched || !result.HasMatch) {
 					continue;
+				}
+
+				// Image is deleted on the source page
+				if (result.Unavailable) {
+					result.AddWarning("Not sent as the image is no longer available on the source page, Hydrus downloader would ignore it");
+
+					return;
 				}
 
 				bool success = await App.hydrusApi.SendUrl(result, sendPageUrlInsteadOfImageUrl ? result.Url : result.Full);

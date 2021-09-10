@@ -17,5 +17,6 @@ namespace Hatate.Parser
 		int Width { get; }
 		int Height { get; }
 		string Rating { get; }
+		bool Unavailable { get; }
 	}
 }

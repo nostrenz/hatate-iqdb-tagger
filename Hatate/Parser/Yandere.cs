@@ -44,6 +44,17 @@
 				this.GetFullImageUrlAndSizeFromLink(highresLink);
 			}
 
+			// Checks if the image is deleted
+			Supremes.Nodes.Elements statusNotices= doc.Select(".status-notice");
+
+			foreach (Supremes.Nodes.Element statusNotice in statusNotices) {
+				if (statusNotice.Text.Contains("This post was deleted.")) {
+					this.unavailable = true;
+
+					break;
+				}
+			}
+
 			return true;
 		}
 

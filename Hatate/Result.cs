@@ -20,6 +20,7 @@ namespace Hatate
 		private List<string> warnings = new List<string>();
 		private int matchIndex = -1;
 		private IqdbApi.Enums.Rating overrideRating = IqdbApi.Enums.Rating.Unrated;
+		private bool unavailable = false;
 
 		public Result(string imagePath)
 		{
@@ -427,6 +428,17 @@ namespace Hatate
 
 				return "(" + parenthesisText + ") " + this.ImagePath;
 			}
+		}
+
+		/// <summary>
+		/// An unavailable match means that the image is no longer available on the selected match's source page,
+		/// because it was deleted, banned, or a lack of access rights prevents from obtaining the image's URL.
+		/// Usually tags are still available but the image isn't displayed and there's no link to the full image.
+		/// </summary>
+		public bool Unavailable
+		{
+			get { return this.unavailable; }
+			set { this.unavailable = value; }
 		}
 
 		#endregion Accessor

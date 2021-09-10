@@ -69,6 +69,14 @@
 				}
 			}
 
+			// Checks if the image is deleted
+			Supremes.Nodes.Element postNoticeDeleted = doc.Select(".post-notice-deleted").First;
+			Supremes.Nodes.Element postNoticeBanned = doc.Select(".post-notice-banned").First;
+
+			if (postNoticeDeleted != null || postNoticeBanned != null) {
+				this.unavailable = true;
+			}
+
 			return true;
 		}
 

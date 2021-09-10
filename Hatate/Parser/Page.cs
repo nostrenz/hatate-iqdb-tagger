@@ -22,6 +22,7 @@ namespace Hatate.Parser
 		protected int height = 0;
 		protected string rating = null;
 		protected string source = null;
+		protected bool unavailable = false;
 
 		/*
 		============================================
@@ -188,6 +189,11 @@ namespace Hatate.Parser
 		public string Rating
 		{
 			get { return this.rating; }
+		}
+
+		public bool Unavailable
+		{
+			get { return this.unavailable; }
 		}
 
 		protected string Url
