@@ -1628,7 +1628,7 @@ namespace Hatate
 
 				// Image is deleted on the source page
 				if (result.Unavailable) {
-					result.AddWarning("Not sent as the image is no longer available on the source page, Hydrus downloader would ignore it");
+					result.AddWarning("Hydrus: URL not sent - image no longer available on the source page, downloader would ignore it");
 					counts = this.HandleProcessedResult(result, false, ref successes, ref failures);
 
 					continue;
