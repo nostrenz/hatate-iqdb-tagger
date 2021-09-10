@@ -14,7 +14,7 @@ namespace Hatate
 	/// </summary>
 	public partial class App : Application
 	{
-		public const ushort RELEASE_NUMBER = 5;
+		public const ushort RELEASE_NUMBER = 6;
 
 		public const string GITHUB_REPOSITORY_URL = "https://github.com/nostrenz/hatate-iqdb-tagger";
 		public const string GITHUB_LATEST_RELEASE = "/releases/latest";
