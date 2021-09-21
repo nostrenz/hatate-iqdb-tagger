@@ -350,6 +350,9 @@ namespace Hatate
 			if (!this.ImageFormatIsSupported(result.Local, searchEngine)) {
 				this.SetStatus("Image of type " + result.Local.Format + " not supported by " + searchEngine.ToString() + ", skipping.");
 
+				result.AddWarning(this.Label_Status.Content.ToString());
+				result.Searched = true;
+
 				return;
 			}
 
