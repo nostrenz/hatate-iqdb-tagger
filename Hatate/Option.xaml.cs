@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
 using Options = Hatate.Properties.Settings;
 
 namespace Hatate
@@ -34,6 +36,33 @@ namespace Hatate
 				Combo_SearchEngines.Items.Add(item);
 			}
 
+			// Add sources
+			List<System.Windows.Controls.CheckBox> checkboxes = new List<System.Windows.Controls.CheckBox>();
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Danbooru", Tag = Math.Abs(Options.Default.Source_Danbooru), IsChecked = Options.Default.Source_Danbooru > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Konachan", Tag = Math.Abs(Options.Default.Source_Konachan), IsChecked = Options.Default.Source_Konachan > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Yandere", Tag = Math.Abs(Options.Default.Source_Yandere), IsChecked = Options.Default.Source_Yandere > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Gelbooru", Tag = Math.Abs(Options.Default.Source_Gelbooru), IsChecked = Options.Default.Source_Gelbooru > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "SankakuChannel", Tag = Math.Abs(Options.Default.Source_SankakuChannel), IsChecked = Options.Default.Source_SankakuChannel > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Eshuushuu", Tag = Math.Abs(Options.Default.Source_Eshuushuu), IsChecked = Options.Default.Source_Eshuushuu > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "TheAnimeGallery", Tag = Math.Abs(Options.Default.Source_TheAnimeGallery), IsChecked = Options.Default.Source_TheAnimeGallery > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Zerochan", Tag = Math.Abs(Options.Default.Source_Zerochan), IsChecked = Options.Default.Source_Zerochan > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "AnimePictures", Tag = Math.Abs(Options.Default.Source_AnimePictures), IsChecked = Options.Default.Source_AnimePictures > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Pivix", Tag = Math.Abs(Options.Default.Source_Pixiv), IsChecked = Options.Default.Source_Pixiv > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Twitter", Tag = Math.Abs(Options.Default.Source_Twitter), IsChecked = Options.Default.Source_Twitter > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Nico Nico Seiga", Tag = Math.Abs(Options.Default.Source_Seiga), IsChecked = Options.Default.Source_Seiga > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "DeviantArt", Tag = Math.Abs(Options.Default.Source_DeviantArt), IsChecked = Options.Default.Source_DeviantArt > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Pawoo", Tag = Math.Abs(Options.Default.Source_Pawoo), IsChecked = Options.Default.Source_Pawoo > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "MangaDex", Tag = Math.Abs(Options.Default.Source_MangaDex), IsChecked = Options.Default.Source_MangaDex > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "ArtStation", Tag = Math.Abs(Options.Default.Source_ArtStation), IsChecked = Options.Default.Source_ArtStation > 0 });
+			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Other sources", Tag = Math.Abs(Options.Default.Source_Other), IsChecked = Options.Default.Source_Other > 0 });
+
+			// Sort sources
+			checkboxes = checkboxes.OrderBy(checkbox => (sbyte)checkbox.Tag).ToList();
+
+			foreach (System.Windows.Controls.CheckBox checkbox in checkboxes) {
+				this.ListView_Sources.Items.Add(checkbox);
+			}
+
 			// Parenthesis value
 			switch (Options.Default.SearchedParenthesisValue) {
 				case PARENTHESIS_VALUE_NUMBER_OF_TAGS: this.RadioButton_Parenthesis_NumberOfTags.IsChecked = true; break;
@@ -58,25 +87,7 @@ namespace Hatate
 			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
 			this.CheckBox_RemoveResultAfter.IsChecked = Options.Default.RemoveResultAfter;
 			this.CheckBox_StartupReleaseCheck.IsChecked = Options.Default.StartupReleaseCheck;
-
-			// Sources
-			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
-			this.CheckBox_Source_Konachan.IsChecked = Options.Default.Source_Konachan;
-			this.CheckBox_Source_Yandere.IsChecked = Options.Default.Source_Yandere;
-			this.CheckBox_Source_Gelbooru.IsChecked = Options.Default.Source_Gelbooru;
-			this.CheckBox_Source_SankakuChannel.IsChecked = Options.Default.Source_SankakuChannel;
-			this.CheckBox_Source_Eshuushuu.IsChecked = Options.Default.Source_Eshuushuu;
-			this.CheckBox_Source_TheAnimeGallery.IsChecked = Options.Default.Source_TheAnimeGallery;
-			this.CheckBox_Source_Zerochan.IsChecked = Options.Default.Source_Zerochan;
-			this.CheckBox_Source_AnimePictures.IsChecked = Options.Default.Source_AnimePictures;
-			this.CheckBox_Source_Pixiv.IsChecked = Options.Default.Source_Pixiv;
-			this.CheckBox_Source_Twitter.IsChecked = Options.Default.Source_Twitter;
-			this.CheckBox_Source_Seiga.IsChecked = Options.Default.Source_Seiga;
-			this.CheckBox_Source_DeviantArt.IsChecked = Options.Default.Source_DeviantArt;
-			this.CheckBox_Source_ArtStation.IsChecked = Options.Default.Source_ArtStation;
-			this.CheckBox_Source_Pawoo.IsChecked = Options.Default.Source_Pawoo;
-			this.CheckBox_Source_MangaDex.IsChecked = Options.Default.Source_MangaDex;
-			this.CheckBox_Source_Other.IsChecked = Options.Default.Source_Other;
+			this.TextBox_SimilarityThreshold.Text = Options.Default.SimilarityThreshold.ToString();
 
 			// Tags
 			this.CheckBox_AddFoundTag.IsChecked = Options.Default.AddFoundTag;
@@ -145,23 +156,33 @@ namespace Hatate
 			Options.Default.StartupReleaseCheck = (bool)this.CheckBox_StartupReleaseCheck.IsChecked;
 
 			// Sources
-			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
-			Options.Default.Source_Konachan = (bool)this.CheckBox_Source_Konachan.IsChecked;
-			Options.Default.Source_Yandere = (bool)this.CheckBox_Source_Yandere.IsChecked;
-			Options.Default.Source_Gelbooru = (bool)this.CheckBox_Source_Gelbooru.IsChecked;
-			Options.Default.Source_SankakuChannel =(bool)this.CheckBox_Source_SankakuChannel.IsChecked;
-			Options.Default.Source_Eshuushuu = (bool)this.CheckBox_Source_Eshuushuu.IsChecked;
-			Options.Default.Source_TheAnimeGallery = (bool)this.CheckBox_Source_TheAnimeGallery.IsChecked;
-			Options.Default.Source_Zerochan = (bool)this.CheckBox_Source_Zerochan.IsChecked;
-			Options.Default.Source_AnimePictures = (bool)this.CheckBox_Source_AnimePictures.IsChecked;
-			Options.Default.Source_Pixiv = (bool)this.CheckBox_Source_Pixiv.IsChecked;
-			Options.Default.Source_Twitter = (bool)this.CheckBox_Source_Twitter.IsChecked;
-			Options.Default.Source_Seiga = (bool)this.CheckBox_Source_Seiga.IsChecked;
-			Options.Default.Source_DeviantArt = (bool)this.CheckBox_Source_DeviantArt.IsChecked;
-			Options.Default.Source_ArtStation = (bool)this.CheckBox_Source_ArtStation.IsChecked;
-			Options.Default.Source_Pawoo = (bool)this.CheckBox_Source_Pawoo.IsChecked;
-			Options.Default.Source_MangaDex = (bool)this.CheckBox_Source_MangaDex.IsChecked;
-			Options.Default.Source_Other = (bool)this.CheckBox_Source_Other.IsChecked;
+			foreach (System.Windows.Controls.CheckBox checkbox in this.ListView_Sources.Items) {
+				sbyte index = (sbyte)(1 + this.ListView_Sources.Items.IndexOf(checkbox));
+
+				if (!(bool)checkbox.IsChecked) {
+					index *= -1;
+				}
+
+				switch (checkbox.Content.ToString()) {
+					case "Danbooru": Options.Default.Source_Danbooru = index; break;
+					case "Konachan": Options.Default.Source_Konachan = index; break;
+					case "Yandere": Options.Default.Source_Yandere = index; break;
+					case "Gelbooru": Options.Default.Source_Gelbooru = index; break;
+					case "SankakuChannel": Options.Default.Source_SankakuChannel = index; break;
+					case "Eshuushuu": Options.Default.Source_Eshuushuu = index; break;
+					case "TheAnimeGallery": Options.Default.Source_TheAnimeGallery = index; break;
+					case "Zerochan": Options.Default.Source_Zerochan = index; break;
+					case "AnimePictures": Options.Default.Source_AnimePictures = index; break;
+					case "Pixiv": Options.Default.Source_Pixiv = index; break;
+					case "Twitter": Options.Default.Source_Twitter = index; break;
+					case "Nico Nico Seiga": Options.Default.Source_Seiga = index; break;
+					case "DeviantArt": Options.Default.Source_DeviantArt = index; break;
+					case "ArtStation": Options.Default.Source_ArtStation = index; break;
+					case "Pawoo": Options.Default.Source_Pawoo = index; break;
+					case "MangaDex": Options.Default.Source_MangaDex = index; break;
+					case "Other sources": Options.Default.Source_Other = index; break;
+				}
+			}
 
 			// Tags
 			Options.Default.AddFoundTag = (bool)this.CheckBox_AddFoundTag.IsChecked;
@@ -209,6 +230,10 @@ namespace Hatate
 			int.TryParse(this.TextBox_ThumbWidth.Text, out thumbWidth);
 			Options.Default.ThumbWidth = thumbWidth > 0 ? thumbWidth : 150;
 
+			byte similarityThreshold = 0;
+			byte.TryParse(this.TextBox_SimilarityThreshold.Text, out similarityThreshold);
+			Options.Default.SimilarityThreshold = (similarityThreshold >= 0 && similarityThreshold <= 100) ? similarityThreshold : (byte)5;
+
 			Options.Default.Save();
 
 			this.Close();
@@ -250,6 +275,35 @@ namespace Hatate
 			this.TextBox_MinimumTagsCount.IsEnabled = iqdbIsSelected;
 			this.Combo_MatchType.IsEnabled = iqdbIsSelected;
 			this.CheckBox_MatchType.IsEnabled = iqdbIsSelected;
+		}
+
+		private void ListView_Sources_PreviewMouseMoveEvent(object sender, System.Windows.Input.MouseEventArgs e)
+		{
+			if (sender is System.Windows.Controls.ListBoxItem && e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
+				System.Windows.Controls.ListBoxItem draggedItem = sender as System.Windows.Controls.ListBoxItem;
+				DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+				draggedItem.IsSelected = true;
+			}
+		}
+
+		private void ListView_Sources_Drop(object sender, DragEventArgs e)
+		{
+			System.Windows.Controls.CheckBox droppedData = e.Data.GetData(typeof(System.Windows.Controls.CheckBox)) as System.Windows.Controls.CheckBox;
+			System.Windows.Controls.CheckBox target = ((System.Windows.Controls.ListBoxItem)(sender)).DataContext as System.Windows.Controls.CheckBox;
+			int removedIndex = ListView_Sources.Items.IndexOf(droppedData);
+			int targetIndex = ListView_Sources.Items.IndexOf(target);
+
+			if (removedIndex == targetIndex) {
+				return;
+			}
+
+			if (removedIndex < targetIndex) {
+				this.ListView_Sources.Items.RemoveAt(removedIndex);
+				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
+			} else {
+				this.ListView_Sources.Items.RemoveAt(removedIndex);
+				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
+			}
 		}
 	}
 }

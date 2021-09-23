@@ -6,6 +6,13 @@
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
         Title="Options" Width="608" MinWidth="608" Height="510" MinHeight="510" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+	<Window.Resources>
+		<Style x:Key="ListBoxDragDrop" TargetType="{x:Type ListBoxItem}">
+			<Setter Property="AllowDrop" Value="true"/>
+			<EventSetter Event="PreviewMouseMove" Handler="ListView_Sources_PreviewMouseMoveEvent"/>
+			<EventSetter Event="Drop" Handler="ListView_Sources_Drop"/>
+		</Style>
+	</Window.Resources>
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
 		<CheckBox x:Name="CheckBox_AddRating" Content="Add rating to tags" HorizontalAlignment="Left" Margin="10,207,0,0" VerticalAlignment="Top" Height="14"/>
@@ -18,26 +25,8 @@
 		<CheckBox x:Name="CheckBox_MatchType" HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top" Click="CheckBox_MatchType_Click" Height="14" Width="13"/>
 		<Label x:Name="Label_Delay" Content="Delay (600secs / 10mins):" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" ToolTip="Time between each search, please don't lower it too much to prevent from abusing the search engines" Width="149" Padding="5,0,0,0" VerticalContentAlignment="Center" Height="18"/>
 		<Slider x:Name="Slider_Delay" HorizontalAlignment="Left" Margin="164,108,0,0" VerticalAlignment="Top" Width="139" ValueChanged="Sliders_ValueChanged" SmallChange="1" Minimum="1" Maximum="600" Value="60"/>
-		<GroupBox Header="Sources" Height="211" Margin="323,10,10,0" VerticalAlignment="Top" ToolTip="Search results from unchecked sources will be ignored">
-			<Grid>
-				<CheckBox x:Name="CheckBox_Source_Danbooru" Content="Danbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Konachan" Content="Konachan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Yandere" Content="Yandere" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,82,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Gelbooru" Content="Gelbooru" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,28,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_SankakuChannel" Content="SankakuChannel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,100,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Eshuushuu" Content="Eshuushuu" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,28,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_TheAnimeGallery" Content="TheAnimeGallery" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,118,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Zerochan" Content="Zerochan" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,64,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_AnimePictures" Content="AnimePictures" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,10,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Pixiv" Content="Pivix" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,46,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Twitter" Content="Twitter" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,64,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Seiga" Content="Nico Nico Seiga" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,82,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_DeviantArt" Content="DeviantArt" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,100,0,0" RenderTransformOrigin="0.493,0.692"/>
-				<CheckBox x:Name="CheckBox_Source_Pawoo" Content="Pawoo" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,136,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_MangaDex" Content="MangaDex" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,136,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_ArtStation" Content="ArtStation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,118,0,0"/>
-				<CheckBox x:Name="CheckBox_Source_Other" Content="Other sources" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,154,0,0"/>
-			</Grid>
+		<GroupBox Header="Sources (ordered by priority)" Height="180" Margin="0,10,10,0" VerticalAlignment="Top" ToolTip="Search results from unchecked sources will be ignored" HorizontalAlignment="Right" Width="268">
+			<ListView x:Name="ListView_Sources" Margin="0,0,0,0" SelectionMode="Single" ItemContainerStyle="{StaticResource ListBoxDragDrop}"/>
 		</GroupBox>
 		<CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top" Height="14"/>
 		<CheckBox x:Name="CheckBox_AskTags" Content="Ask for tags when adding files to the list" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" Height="14"/>
@@ -61,5 +50,7 @@
 		<RadioButton x:Name="RadioButton_Parenthesis_HighestSimilarity" Content="Highest similarity" HorizontalAlignment="Left" Margin="420,406,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,0.577"/>
 		<RadioButton x:Name="RadioButton_Parenthesis_MatchSimilarity" Content="Match similarity" HorizontalAlignment="Left" Margin="319,406,0,0" VerticalAlignment="Top"/>
 		<RadioButton x:Name="RadioButton_Parenthesis_MatchSource" Content="Match source" HorizontalAlignment="Left" Margin="230,406,0,0" VerticalAlignment="Top"/>
+		<Label Content="Similarity threshold" HorizontalAlignment="Right" Margin="0,196,161,0" VerticalAlignment="Top" Width="117" ToolTip="Sources with higher priority will be prefered to a source with a higher match similarity as long as it's within this threshold"/>
+		<TextBox x:Name="TextBox_SimilarityThreshold" Height="26" Margin="446,195,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
 	</Grid>
 </Window>
