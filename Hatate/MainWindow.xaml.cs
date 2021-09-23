@@ -1908,9 +1908,13 @@ namespace Hatate
 		/// <param name="messageWhenUpToDate"></param>
 		private async Task CheckForNewRelease(bool messageWhenUpToDate)
 		{
-			string latestReleaseUrl = App.GITHUB_REPOSITORY_URL + App.GITHUB_LATEST_RELEASE;
+			Supremes.Nodes.Document doc = null;
 
-			Supremes.Nodes.Document doc = Supremes.Dcsoup.Parse(new Uri(latestReleaseUrl), 5000);
+			try {
+				doc = Supremes.Dcsoup.Parse(new Uri(App.GITHUB_REPOSITORY_URL + App.GITHUB_LATEST_RELEASE), 5000);
+			} catch (Exception) {
+				return;
+			}
 
 			if (doc == null) {
 				this.GitHubReleaseParsingErrorMessage();
