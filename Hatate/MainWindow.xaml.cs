@@ -506,6 +506,11 @@ namespace Hatate
 
 				sbyte sourceOrdering = this.GetSourceOrderingIndex(match.Source);
 
+				// Source is disabled
+				if (sourceOrdering < 1) {
+					continue;
+				}
+
 				if (bestOrdering == 0 || sourceOrdering < bestOrdering) {
 					currentMatch = match;
 					bestOrdering = sourceOrdering;
