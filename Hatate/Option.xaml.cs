@@ -87,7 +87,7 @@ namespace Hatate
 			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
 			this.CheckBox_RemoveResultAfter.IsChecked = Options.Default.RemoveResultAfter;
 			this.CheckBox_StartupReleaseCheck.IsChecked = Options.Default.StartupReleaseCheck;
-			this.TextBox_SimilarityThreshold.Text = Options.Default.SimilarityThreshold.ToString();
+			this.Slider_SimilarityThreshold.Value = Options.Default.SimilarityThreshold;
 
 			// Tags
 			this.CheckBox_AddFoundTag.IsChecked = Options.Default.AddFoundTag;
@@ -99,6 +99,8 @@ namespace Hatate
 			this.TextBox_FoundTag.IsEnabled = Options.Default.AddFoundTag;
 			this.TextBox_NotfoundTag.IsEnabled = Options.Default.AddNotfoundTag;
 			this.TextBox_TaggedTag.IsEnabled = Options.Default.AddTaggedTag;
+
+			this.Slider_SimilarityThreshold.ToolTip = this.Label_SimilarityThreshold.ToolTip;
 
 			this.UpdateLabels();
 		}
@@ -154,6 +156,7 @@ namespace Hatate
 			Options.Default.SearchEngine = (byte)(SearchEngine)this.Combo_SearchEngines.SelectedItem;
 			Options.Default.RemoveResultAfter = (bool)this.CheckBox_RemoveResultAfter.IsChecked;
 			Options.Default.StartupReleaseCheck = (bool)this.CheckBox_StartupReleaseCheck.IsChecked;
+			Options.Default.SimilarityThreshold = (byte)this.Slider_SimilarityThreshold.Value;
 
 			// Sources
 			foreach (System.Windows.Controls.CheckBox checkbox in this.ListView_Sources.Items) {
@@ -230,10 +233,6 @@ namespace Hatate
 			int.TryParse(this.TextBox_ThumbWidth.Text, out thumbWidth);
 			Options.Default.ThumbWidth = thumbWidth > 0 ? thumbWidth : 150;
 
-			byte similarityThreshold = 0;
-			byte.TryParse(this.TextBox_SimilarityThreshold.Text, out similarityThreshold);
-			Options.Default.SimilarityThreshold = (similarityThreshold >= 0 && similarityThreshold <= 100) ? similarityThreshold : (byte)5;
-
 			Options.Default.Save();
 
 			this.Close();
@@ -304,6 +303,11 @@ namespace Hatate
 				this.ListView_Sources.Items.RemoveAt(removedIndex);
 				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
 			}
+		}
+
+		private void Slider_SimilarityThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			this.Label_SimilarityThreshold.Content = "Similarity threshold (" + (byte)this.Slider_SimilarityThreshold.Value + "%)";
 		}
 	}
 }

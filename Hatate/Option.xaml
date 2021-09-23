@@ -16,8 +16,8 @@
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
 		<CheckBox x:Name="CheckBox_AddRating" Content="Add rating to tags" HorizontalAlignment="Left" Margin="10,207,0,0" VerticalAlignment="Top" Height="14"/>
-		<Slider x:Name="Slider_Similarity" HorizontalAlignment="Left" Margin="164,85,0,0" VerticalAlignment="Top" Width="139" ValueChanged="Sliders_ValueChanged" SmallChange="1" Maximum="100" Value="90"/>
-		<Label x:Name="Label_Similarity" Content="Minimum similarity (90%):" HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Padding="5,0,0,0" Width="149" Height="18" VerticalContentAlignment="Center"/>
+		<Slider x:Name="Slider_Similarity" HorizontalAlignment="Left" Margin="164,85,0,0" VerticalAlignment="Top" Width="139" ValueChanged="Sliders_ValueChanged" SmallChange="1" Maximum="100" Value="100"/>
+		<Label x:Name="Label_Similarity" Content="Minimum similarity (100%):" HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Padding="5,0,0,0" Width="149" Height="18" VerticalContentAlignment="Center"/>
 		<ComboBox x:Name="Combo_MatchType" HorizontalAlignment="Left" Margin="164,35,0,0" VerticalAlignment="Top" Width="139" />
 		<Label x:Name="Label_MatchType" Content="Minimum match type:" HorizontalAlignment="Left" Margin="28,35,0,0" VerticalAlignment="Top" Width="131" Height="20" Padding="3,0,0,0" ToolTip="Only for IQDB searches" VerticalContentAlignment="Center"/>
 		<Label Content="Minimum number of tags:" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" Width="149" ToolTip="Only for IQDB searches" Height="20" Padding="5,0,0,0" VerticalContentAlignment="Center"/>
@@ -25,7 +25,7 @@
 		<CheckBox x:Name="CheckBox_MatchType" HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top" Click="CheckBox_MatchType_Click" Height="14" Width="13"/>
 		<Label x:Name="Label_Delay" Content="Delay (600secs / 10mins):" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" ToolTip="Time between each search, please don't lower it too much to prevent from abusing the search engines" Width="149" Padding="5,0,0,0" VerticalContentAlignment="Center" Height="18"/>
 		<Slider x:Name="Slider_Delay" HorizontalAlignment="Left" Margin="164,108,0,0" VerticalAlignment="Top" Width="139" ValueChanged="Sliders_ValueChanged" SmallChange="1" Minimum="1" Maximum="600" Value="60"/>
-		<GroupBox Header="Sources (ordered by priority)" Height="180" Margin="0,10,10,0" VerticalAlignment="Top" ToolTip="Search results from unchecked sources will be ignored" HorizontalAlignment="Right" Width="268">
+		<GroupBox Header="Sources (ordered by priority)" Height="180" Margin="0,10,10,0" VerticalAlignment="Top" ToolTip="Search results from unchecked sources will be ignored.&#x0d;&#x0a;Sources can be ordered by priority by drag and drop with the right click." HorizontalAlignment="Right" Width="268">
 			<ListView x:Name="ListView_Sources" Margin="0,0,0,0" SelectionMode="Single" ItemContainerStyle="{StaticResource ListBoxDragDrop}"/>
 		</GroupBox>
 		<CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top" Height="14"/>
@@ -50,7 +50,7 @@
 		<RadioButton x:Name="RadioButton_Parenthesis_HighestSimilarity" Content="Highest similarity" HorizontalAlignment="Left" Margin="420,406,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,0.577"/>
 		<RadioButton x:Name="RadioButton_Parenthesis_MatchSimilarity" Content="Match similarity" HorizontalAlignment="Left" Margin="319,406,0,0" VerticalAlignment="Top"/>
 		<RadioButton x:Name="RadioButton_Parenthesis_MatchSource" Content="Match source" HorizontalAlignment="Left" Margin="230,406,0,0" VerticalAlignment="Top"/>
-		<Label Content="Similarity threshold" HorizontalAlignment="Right" Margin="0,196,161,0" VerticalAlignment="Top" Width="117" ToolTip="Sources with higher priority will be prefered to a source with a higher match similarity as long as it's within this threshold"/>
-		<TextBox x:Name="TextBox_SimilarityThreshold" Height="26" Margin="446,195,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+		<Label x:Name="Label_SimilarityThreshold" Content="Similarity threshold (100%)" HorizontalAlignment="Right" Margin="0,195,132,0" VerticalAlignment="Top" Width="146" Padding="0" Height="18" ToolTip="Sources with higher priority will be prefered to a source with a higher&#x0d;&#x0a;match similarity as long as the difference is within this threshold."/>
+		<Slider x:Name="Slider_SimilarityThreshold" Margin="0,195,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Width="122" Minimum="0" Maximum="100" SmallChange="1" Value="100" ValueChanged="Slider_SimilarityThreshold_ValueChanged"/>
 	</Grid>
 </Window>
