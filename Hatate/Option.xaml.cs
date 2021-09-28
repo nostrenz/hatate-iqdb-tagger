@@ -3,6 +3,9 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using Options = Hatate.Properties.Settings;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using MenuItem = System.Windows.Controls.MenuItem;
+using CheckBox = System.Windows.Controls.CheckBox;
 
 namespace Hatate
 {
@@ -27,41 +30,34 @@ namespace Hatate
 			this.Owner = App.Current.MainWindow;
 
 			// Add match types
-			foreach (var item in Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
-				Combo_MatchType.Items.Add(item);
+			foreach (var value in Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
+				Combo_MatchType.Items.Add(value);
 			}
 
 			// Add search engines
-			foreach (var item in Enum.GetValues(typeof(SearchEngine))) {
-				Combo_SearchEngines.Items.Add(item);
+			foreach (var value in Enum.GetValues(typeof(SearchEngine))) {
+				Combo_SearchEngines.Items.Add(value);
 			}
 
 			// Add sources
-			List<System.Windows.Controls.CheckBox> checkboxes = new List<System.Windows.Controls.CheckBox>();
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Danbooru", Tag = Math.Abs(Options.Default.Source_Danbooru), IsChecked = Options.Default.Source_Danbooru > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Konachan", Tag = Math.Abs(Options.Default.Source_Konachan), IsChecked = Options.Default.Source_Konachan > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Yandere", Tag = Math.Abs(Options.Default.Source_Yandere), IsChecked = Options.Default.Source_Yandere > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Gelbooru", Tag = Math.Abs(Options.Default.Source_Gelbooru), IsChecked = Options.Default.Source_Gelbooru > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "SankakuChannel", Tag = Math.Abs(Options.Default.Source_SankakuChannel), IsChecked = Options.Default.Source_SankakuChannel > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Eshuushuu", Tag = Math.Abs(Options.Default.Source_Eshuushuu), IsChecked = Options.Default.Source_Eshuushuu > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "TheAnimeGallery", Tag = Math.Abs(Options.Default.Source_TheAnimeGallery), IsChecked = Options.Default.Source_TheAnimeGallery > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Zerochan", Tag = Math.Abs(Options.Default.Source_Zerochan), IsChecked = Options.Default.Source_Zerochan > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "AnimePictures", Tag = Math.Abs(Options.Default.Source_AnimePictures), IsChecked = Options.Default.Source_AnimePictures > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Pivix", Tag = Math.Abs(Options.Default.Source_Pixiv), IsChecked = Options.Default.Source_Pixiv > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Twitter", Tag = Math.Abs(Options.Default.Source_Twitter), IsChecked = Options.Default.Source_Twitter > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Nico Nico Seiga", Tag = Math.Abs(Options.Default.Source_Seiga), IsChecked = Options.Default.Source_Seiga > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "DeviantArt", Tag = Math.Abs(Options.Default.Source_DeviantArt), IsChecked = Options.Default.Source_DeviantArt > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Pawoo", Tag = Math.Abs(Options.Default.Source_Pawoo), IsChecked = Options.Default.Source_Pawoo > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "MangaDex", Tag = Math.Abs(Options.Default.Source_MangaDex), IsChecked = Options.Default.Source_MangaDex > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "ArtStation", Tag = Math.Abs(Options.Default.Source_ArtStation), IsChecked = Options.Default.Source_ArtStation > 0 });
-			checkboxes.Add(new System.Windows.Controls.CheckBox() { Content = "Other sources", Tag = Math.Abs(Options.Default.Source_Other), IsChecked = Options.Default.Source_Other > 0 });
-
-			// Sort sources
-			checkboxes = checkboxes.OrderBy(checkbox => (sbyte)checkbox.Tag).ToList();
-
-			foreach (System.Windows.Controls.CheckBox checkbox in checkboxes) {
-				this.ListView_Sources.Items.Add(checkbox);
-			}
+			List<CheckBox> checkboxes = new List<CheckBox>();
+			checkboxes.Add(new CheckBox() { Content = "Danbooru", Tag = Math.Abs(Options.Default.Source_Danbooru), IsChecked = Options.Default.Source_Danbooru > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Konachan", Tag = Math.Abs(Options.Default.Source_Konachan), IsChecked = Options.Default.Source_Konachan > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Yandere", Tag = Math.Abs(Options.Default.Source_Yandere), IsChecked = Options.Default.Source_Yandere > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Gelbooru", Tag = Math.Abs(Options.Default.Source_Gelbooru), IsChecked = Options.Default.Source_Gelbooru > 0 });
+			checkboxes.Add(new CheckBox() { Content = "SankakuChannel", Tag = Math.Abs(Options.Default.Source_SankakuChannel), IsChecked = Options.Default.Source_SankakuChannel > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Eshuushuu", Tag = Math.Abs(Options.Default.Source_Eshuushuu), IsChecked = Options.Default.Source_Eshuushuu > 0 });
+			checkboxes.Add(new CheckBox() { Content = "TheAnimeGallery", Tag = Math.Abs(Options.Default.Source_TheAnimeGallery), IsChecked = Options.Default.Source_TheAnimeGallery > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Zerochan", Tag = Math.Abs(Options.Default.Source_Zerochan), IsChecked = Options.Default.Source_Zerochan > 0 });
+			checkboxes.Add(new CheckBox() { Content = "AnimePictures", Tag = Math.Abs(Options.Default.Source_AnimePictures), IsChecked = Options.Default.Source_AnimePictures > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Pivix", Tag = Math.Abs(Options.Default.Source_Pixiv), IsChecked = Options.Default.Source_Pixiv > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Twitter", Tag = Math.Abs(Options.Default.Source_Twitter), IsChecked = Options.Default.Source_Twitter > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Nico Nico Seiga", Tag = Math.Abs(Options.Default.Source_Seiga), IsChecked = Options.Default.Source_Seiga > 0 });
+			checkboxes.Add(new CheckBox() { Content = "DeviantArt", Tag = Math.Abs(Options.Default.Source_DeviantArt), IsChecked = Options.Default.Source_DeviantArt > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Pawoo", Tag = Math.Abs(Options.Default.Source_Pawoo), IsChecked = Options.Default.Source_Pawoo > 0 });
+			checkboxes.Add(new CheckBox() { Content = "MangaDex", Tag = Math.Abs(Options.Default.Source_MangaDex), IsChecked = Options.Default.Source_MangaDex > 0 });
+			checkboxes.Add(new CheckBox() { Content = "ArtStation", Tag = Math.Abs(Options.Default.Source_ArtStation), IsChecked = Options.Default.Source_ArtStation > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Other sources", Tag = Math.Abs(Options.Default.Source_Other), IsChecked = Options.Default.Source_Other > 0 });
 
 			// Parenthesis value
 			switch (Options.Default.SearchedParenthesisValue) {
@@ -102,7 +98,25 @@ namespace Hatate
 
 			this.Slider_SimilarityThreshold.ToolTip = this.Label_SimilarityThreshold.ToolTip;
 
+			this.UpdateSources(checkboxes);
 			this.UpdateLabels();
+
+			// Create sources list context menu
+			ContextMenu context = new ContextMenu();
+			MenuItem item = new MenuItem();
+
+			item.Header = "Move up";
+			item.Tag = "up";
+			item.Click += this.ContextMenu_MenuItem_MoveSourceUpOrDown;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Move down";
+			item.Tag = "down";
+			item.Click += this.ContextMenu_MenuItem_MoveSourceUpOrDown;
+			context.Items.Add(item);
+
+			this.ListView_Sources.ContextMenu = context;
 		}
 
 		/*
@@ -121,6 +135,16 @@ namespace Hatate
 			this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
 			this.Label_Delay.Content = "Delay (" + delay + "secs / " + (delay / 60) + "mins)";
 			this.CheckBox_Randomize.Content = "Randomize the delay (" + min + "~" + max + " secs / " + (min / 60) + "~" + (max / 60) + " mins)";
+		}
+
+		private void UpdateSources(List<CheckBox> checkboxes)
+		{
+			// Sort by tag
+			checkboxes = checkboxes.OrderBy(checkbox => (sbyte)checkbox.Tag).ToList();
+
+			foreach (CheckBox checkbox in checkboxes) {
+				this.ListView_Sources.Items.Add(checkbox);
+			}
 		}
 
 		/*
@@ -287,8 +311,8 @@ namespace Hatate
 
 		private void ListView_Sources_Drop(object sender, DragEventArgs e)
 		{
-			System.Windows.Controls.CheckBox droppedData = e.Data.GetData(typeof(System.Windows.Controls.CheckBox)) as System.Windows.Controls.CheckBox;
-			System.Windows.Controls.CheckBox target = ((System.Windows.Controls.ListBoxItem)(sender)).DataContext as System.Windows.Controls.CheckBox;
+			CheckBox droppedData = e.Data.GetData(typeof(CheckBox)) as CheckBox;
+			CheckBox target = ((System.Windows.Controls.ListBoxItem)(sender)).DataContext as CheckBox;
 			int removedIndex = ListView_Sources.Items.IndexOf(droppedData);
 			int targetIndex = ListView_Sources.Items.IndexOf(target);
 
@@ -308,6 +332,44 @@ namespace Hatate
 		private void Slider_SimilarityThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
 			this.Label_SimilarityThreshold.Content = "Similarity threshold (" + (byte)this.Slider_SimilarityThreshold.Value + "%)";
+		}
+
+		private void ContextMenu_MenuItem_MoveSourceUpOrDown(object sender, RoutedEventArgs e)
+		{
+			MenuItem mi = sender as MenuItem;
+
+			if (mi == null) {
+				return;
+			}
+
+			bool up = (string)mi.Tag == "up";
+
+			// Don't move source up if it's already at the top
+			if (up && this.ListView_Sources.SelectedIndex < 1) {
+				return;
+			} else if (!up && this.ListView_Sources.SelectedIndex == this.ListView_Sources.Items.Count - 1) {
+				return;
+			}
+
+			CheckBox selectedItem = this.ListView_Sources.SelectedItem as CheckBox;
+			CheckBox otherItem = this.ListView_Sources.Items.GetItemAt(this.ListView_Sources.SelectedIndex + (up ? -1 : 1)) as CheckBox;
+
+			// Exchange tag with the item above
+			object selectedItemTag = selectedItem.Tag;
+			object otherItemTag = otherItem.Tag;
+			selectedItem.Tag = otherItemTag;
+			otherItem.Tag = selectedItemTag;
+
+			// Build new list
+			List<CheckBox> checkboxes = new List<CheckBox>();
+
+			foreach (CheckBox checkbox in this.ListView_Sources.Items) {
+				checkboxes.Add(checkbox);
+			}
+
+			// Update sources
+			this.ListView_Sources.Items.Clear();
+			this.UpdateSources(checkboxes);
 		}
 	}
 }
