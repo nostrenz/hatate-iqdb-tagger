@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
 using Options = Hatate.Properties.Settings;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using MenuItem = System.Windows.Controls.MenuItem;
+using CheckBox = System.Windows.Controls.CheckBox;
+using ListBoxItem = System.Windows.Controls.ListBoxItem;
 
 namespace Hatate
 {
@@ -25,14 +31,34 @@ namespace Hatate
 			this.Owner = App.Current.MainWindow;
 
 			// Add match types
-			foreach (var item in Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
-				Combo_MatchType.Items.Add(item);
+			foreach (var value in Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
+				Combo_MatchType.Items.Add(value);
 			}
 
 			// Add search engines
-			foreach (var item in Enum.GetValues(typeof(SearchEngine))) {
-				Combo_SearchEngines.Items.Add(item);
+			foreach (var value in Enum.GetValues(typeof(SearchEngine))) {
+				Combo_SearchEngines.Items.Add(value);
 			}
+
+			// Add sources
+			List<CheckBox> checkboxes = new List<CheckBox>();
+			checkboxes.Add(new CheckBox() { Content = "Danbooru", Tag = Math.Abs(Options.Default.Source_Danbooru), IsChecked = Options.Default.Source_Danbooru > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Konachan", Tag = Math.Abs(Options.Default.Source_Konachan), IsChecked = Options.Default.Source_Konachan > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Yandere", Tag = Math.Abs(Options.Default.Source_Yandere), IsChecked = Options.Default.Source_Yandere > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Gelbooru", Tag = Math.Abs(Options.Default.Source_Gelbooru), IsChecked = Options.Default.Source_Gelbooru > 0 });
+			checkboxes.Add(new CheckBox() { Content = "SankakuChannel", Tag = Math.Abs(Options.Default.Source_SankakuChannel), IsChecked = Options.Default.Source_SankakuChannel > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Eshuushuu", Tag = Math.Abs(Options.Default.Source_Eshuushuu), IsChecked = Options.Default.Source_Eshuushuu > 0 });
+			checkboxes.Add(new CheckBox() { Content = "TheAnimeGallery", Tag = Math.Abs(Options.Default.Source_TheAnimeGallery), IsChecked = Options.Default.Source_TheAnimeGallery > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Zerochan", Tag = Math.Abs(Options.Default.Source_Zerochan), IsChecked = Options.Default.Source_Zerochan > 0 });
+			checkboxes.Add(new CheckBox() { Content = "AnimePictures", Tag = Math.Abs(Options.Default.Source_AnimePictures), IsChecked = Options.Default.Source_AnimePictures > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Pivix", Tag = Math.Abs(Options.Default.Source_Pixiv), IsChecked = Options.Default.Source_Pixiv > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Twitter", Tag = Math.Abs(Options.Default.Source_Twitter), IsChecked = Options.Default.Source_Twitter > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Nico Nico Seiga", Tag = Math.Abs(Options.Default.Source_Seiga), IsChecked = Options.Default.Source_Seiga > 0 });
+			checkboxes.Add(new CheckBox() { Content = "DeviantArt", Tag = Math.Abs(Options.Default.Source_DeviantArt), IsChecked = Options.Default.Source_DeviantArt > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Pawoo", Tag = Math.Abs(Options.Default.Source_Pawoo), IsChecked = Options.Default.Source_Pawoo > 0 });
+			checkboxes.Add(new CheckBox() { Content = "MangaDex", Tag = Math.Abs(Options.Default.Source_MangaDex), IsChecked = Options.Default.Source_MangaDex > 0 });
+			checkboxes.Add(new CheckBox() { Content = "ArtStation", Tag = Math.Abs(Options.Default.Source_ArtStation), IsChecked = Options.Default.Source_ArtStation > 0 });
+			checkboxes.Add(new CheckBox() { Content = "Other sources", Tag = Math.Abs(Options.Default.Source_Other), IsChecked = Options.Default.Source_Other > 0 });
 
 			// Parenthesis value
 			switch (Options.Default.SearchedParenthesisValue) {
@@ -58,25 +84,7 @@ namespace Hatate
 			this.Combo_SearchEngines.SelectedItem = (SearchEngine)Options.Default.SearchEngine;
 			this.CheckBox_RemoveResultAfter.IsChecked = Options.Default.RemoveResultAfter;
 			this.CheckBox_StartupReleaseCheck.IsChecked = Options.Default.StartupReleaseCheck;
-
-			// Sources
-			this.CheckBox_Source_Danbooru.IsChecked = Options.Default.Source_Danbooru;
-			this.CheckBox_Source_Konachan.IsChecked = Options.Default.Source_Konachan;
-			this.CheckBox_Source_Yandere.IsChecked = Options.Default.Source_Yandere;
-			this.CheckBox_Source_Gelbooru.IsChecked = Options.Default.Source_Gelbooru;
-			this.CheckBox_Source_SankakuChannel.IsChecked = Options.Default.Source_SankakuChannel;
-			this.CheckBox_Source_Eshuushuu.IsChecked = Options.Default.Source_Eshuushuu;
-			this.CheckBox_Source_TheAnimeGallery.IsChecked = Options.Default.Source_TheAnimeGallery;
-			this.CheckBox_Source_Zerochan.IsChecked = Options.Default.Source_Zerochan;
-			this.CheckBox_Source_AnimePictures.IsChecked = Options.Default.Source_AnimePictures;
-			this.CheckBox_Source_Pixiv.IsChecked = Options.Default.Source_Pixiv;
-			this.CheckBox_Source_Twitter.IsChecked = Options.Default.Source_Twitter;
-			this.CheckBox_Source_Seiga.IsChecked = Options.Default.Source_Seiga;
-			this.CheckBox_Source_DeviantArt.IsChecked = Options.Default.Source_DeviantArt;
-			this.CheckBox_Source_ArtStation.IsChecked = Options.Default.Source_ArtStation;
-			this.CheckBox_Source_Pawoo.IsChecked = Options.Default.Source_Pawoo;
-			this.CheckBox_Source_MangaDex.IsChecked = Options.Default.Source_MangaDex;
-			this.CheckBox_Source_Other.IsChecked = Options.Default.Source_Other;
+			this.Slider_SimilarityThreshold.Value = Options.Default.SimilarityThreshold;
 
 			// Tags
 			this.CheckBox_AddFoundTag.IsChecked = Options.Default.AddFoundTag;
@@ -89,7 +97,27 @@ namespace Hatate
 			this.TextBox_NotfoundTag.IsEnabled = Options.Default.AddNotfoundTag;
 			this.TextBox_TaggedTag.IsEnabled = Options.Default.AddTaggedTag;
 
+			this.Slider_SimilarityThreshold.ToolTip = this.Label_SimilarityThreshold.ToolTip;
+
+			this.UpdateSources(checkboxes);
 			this.UpdateLabels();
+
+			// Create sources list context menu
+			ContextMenu context = new ContextMenu();
+			MenuItem item = new MenuItem();
+
+			item.Header = "Move up";
+			item.Tag = "up";
+			item.Click += this.ContextMenu_MenuItem_MoveSourceUpOrDown;
+			context.Items.Add(item);
+
+			item = new MenuItem();
+			item.Header = "Move down";
+			item.Tag = "down";
+			item.Click += this.ContextMenu_MenuItem_MoveSourceUpOrDown;
+			context.Items.Add(item);
+
+			this.ListView_Sources.ContextMenu = context;
 		}
 
 		/*
@@ -108,6 +136,16 @@ namespace Hatate
 			this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
 			this.Label_Delay.Content = "Delay (" + delay + "secs / " + (delay / 60) + "mins)";
 			this.CheckBox_Randomize.Content = "Randomize the delay (" + min + "~" + max + " secs / " + (min / 60) + "~" + (max / 60) + " mins)";
+		}
+
+		private void UpdateSources(List<CheckBox> checkboxes)
+		{
+			// Sort by tag
+			checkboxes = checkboxes.OrderBy(checkbox => (sbyte)checkbox.Tag).ToList();
+
+			foreach (CheckBox checkbox in checkboxes) {
+				this.ListView_Sources.Items.Add(checkbox);
+			}
 		}
 
 		/*
@@ -143,25 +181,36 @@ namespace Hatate
 			Options.Default.SearchEngine = (byte)(SearchEngine)this.Combo_SearchEngines.SelectedItem;
 			Options.Default.RemoveResultAfter = (bool)this.CheckBox_RemoveResultAfter.IsChecked;
 			Options.Default.StartupReleaseCheck = (bool)this.CheckBox_StartupReleaseCheck.IsChecked;
+			Options.Default.SimilarityThreshold = (byte)this.Slider_SimilarityThreshold.Value;
 
 			// Sources
-			Options.Default.Source_Danbooru = (bool)this.CheckBox_Source_Danbooru.IsChecked;
-			Options.Default.Source_Konachan = (bool)this.CheckBox_Source_Konachan.IsChecked;
-			Options.Default.Source_Yandere = (bool)this.CheckBox_Source_Yandere.IsChecked;
-			Options.Default.Source_Gelbooru = (bool)this.CheckBox_Source_Gelbooru.IsChecked;
-			Options.Default.Source_SankakuChannel =(bool)this.CheckBox_Source_SankakuChannel.IsChecked;
-			Options.Default.Source_Eshuushuu = (bool)this.CheckBox_Source_Eshuushuu.IsChecked;
-			Options.Default.Source_TheAnimeGallery = (bool)this.CheckBox_Source_TheAnimeGallery.IsChecked;
-			Options.Default.Source_Zerochan = (bool)this.CheckBox_Source_Zerochan.IsChecked;
-			Options.Default.Source_AnimePictures = (bool)this.CheckBox_Source_AnimePictures.IsChecked;
-			Options.Default.Source_Pixiv = (bool)this.CheckBox_Source_Pixiv.IsChecked;
-			Options.Default.Source_Twitter = (bool)this.CheckBox_Source_Twitter.IsChecked;
-			Options.Default.Source_Seiga = (bool)this.CheckBox_Source_Seiga.IsChecked;
-			Options.Default.Source_DeviantArt = (bool)this.CheckBox_Source_DeviantArt.IsChecked;
-			Options.Default.Source_ArtStation = (bool)this.CheckBox_Source_ArtStation.IsChecked;
-			Options.Default.Source_Pawoo = (bool)this.CheckBox_Source_Pawoo.IsChecked;
-			Options.Default.Source_MangaDex = (bool)this.CheckBox_Source_MangaDex.IsChecked;
-			Options.Default.Source_Other = (bool)this.CheckBox_Source_Other.IsChecked;
+			foreach (CheckBox checkbox in this.ListView_Sources.Items) {
+				sbyte index = (sbyte)(1 + this.ListView_Sources.Items.IndexOf(checkbox));
+
+				if (!(bool)checkbox.IsChecked) {
+					index *= -1;
+				}
+
+				switch (checkbox.Content.ToString()) {
+					case "Danbooru": Options.Default.Source_Danbooru = index; break;
+					case "Konachan": Options.Default.Source_Konachan = index; break;
+					case "Yandere": Options.Default.Source_Yandere = index; break;
+					case "Gelbooru": Options.Default.Source_Gelbooru = index; break;
+					case "SankakuChannel": Options.Default.Source_SankakuChannel = index; break;
+					case "Eshuushuu": Options.Default.Source_Eshuushuu = index; break;
+					case "TheAnimeGallery": Options.Default.Source_TheAnimeGallery = index; break;
+					case "Zerochan": Options.Default.Source_Zerochan = index; break;
+					case "AnimePictures": Options.Default.Source_AnimePictures = index; break;
+					case "Pixiv": Options.Default.Source_Pixiv = index; break;
+					case "Twitter": Options.Default.Source_Twitter = index; break;
+					case "Nico Nico Seiga": Options.Default.Source_Seiga = index; break;
+					case "DeviantArt": Options.Default.Source_DeviantArt = index; break;
+					case "ArtStation": Options.Default.Source_ArtStation = index; break;
+					case "Pawoo": Options.Default.Source_Pawoo = index; break;
+					case "MangaDex": Options.Default.Source_MangaDex = index; break;
+					case "Other sources": Options.Default.Source_Other = index; break;
+				}
+			}
 
 			// Tags
 			Options.Default.AddFoundTag = (bool)this.CheckBox_AddFoundTag.IsChecked;
@@ -250,6 +299,78 @@ namespace Hatate
 			this.TextBox_MinimumTagsCount.IsEnabled = iqdbIsSelected;
 			this.Combo_MatchType.IsEnabled = iqdbIsSelected;
 			this.CheckBox_MatchType.IsEnabled = iqdbIsSelected;
+		}
+
+		private void ListView_Sources_PreviewMouseMoveEvent(object sender, System.Windows.Input.MouseEventArgs e)
+		{
+			if (sender is ListBoxItem && e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
+				ListBoxItem draggedItem = sender as ListBoxItem;
+				DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+				draggedItem.IsSelected = true;
+			}
+		}
+
+		private void ListView_Sources_Drop(object sender, DragEventArgs e)
+		{
+			CheckBox droppedData = e.Data.GetData(typeof(CheckBox)) as CheckBox;
+			CheckBox target = ((ListBoxItem)(sender)).DataContext as CheckBox;
+			int removedIndex = ListView_Sources.Items.IndexOf(droppedData);
+			int targetIndex = ListView_Sources.Items.IndexOf(target);
+
+			if (removedIndex == targetIndex) {
+				return;
+			}
+
+			if (removedIndex < targetIndex) {
+				this.ListView_Sources.Items.RemoveAt(removedIndex);
+				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
+			} else {
+				this.ListView_Sources.Items.RemoveAt(removedIndex);
+				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
+			}
+		}
+
+		private void Slider_SimilarityThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			this.Label_SimilarityThreshold.Content = "Similarity threshold (" + (byte)this.Slider_SimilarityThreshold.Value + "%)";
+		}
+
+		private void ContextMenu_MenuItem_MoveSourceUpOrDown(object sender, RoutedEventArgs e)
+		{
+			MenuItem mi = sender as MenuItem;
+
+			if (mi == null) {
+				return;
+			}
+
+			bool up = (string)mi.Tag == "up";
+
+			// Don't move source up if it's already at the top
+			if (up && this.ListView_Sources.SelectedIndex < 1) {
+				return;
+			} else if (!up && this.ListView_Sources.SelectedIndex == this.ListView_Sources.Items.Count - 1) {
+				return;
+			}
+
+			CheckBox selectedItem = this.ListView_Sources.SelectedItem as CheckBox;
+			CheckBox otherItem = this.ListView_Sources.Items.GetItemAt(this.ListView_Sources.SelectedIndex + (up ? -1 : 1)) as CheckBox;
+
+			// Exchange tag with the item above
+			object selectedItemTag = selectedItem.Tag;
+			object otherItemTag = otherItem.Tag;
+			selectedItem.Tag = otherItemTag;
+			otherItem.Tag = selectedItemTag;
+
+			// Build new list
+			List<CheckBox> checkboxes = new List<CheckBox>();
+
+			foreach (CheckBox checkbox in this.ListView_Sources.Items) {
+				checkboxes.Add(checkbox);
+			}
+
+			// Update sources
+			this.ListView_Sources.Items.Clear();
+			this.UpdateSources(checkboxes);
 		}
 	}
 }

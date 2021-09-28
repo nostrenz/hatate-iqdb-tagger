@@ -492,6 +492,34 @@ namespace Hatate
 			this.AddAutoTags(result);
 		}
 
+		private Match GetMatchWithBestSourceOrdering(Result result, Match currentMatch)
+		{
+			sbyte bestOrdering = 0;
+			byte similarityThreshold = Options.Default.SimilarityThreshold;
+			float lowestAcceptableSimilarity = currentMatch.Similarity - similarityThreshold;
+
+			foreach (Match match in result.Matches) {
+				// Similarity too low, we won't select this match even if it's source is higher in the ordering
+				if (match.Similarity < lowestAcceptableSimilarity) {
+					continue;
+				}
+
+				sbyte sourceOrdering = this.GetSourceOrderingIndex(match.Source);
+
+				// Source is disabled
+				if (sourceOrdering < 1) {
+					continue;
+				}
+
+				if (bestOrdering == 0 || sourceOrdering < bestOrdering) {
+					currentMatch = match;
+					bestOrdering = sourceOrdering;
+				}
+			}
+
+			return currentMatch;
+		}
+
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
@@ -513,13 +541,13 @@ namespace Hatate
 					continue;
 				}
 
-				// Check source
-				if (!this.CheckSource(match.Source)) {
+				// Check if source is enabled
+				if (this.GetSourceOrderingIndex(match.Source) < 1) {
 					continue;
 				}
 
 				// Match found
-				result.Match = match;
+				result.Match = this.GetMatchWithBestSourceOrdering(result, match);
 
 				// Log the URL
 				if (Options.Default.LogMatchedUrls) {
@@ -676,7 +704,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name=""></param>
 		/// <returns></returns>
-		private bool CheckSource(Source source)
+		private sbyte GetSourceOrderingIndex(Source source)
 		{
 			switch (source) {
 				case Source.Danbooru:
@@ -715,7 +743,7 @@ namespace Hatate
 					return Options.Default.Source_Other;
 			}
 
-			return false;
+			return 0;
 		}
 
 		/// <summary>

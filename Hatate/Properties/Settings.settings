@@ -23,32 +23,32 @@
     <Setting Name="Setting" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Source_Danbooru" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Danbooru" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="Source_Konachan" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Konachan" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="Source_Yandere" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Yandere" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="Source_Gelbooru" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Gelbooru" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">4</Value>
     </Setting>
-    <Setting Name="Source_SankakuChannel" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_SankakuChannel" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-5</Value>
     </Setting>
-    <Setting Name="Source_Eshuushuu" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Eshuushuu" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">6</Value>
     </Setting>
-    <Setting Name="Source_TheAnimeGallery" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_TheAnimeGallery" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-7</Value>
     </Setting>
-    <Setting Name="Source_Zerochan" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_Zerochan" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-8</Value>
     </Setting>
-    <Setting Name="Source_AnimePictures" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_AnimePictures" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">9</Value>
     </Setting>
     <Setting Name="AddRating" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -119,32 +119,32 @@
     <Setting Name="RemoveResultAfter" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Source_Pixiv" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Pixiv" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">10</Value>
     </Setting>
-    <Setting Name="Source_Twitter" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Source_Twitter" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">11</Value>
     </Setting>
-    <Setting Name="Source_Other" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_Other" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-12</Value>
     </Setting>
-    <Setting Name="Source_Seiga" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_Seiga" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-13</Value>
     </Setting>
     <Setting Name="SauceNaoApiKey" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Source_DeviantArt" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_DeviantArt" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-14</Value>
     </Setting>
-    <Setting Name="Source_ArtStation" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_ArtStation" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-15</Value>
     </Setting>
-    <Setting Name="Source_Pawoo" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_Pawoo" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-16</Value>
     </Setting>
-    <Setting Name="Source_MangaDex" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Source_MangaDex" Type="System.SByte" Scope="User">
+      <Value Profile="(Default)">-17</Value>
     </Setting>
     <Setting Name="StartupReleaseCheck" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -157,6 +157,9 @@
     </Setting>
     <Setting Name="SearchedParenthesisValue" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SimilarityThreshold" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">15</Value>
     </Setting>
   </Settings>
 </SettingsFile>
