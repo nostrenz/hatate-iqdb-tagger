@@ -50,7 +50,7 @@
 		<RadioButton x:Name="RadioButton_Parenthesis_HighestSimilarity" Content="Highest similarity" HorizontalAlignment="Left" Margin="420,406,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,0.577"/>
 		<RadioButton x:Name="RadioButton_Parenthesis_MatchSimilarity" Content="Match similarity" HorizontalAlignment="Left" Margin="319,406,0,0" VerticalAlignment="Top"/>
 		<RadioButton x:Name="RadioButton_Parenthesis_MatchSource" Content="Match source" HorizontalAlignment="Left" Margin="230,406,0,0" VerticalAlignment="Top"/>
-		<Label x:Name="Label_SimilarityThreshold" Content="Similarity threshold (100%)" HorizontalAlignment="Right" Margin="0,195,132,0" VerticalAlignment="Top" Width="146" Padding="0" Height="18" ToolTip="Sources with higher priority will be prefered to a source with a higher&#x0d;&#x0a;match similarity as long as the difference is within this threshold."/>
+		<Label x:Name="Label_SimilarityThreshold" Content="Similarity threshold (100%)" HorizontalAlignment="Right" Margin="0,195,132,0" VerticalAlignment="Top" Width="146" Padding="0" Height="18" ToolTip="Sources positioned higher in the list will be prefered to those with a higher&#x0d;&#x0a;match similarity as long as the difference is within this threshold."/>
 		<Slider x:Name="Slider_SimilarityThreshold" Margin="0,195,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Width="122" Minimum="0" Maximum="100" SmallChange="1" Value="100" ValueChanged="Slider_SimilarityThreshold_ValueChanged"/>
 	</Grid>
 </Window>

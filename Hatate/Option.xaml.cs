@@ -6,6 +6,7 @@ using Options = Hatate.Properties.Settings;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using CheckBox = System.Windows.Controls.CheckBox;
+using ListBoxItem = System.Windows.Controls.ListBoxItem;
 
 namespace Hatate
 {
@@ -183,7 +184,7 @@ namespace Hatate
 			Options.Default.SimilarityThreshold = (byte)this.Slider_SimilarityThreshold.Value;
 
 			// Sources
-			foreach (System.Windows.Controls.CheckBox checkbox in this.ListView_Sources.Items) {
+			foreach (CheckBox checkbox in this.ListView_Sources.Items) {
 				sbyte index = (sbyte)(1 + this.ListView_Sources.Items.IndexOf(checkbox));
 
 				if (!(bool)checkbox.IsChecked) {
@@ -302,8 +303,8 @@ namespace Hatate
 
 		private void ListView_Sources_PreviewMouseMoveEvent(object sender, System.Windows.Input.MouseEventArgs e)
 		{
-			if (sender is System.Windows.Controls.ListBoxItem && e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
-				System.Windows.Controls.ListBoxItem draggedItem = sender as System.Windows.Controls.ListBoxItem;
+			if (sender is ListBoxItem && e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
+				ListBoxItem draggedItem = sender as ListBoxItem;
 				DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
 				draggedItem.IsSelected = true;
 			}
@@ -312,7 +313,7 @@ namespace Hatate
 		private void ListView_Sources_Drop(object sender, DragEventArgs e)
 		{
 			CheckBox droppedData = e.Data.GetData(typeof(CheckBox)) as CheckBox;
-			CheckBox target = ((System.Windows.Controls.ListBoxItem)(sender)).DataContext as CheckBox;
+			CheckBox target = ((ListBoxItem)(sender)).DataContext as CheckBox;
 			int removedIndex = ListView_Sources.Items.IndexOf(droppedData);
 			int targetIndex = ListView_Sources.Items.IndexOf(target);
 
