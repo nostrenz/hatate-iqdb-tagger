@@ -314,20 +314,27 @@ namespace Hatate
 		{
 			CheckBox droppedData = e.Data.GetData(typeof(CheckBox)) as CheckBox;
 			CheckBox target = ((ListBoxItem)(sender)).DataContext as CheckBox;
-			int removedIndex = ListView_Sources.Items.IndexOf(droppedData);
-			int targetIndex = ListView_Sources.Items.IndexOf(target);
+			sbyte removedIndex = (sbyte)ListView_Sources.Items.IndexOf(droppedData);
+			sbyte targetIndex = (sbyte)ListView_Sources.Items.IndexOf(target);
 
 			if (removedIndex == targetIndex) {
 				return;
 			}
 
-			if (removedIndex < targetIndex) {
-				this.ListView_Sources.Items.RemoveAt(removedIndex);
-				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
-			} else {
-				this.ListView_Sources.Items.RemoveAt(removedIndex);
-				this.ListView_Sources.Items.Insert(targetIndex, droppedData);
+			this.ListView_Sources.Items.RemoveAt(removedIndex);
+			this.ListView_Sources.Items.Insert(targetIndex, droppedData);
+
+			// Update tag index for ordering
+			if ((bool)droppedData.IsChecked) {
+				removedIndex *= -1;
 			}
+
+			if ((bool)target.IsChecked) {
+				targetIndex *= -1;
+			}
+
+			droppedData.Tag = removedIndex;
+			target.Tag = targetIndex;
 		}
 
 		private void Slider_SimilarityThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
