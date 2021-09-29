@@ -15,11 +15,11 @@ namespace Hatate
 	/// </summary>
 	public partial class Option : Window
 	{
-		public const byte PARENTHESIS_VALUE_NUMBER_OF_TAGS      = 1;
-		public const byte PARENTHESIS_VALUE_NUMBER_OF_MATCHES   = 2;
-		public const byte PARENTHESIS_VALUE_MATCH_SOURCE        = 3;
-		public const byte PARENTHESIS_VALUE_MATCH_SIMILARITY    = 4;
-		public const byte PARENTHESIS_VALUE_HIGHEST_SIMILARITY  = 5;
+		public const byte PARENTHESIS_VALUE_NUMBER_OF_TAGS     = 1;
+		public const byte PARENTHESIS_VALUE_NUMBER_OF_MATCHES  = 2;
+		public const byte PARENTHESIS_VALUE_MATCH_SOURCE       = 3;
+		public const byte PARENTHESIS_VALUE_MATCH_SIMILARITY   = 4;
+		public const byte PARENTHESIS_VALUE_HIGHEST_SIMILARITY = 5;
 
 		// If the list of results needs to be refreshed after closing the options window
 		private bool listRefreshRequired = false;
@@ -324,17 +324,16 @@ namespace Hatate
 			this.ListView_Sources.Items.RemoveAt(removedIndex);
 			this.ListView_Sources.Items.Insert(targetIndex, droppedData);
 
-			// Update tag index for ordering
-			if ((bool)droppedData.IsChecked) {
-				removedIndex *= -1;
-			}
+			// Update tag indexes for ordering
+			foreach (CheckBox checkbox in this.ListView_Sources.Items) {
+				sbyte index = (sbyte)(1 + this.ListView_Sources.Items.IndexOf(checkbox));
 
-			if ((bool)target.IsChecked) {
-				targetIndex *= -1;
-			}
+				if (!(bool)checkbox.IsChecked) {
+					index *= -1;
+				}
 
-			droppedData.Tag = removedIndex;
-			target.Tag = targetIndex;
+				checkbox.Tag = index;
+			}
 		}
 
 		private void Slider_SimilarityThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
