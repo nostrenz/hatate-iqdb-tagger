@@ -46,13 +46,20 @@
 					if (content.StartsWith("Size:")) {
 						Supremes.Nodes.Element full = li.Select("a").First;
 
+						int start = 0;
+						int end = 0;
+
 						if (full != null) {
+							end = full.Text.LastIndexOf(' ');
 							this.full = full.Attr("href");
-							this.size = this.KbOrMbToBytes(full.Text.Substring(0, full.Text.LastIndexOf(' ')));
+							
+							if (end > 0) {
+								this.size = this.KbOrMbToBytes(full.Text.Substring(0, end));
+							}
 						}
 
-						int start = content.LastIndexOf('(');
-						int end = content.LastIndexOf(')');
+						start = content.LastIndexOf('(');
+						end = content.LastIndexOf(')');
 
 						if (start > 0 && end > start) {
 							this.parseResolution(content.Substring(start + 1, end - start - 1));
