@@ -2,6 +2,8 @@
 {
 	class Gelbooru : Page, IParser
 	{
+		private const byte SIZE_SUBSTR_START = 6;
+
 		/*
 		============================================
 		Protected
@@ -47,8 +49,8 @@
 				if (content.StartsWith("Size:")) {
 					int end = content.IndexOf('<');
 
-					if (end > 0) {
-						content = content.Substring(6, end - 6);
+					if (end > SIZE_SUBSTR_START) {
+						content = content.Substring(SIZE_SUBSTR_START, end - SIZE_SUBSTR_START);
 						string[] parts = content.Trim().Split('x');
 
 						if (parts.Length == 2) {

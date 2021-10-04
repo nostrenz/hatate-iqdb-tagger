@@ -97,7 +97,7 @@
 			int start = linkText.LastIndexOf('(');
 			int end = linkText.LastIndexOf(')');
 
-			if (start > 0 && end > 0) {
+			if (start > 0 && end > start) {
 				this.size = this.KbOrMbToBytes(linkText.Substring(start + 1, end - start - 1));
 			}
 		}

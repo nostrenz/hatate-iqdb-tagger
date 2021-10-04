@@ -54,7 +54,7 @@
 						int start = content.LastIndexOf('(');
 						int end = content.LastIndexOf(')');
 
-						if (start > 0 && end > 0) {
+						if (start > 0 && end > start) {
 							this.parseResolution(content.Substring(start + 1, end - start - 1));
 						}
 					} else if (content.StartsWith("Rating:")) {
