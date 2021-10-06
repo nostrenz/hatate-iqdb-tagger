@@ -6,7 +6,7 @@ using Options = Hatate.Properties.Settings;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using CheckBox = System.Windows.Controls.CheckBox;
-using ListBoxItem = System.Windows.Controls.ListBoxItem;
+using ListViewItem = System.Windows.Controls.ListViewItem;
 
 namespace Hatate
 {
@@ -303,8 +303,8 @@ namespace Hatate
 
 		private void ListView_Sources_PreviewMouseMoveEvent(object sender, System.Windows.Input.MouseEventArgs e)
 		{
-			if (sender is ListBoxItem && e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
-				ListBoxItem draggedItem = sender as ListBoxItem;
+			if (sender is ListViewItem && e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
+				ListViewItem draggedItem = sender as ListViewItem;
 				DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
 				draggedItem.IsSelected = true;
 			}
@@ -313,7 +313,7 @@ namespace Hatate
 		private void ListView_Sources_Drop(object sender, DragEventArgs e)
 		{
 			CheckBox droppedData = e.Data.GetData(typeof(CheckBox)) as CheckBox;
-			CheckBox target = ((ListBoxItem)(sender)).DataContext as CheckBox;
+			CheckBox target = ((ListViewItem)(sender)).DataContext as CheckBox;
 			sbyte removedIndex = (sbyte)ListView_Sources.Items.IndexOf(droppedData);
 			sbyte targetIndex = (sbyte)ListView_Sources.Items.IndexOf(target);
 
