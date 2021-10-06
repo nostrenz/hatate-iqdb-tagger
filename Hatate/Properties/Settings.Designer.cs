@@ -121,7 +121,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public sbyte Source_Konachan {
             get {
                 return ((sbyte)(this["Source_Konachan"]));
@@ -133,7 +133,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public sbyte Source_Yandere {
             get {
                 return ((sbyte)(this["Source_Yandere"]));
@@ -145,7 +145,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public sbyte Source_Gelbooru {
             get {
                 return ((sbyte)(this["Source_Gelbooru"]));
@@ -157,7 +157,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public sbyte Source_SankakuChannel {
             get {
                 return ((sbyte)(this["Source_SankakuChannel"]));
@@ -181,7 +181,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("9")]
         public sbyte Source_TheAnimeGallery {
             get {
                 return ((sbyte)(this["Source_TheAnimeGallery"]));
@@ -193,7 +193,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public sbyte Source_Zerochan {
             get {
                 return ((sbyte)(this["Source_Zerochan"]));
@@ -205,7 +205,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
         public sbyte Source_AnimePictures {
             get {
                 return ((sbyte)(this["Source_AnimePictures"]));
@@ -493,7 +493,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public sbyte Source_Pixiv {
             get {
                 return ((sbyte)(this["Source_Pixiv"]));
@@ -505,7 +505,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("11")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-14")]
         public sbyte Source_Twitter {
             get {
                 return ((sbyte)(this["Source_Twitter"]));
@@ -517,7 +517,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-12")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-17")]
         public sbyte Source_Other {
             get {
                 return ((sbyte)(this["Source_Other"]));
@@ -529,7 +529,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-13")]
+        [global::System.Configuration.DefaultSettingValueAttribute("11")]
         public sbyte Source_Seiga {
             get {
                 return ((sbyte)(this["Source_Seiga"]));
@@ -553,7 +553,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-14")]
+        [global::System.Configuration.DefaultSettingValueAttribute("12")]
         public sbyte Source_DeviantArt {
             get {
                 return ((sbyte)(this["Source_DeviantArt"]));
@@ -577,7 +577,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-16")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-13")]
         public sbyte Source_Pawoo {
             get {
                 return ((sbyte)(this["Source_Pawoo"]));
@@ -589,7 +589,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-17")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-16")]
         public sbyte Source_MangaDex {
             get {
                 return ((sbyte)(this["Source_MangaDex"]));
