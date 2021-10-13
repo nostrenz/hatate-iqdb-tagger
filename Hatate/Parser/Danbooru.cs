@@ -49,7 +49,7 @@
 						int start = 0;
 						int end = 0;
 
-						if (full != null) {
+						if (full != null && full.Text != "»") {
 							end = full.Text.LastIndexOf(' ');
 							this.full = full.Attr("href");
 							
