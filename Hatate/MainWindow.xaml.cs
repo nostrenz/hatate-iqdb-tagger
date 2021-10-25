@@ -342,7 +342,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		private async Task SearchFile(int index, SearchEngine searchEngine)
+		private async Task SearchFile(int index, SearchEngine searchEngine, bool isRetry=false)
 		{
 			Result result = this.GetResultAt(index);
 
@@ -389,6 +389,18 @@ namespace Hatate
 			} else { // Not found on IQDB
 				this.SetStatus("File not found.");
 				this.notFound++;
+
+				// Retry with the other engine
+				if (Options.Default.RetryMethod != (sbyte)RetryMethod.DontRetry && !isRetry) {
+					// Use the other engine
+					if (Options.Default.RetryMethod == (sbyte)RetryMethod.OtherEngine) {
+						searchEngine = (searchEngine == SearchEngine.IQDB ? SearchEngine.SauceNAO : SearchEngine.IQDB);
+					}
+
+					await this.SearchFile(index, searchEngine, true);
+
+					return;
+				}
 			}
 
 			// Send to Hydrus
@@ -448,7 +460,7 @@ namespace Hatate
 				result.UseIqdbApiMatches(iqdbResult.Matches);
 
 				// Check for matching results
-				this.CheckMatches(result);
+				this.CheckMatches(result, SearchEngine.IQDB);
 			}
 
 			this.AddAutoTags(result);
@@ -488,7 +500,7 @@ namespace Hatate
 			this.lastSearchedInSeconds = 1;
 			result.Matches = sauceNao.Matches;
 
-			this.CheckMatches(result);
+			this.CheckMatches(result, SearchEngine.SauceNAO);
 			this.AddAutoTags(result);
 		}
 
@@ -523,7 +535,7 @@ namespace Hatate
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
-		private void CheckMatches(Result result)
+		private void CheckMatches(Result result, SearchEngine usedSearchEngine)
 		{
 			foreach (Match match in result.Matches) {
 				// Check minimum similarity
@@ -532,12 +544,12 @@ namespace Hatate
 				}
 
 				// Check minimum number of tags (only for IQDB)
-				if (this.SearchEngine == SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
+				if (usedSearchEngine == SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
 					continue;
 				}
 
 				// Check match type if enabled (only for IQDB)
-				if (this.SearchEngine == SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
+				if (usedSearchEngine == SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
 					continue;
 				}
 

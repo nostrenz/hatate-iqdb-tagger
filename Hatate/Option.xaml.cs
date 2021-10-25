@@ -10,17 +10,27 @@ using ListViewItem = System.Windows.Controls.ListViewItem;
 
 namespace Hatate
 {
+	public enum ParenthesisValue : byte
+	{
+		NumberOfTags = 1,
+		NumberOfMatches,
+		MatchSource,
+		MatchSimilarity,
+		HighestSimilarity
+	}
+
+	public enum RetryMethod : byte
+	{
+		DontRetry,
+		SameEngine,
+		OtherEngine
+	}
+
 	/// <summary>
 	/// Interaction logic for Option.xaml
 	/// </summary>
 	public partial class Option : Window
 	{
-		public const byte PARENTHESIS_VALUE_NUMBER_OF_TAGS     = 1;
-		public const byte PARENTHESIS_VALUE_NUMBER_OF_MATCHES  = 2;
-		public const byte PARENTHESIS_VALUE_MATCH_SOURCE       = 3;
-		public const byte PARENTHESIS_VALUE_MATCH_SIMILARITY   = 4;
-		public const byte PARENTHESIS_VALUE_HIGHEST_SIMILARITY = 5;
-
 		// If the list of results needs to be refreshed after closing the options window
 		private bool listRefreshRequired = false;
 
@@ -60,13 +70,20 @@ namespace Hatate
 			checkboxes.Add(new CheckBox() { Content = "ArtStation", Tag = Math.Abs(Options.Default.Source_ArtStation), IsChecked = Options.Default.Source_ArtStation > 0 });
 			checkboxes.Add(new CheckBox() { Content = "Other sources", Tag = Math.Abs(Options.Default.Source_Other), IsChecked = Options.Default.Source_Other > 0 });
 
+			// Retry method
+			switch (Options.Default.RetryMethod) {
+				case (byte)RetryMethod.DontRetry: this.RadioButton_DontRetry.IsChecked = true; break;
+				case (byte)RetryMethod.SameEngine: this.RadioButton_RetrySameEngine.IsChecked = true; break;
+				case (byte)RetryMethod.OtherEngine: this.RadioButton_RetryOtherEngine.IsChecked = true; break;
+			}
+
 			// Parenthesis value
 			switch (Options.Default.SearchedParenthesisValue) {
-				case PARENTHESIS_VALUE_NUMBER_OF_TAGS: this.RadioButton_Parenthesis_NumberOfTags.IsChecked = true; break;
-				case PARENTHESIS_VALUE_NUMBER_OF_MATCHES: this.RadioButton_Parenthesis_NumberOfMatches.IsChecked = true; break;
-				case PARENTHESIS_VALUE_MATCH_SOURCE: this.RadioButton_Parenthesis_MatchSource.IsChecked = true; break;
-				case PARENTHESIS_VALUE_MATCH_SIMILARITY: this.RadioButton_Parenthesis_MatchSimilarity.IsChecked = true; break;
-				case PARENTHESIS_VALUE_HIGHEST_SIMILARITY: this.RadioButton_Parenthesis_HighestSimilarity.IsChecked = true; break;
+				case (byte)ParenthesisValue.NumberOfTags: this.RadioButton_Parenthesis_NumberOfTags.IsChecked = true; break;
+				case (byte)ParenthesisValue.NumberOfMatches: this.RadioButton_Parenthesis_NumberOfMatches.IsChecked = true; break;
+				case (byte)ParenthesisValue.MatchSource: this.RadioButton_Parenthesis_MatchSource.IsChecked = true; break;
+				case (byte)ParenthesisValue.MatchSimilarity: this.RadioButton_Parenthesis_MatchSimilarity.IsChecked = true; break;
+				case (byte)ParenthesisValue.HighestSimilarity: this.RadioButton_Parenthesis_HighestSimilarity.IsChecked = true; break;
 			}
 
 			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
@@ -236,17 +253,26 @@ namespace Hatate
 
 			byte previousParenthesisValue = Options.Default.SearchedParenthesisValue;
 
+			// Retry method
+			if ((bool)this.RadioButton_RetrySameEngine.IsChecked) {
+				Options.Default.RetryMethod = (byte)RetryMethod.SameEngine;
+			} else if ((bool)this.RadioButton_RetryOtherEngine.IsChecked) {
+				Options.Default.RetryMethod = (byte)RetryMethod.OtherEngine;
+			} else {
+				Options.Default.RetryMethod = (byte)RetryMethod.DontRetry;
+			}
+
 			// Parenthesis value
 			if ((bool)this.RadioButton_Parenthesis_NumberOfTags.IsChecked) {
-				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_NUMBER_OF_TAGS;
+				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.NumberOfTags;
 			} else if ((bool)this.RadioButton_Parenthesis_NumberOfMatches.IsChecked) {
-				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_NUMBER_OF_MATCHES;
+				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.NumberOfMatches;
 			} else if ((bool)this.RadioButton_Parenthesis_MatchSource.IsChecked) {
-				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_MATCH_SOURCE;
+				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.MatchSource;
 			} else if ((bool)this.RadioButton_Parenthesis_MatchSimilarity.IsChecked) {
-				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_MATCH_SIMILARITY;
+				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.MatchSimilarity;
 			} else if ((bool)this.RadioButton_Parenthesis_HighestSimilarity.IsChecked) {
-				Options.Default.SearchedParenthesisValue = PARENTHESIS_VALUE_HIGHEST_SIMILARITY;
+				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.HighestSimilarity;
 			}
 
 			// We'll need to refresh the list
@@ -299,6 +325,9 @@ namespace Hatate
 			this.TextBox_MinimumTagsCount.IsEnabled = iqdbIsSelected;
 			this.Combo_MatchType.IsEnabled = iqdbIsSelected;
 			this.CheckBox_MatchType.IsEnabled = iqdbIsSelected;
+
+			this.Label_Retry.Content = "When a search with " + (iqdbIsSelected ? "IQDB" : "SauceNAO") + " gives no result:";
+			this.RadioButton_RetryOtherEngine.Content = "Retry with " + (iqdbIsSelected ? "SauceNAO" : "IQDB");
 		}
 
 		private void ListView_Sources_PreviewMouseMoveEvent(object sender, System.Windows.Input.MouseEventArgs e)

@@ -414,19 +414,19 @@ namespace Hatate
 				string parenthesisText = null;
 
 				switch (Settings.Default.SearchedParenthesisValue) {
-					case OptionsWindow.PARENTHESIS_VALUE_NUMBER_OF_TAGS:
+					case (byte)ParenthesisValue.NumberOfTags:
 						parenthesisText = this.Tags.Count.ToString();
 					break;
-					case OptionsWindow.PARENTHESIS_VALUE_NUMBER_OF_MATCHES:
+					case (byte)ParenthesisValue.NumberOfMatches:
 						parenthesisText = this.HasMatches ? this.Matches.Count.ToString() : "0";
 					break;
-					case OptionsWindow.PARENTHESIS_VALUE_MATCH_SOURCE:
+					case (byte)ParenthesisValue.MatchSource:
 						parenthesisText = this.HasMatch ? this.Match.Source.ToString() : "unknown";
 					break;
-					case OptionsWindow.PARENTHESIS_VALUE_MATCH_SIMILARITY:
+					case (byte)ParenthesisValue.MatchSimilarity:
 						parenthesisText = (this.HasMatch ? ((int)this.Match.Similarity).ToString() : "0") + "%";
 					break;
-					case OptionsWindow.PARENTHESIS_VALUE_HIGHEST_SIMILARITY:
+					case (byte)ParenthesisValue.HighestSimilarity:
 						parenthesisText = ((int)this.GetHighestMatchSimilarity()).ToString() + "%";
 					break;
 				}

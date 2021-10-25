@@ -658,5 +658,17 @@ namespace Hatate.Properties {
                 this["SimilarityThreshold"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte RetryMethod {
+            get {
+                return ((byte)(this["RetryMethod"]));
+            }
+            set {
+                this["RetryMethod"] = value;
+            }
+        }
     }
 }
