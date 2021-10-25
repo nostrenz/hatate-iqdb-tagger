@@ -391,8 +391,14 @@ namespace Hatate
 			CheckBox otherItem = this.ListView_Sources.Items.GetItemAt(this.ListView_Sources.SelectedIndex + (up ? -1 : 1)) as CheckBox;
 
 			// Exchange tag with the item above
-			object selectedItemTag = selectedItem.Tag;
-			object otherItemTag = otherItem.Tag;
+			sbyte selectedItemTag = sbyte.Parse(selectedItem.Tag.ToString());
+			sbyte otherItemTag = sbyte.Parse(otherItem.Tag.ToString());
+
+			if (selectedItemTag == otherItemTag) {
+				if (up) otherItemTag -= 1;
+				else otherItemTag += 1;
+			}
+
 			selectedItem.Tag = otherItemTag;
 			otherItem.Tag = selectedItemTag;
 
