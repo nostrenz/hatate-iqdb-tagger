@@ -16,12 +16,12 @@ namespace Hatate
 			this.Owner = App.Current.MainWindow;
 
 			this.Label_Release.Content += " " + App.RELEASE_NUMBER;
-			this.TextBlock_GithubUrl.Text = App.GITHUB_REPOSITORY_URL;
+			this.TextBlock_GithubUrl.Text = App.RepositoryUrl;
 		}
 
 		private void TextBlock_GithubUrl_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			Process.Start(App.GITHUB_REPOSITORY_URL);
+			Process.Start(App.RepositoryUrl);
 		}
 	}
 }

@@ -39,7 +39,7 @@ namespace Hatate
 
 		private void Button_Open_Click(object sender, RoutedEventArgs e)
 		{
-			Process.Start(App.GITHUB_REPOSITORY_URL + App.GITHUB_LATEST_RELEASE);
+			Process.Start(App.RepositoryUrl + App.GITHUB_LATEST_RELEASE);
 
 			this.Close();
 		}

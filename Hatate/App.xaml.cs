@@ -16,7 +16,7 @@ namespace Hatate
 	{
 		public const ushort RELEASE_NUMBER = 7;
 
-		public const string GITHUB_REPOSITORY_URL = "https://github.com/nostrenz/hatate-iqdb-tagger";
+		public const string GITHUB_REPOSITORY     = "/nostrenz/hatate-iqdb-tagger";
 		public const string GITHUB_LATEST_RELEASE = "/releases/latest";
 
 		public static string appDir = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
@@ -165,6 +165,14 @@ namespace Hatate
 		public static string TempPngFilePath
 		{
 			get { return App.TempDirPath +  DateTime.Now.ToString("yyyymmddhhmmssffff") + ".png"; }
+		}
+
+		/// <summary>
+		/// Returns the full URL to the Github repository.
+		/// </summary>
+		public static string RepositoryUrl
+		{
+			get { return "https://github.com" + GITHUB_REPOSITORY; }
 		}
 
 		/*

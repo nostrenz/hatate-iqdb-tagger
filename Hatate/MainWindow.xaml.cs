@@ -1952,7 +1952,7 @@ namespace Hatate
 			Supremes.Nodes.Document doc = null;
 
 			try {
-				doc = Supremes.Dcsoup.Parse(new Uri(App.GITHUB_REPOSITORY_URL + App.GITHUB_LATEST_RELEASE), 5000);
+				doc = Supremes.Dcsoup.Parse(new Uri(App.RepositoryUrl + App.GITHUB_LATEST_RELEASE), 5000);
 			} catch (Exception) {
 				return;
 			}
@@ -1963,52 +1963,72 @@ namespace Hatate
 				return;
 			}
 
-			Supremes.Nodes.Element tag = doc.Select("div.release.label-latest a.Link--muted.css-truncate").First;
+			Supremes.Nodes.Elements links = doc.Select("a");
 
-			if (tag == null) {
+			if (links.Count < 1) {
 				this.GitHubReleaseParsingErrorMessage();
 
 				return;
 			}
 
-			string title = tag.Attr("title");
+			foreach (Supremes.Nodes.Element link in links) {
+				string href = link.Attr("href");
+				string path = App.GITHUB_REPOSITORY + "/tree/r";
 
-			if (title == null || title[0] != 'r') {
-				this.GitHubReleaseParsingErrorMessage();
-
-				return;
-			}
-
-			ushort release;
-
-			// Release number is prefixed with 'r'
-			if (!ushort.TryParse(title.Remove(0, 1), out release)) {
-				this.GitHubReleaseParsingErrorMessage();
-
-				return;
-			}
-
-			// Not a newer release
-			if (release <= App.RELEASE_NUMBER) {
-				if (messageWhenUpToDate) {
-					MessageBox.Show("You have the latest release (r" + release + ").");
+				if (!href.StartsWith(path)) {
+					continue;
 				}
 
-				return;
-			}
+				int lastSlashPos = href.LastIndexOf('/');
 
-			Supremes.Nodes.Element changelog = doc.Select("div.release-main-section div.markdown-body").First;
+				// Last slash in the matched path should be the last in the whole URL
+				if (lastSlashPos != path.Length - 2) {
+					this.GitHubReleaseParsingErrorMessage();
 
-			Application.Current.Dispatcher.Invoke(new Action(() =>
-			{
-				Release releaseWindow = new Release(release);
-
-				if (changelog != null) {
-					releaseWindow.Changelog = changelog.Html;
+					return;
 				}
 
-				releaseWindow.ShowDialog();
-			}));
+				href = href.Substring(lastSlashPos + 1);
+
+				if (href.Length < 2 || href[0] != 'r') {
+					this.GitHubReleaseParsingErrorMessage();
+
+					return;
+				}
+
+				ushort release;
+
+				// Release number is prefixed with 'r'
+				if (!ushort.TryParse(href.Remove(0, 1), out release)) {
+					this.GitHubReleaseParsingErrorMessage();
+
+					return;
+				}
+
+				// Not a newer release
+				if (release <= App.RELEASE_NUMBER) {
+					if (messageWhenUpToDate) {
+						MessageBox.Show("You have the latest release (r" + release + ").");
+					}
+
+					return;
+				}
+
+				Supremes.Nodes.Element changelog = doc.Select("div.release-main-section div.markdown-body").First;
+
+				Application.Current.Dispatcher.Invoke(new Action(() =>
+				{
+					Release releaseWindow = new Release(release);
+
+					if (changelog != null) {
+						releaseWindow.Changelog = changelog.Html;
+					}
+
+					releaseWindow.ShowDialog();
+				}));
+
+				return;
+			}
 		}
 
 		/// <summary>
@@ -2016,7 +2036,7 @@ namespace Hatate
 		/// </summary>
 		private void GitHubReleaseParsingErrorMessage()
 		{
-			System.Windows.Forms.MessageBox.Show("Unable to find the latest release.\nPlease check the Github repository to download it.\n\n" + App.GITHUB_REPOSITORY_URL);
+			System.Windows.Forms.MessageBox.Show("Unable to find the latest release.\nPlease check the Github repository to download it.\n\n" + App.RepositoryUrl);
 		}
 
 		/// <summary>
@@ -3114,7 +3134,7 @@ namespace Hatate
 
 		private void MenuItem_Github_Click(object sender, RoutedEventArgs e)
 		{
-			Process.Start(App.GITHUB_REPOSITORY_URL);
+			Process.Start(App.RepositoryUrl);
 		}
 
 		private async void MenuItem_CheckForUpdate_Click(object sender, RoutedEventArgs e)
