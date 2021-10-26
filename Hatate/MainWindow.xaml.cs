@@ -379,9 +379,6 @@ namespace Hatate
 				break;
 			}
 
-			result.Searched = true;
-			bool hasTags = result.HasTags;
-
 			// Image found
 			if (result.Found) {
 				this.SetStatus("File found.");
@@ -390,21 +387,25 @@ namespace Hatate
 				this.SetStatus("File not found.");
 				this.notFound++;
 
-				// Retry with the other engine
-				if (Options.Default.RetryMethod != (sbyte)RetryMethod.DontRetry && !isRetry) {
-					// Use the other engine
-					if (Options.Default.RetryMethod == (sbyte)RetryMethod.OtherEngine) {
+				if (!isRetry) {
+					if (Options.Default.RetryMethod == (byte)RetryMethod.SameEngine) {
+						// Retry with the same search engine
+						return;
+					} else if (Options.Default.RetryMethod == (byte)RetryMethod.OtherEngine) {
+						// Retry with the other search engine
 						searchEngine = (searchEngine == SearchEngine.IQDB ? SearchEngine.SauceNAO : SearchEngine.IQDB);
+
+						await this.SearchFile(index, searchEngine, true);
+
+						return;
 					}
-
-					await this.SearchFile(index, searchEngine, true);
-
-					return;
 				}
 			}
 
+			result.Searched = true;
+
 			// Send to Hydrus
-			if (hasTags && Options.Default.AutoSend) {
+			if (result.HasTags && Options.Default.AutoSend) {
 				string hydrusPageKey = null;
 
 				if (Options.Default.AddImagesToHydrusPage) {
@@ -2363,12 +2364,12 @@ namespace Hatate
 				break;
 				case "searchIqdb":
 					this.SelectedResult.Reset();
-					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.IQDB);
+					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.IQDB, true);
 					this.ListBox_Files.Items.Refresh();
 				break;
 				case "searchSauceNao":
 					this.SelectedResult.Reset();
-					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.SauceNAO);
+					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.SauceNAO, true);
 					this.ListBox_Files.Items.Refresh();
 				break;
 				case "resetResult":
