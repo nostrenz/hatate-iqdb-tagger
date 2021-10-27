@@ -38,6 +38,7 @@ namespace Hatate
 		private int found = 0;
 		private int notFound = 0;
 		private int delay = 0;
+		private bool retrySearch = false;
 		private Timer timer = new Timer();
 		private Compare compareWindow = null;
 
@@ -311,7 +312,7 @@ namespace Hatate
 			this.ListBox_Files.Items.Refresh();
 
 			// This is the last search, end here
-			if (progress >= this.ListBox_Files.Items.Count - 1) {
+			if (progress >= this.ListBox_Files.Items.Count - 1 && !this.retrySearch) {
 				this.EndSearch();
 
 				return;
@@ -342,9 +343,12 @@ namespace Hatate
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		private async Task SearchFile(int index, SearchEngine searchEngine, bool isRetry=false)
+		private async Task SearchFile(int index, SearchEngine searchEngine)
 		{
 			Result result = this.GetResultAt(index);
+			bool isRetry = this.retrySearch;
+
+			this.retrySearch = false;
 
 			// Some file format aren't supported by some search engines
 			if (!this.ImageFormatIsSupported(result.Local, searchEngine)) {
@@ -384,22 +388,25 @@ namespace Hatate
 				this.SetStatus("File found.");
 				this.found++;
 			} else { // Not found on IQDB
-				this.SetStatus("File not found.");
-				this.notFound++;
-
 				if (!isRetry) {
 					if (Options.Default.RetryMethod == (byte)RetryMethod.SameEngine) {
 						// Retry with the same search engine
+						this.retrySearch = true;
+
 						return;
 					} else if (Options.Default.RetryMethod == (byte)RetryMethod.OtherEngine) {
 						// Retry with the other search engine
+						this.retrySearch = true;
 						searchEngine = (searchEngine == SearchEngine.IQDB ? SearchEngine.SauceNAO : SearchEngine.IQDB);
 
-						await this.SearchFile(index, searchEngine, true);
+						await this.SearchFile(index, searchEngine);
 
 						return;
 					}
 				}
+
+				this.SetStatus("File not found.");
+				this.notFound++;
 			}
 
 			result.Searched = true;
@@ -2158,6 +2165,21 @@ namespace Hatate
 			return false;
 		}
 
+		/// <summary>
+		/// Search the selected result with the given search engine.
+		/// </summary>
+		private async Task SearchSelectedResultWithEngine(SearchEngine searchEngine)
+		{
+			this.SelectedResult.Reset();
+
+			// We don't want to use any of the retry methods when manually searching with a chosen engine
+			this.retrySearch = true;
+
+			await this.SearchFile(this.ListBox_Files.SelectedIndex, searchEngine);
+
+			this.ListBox_Files.Items.Refresh();
+		}
+
 		#endregion Private
 
 		/*
@@ -2383,14 +2405,10 @@ namespace Hatate
 					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
 				case "searchIqdb":
-					this.SelectedResult.Reset();
-					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.IQDB, true);
-					this.ListBox_Files.Items.Refresh();
+					await this.SearchSelectedResultWithEngine(SearchEngine.IQDB);
 				break;
 				case "searchSauceNao":
-					this.SelectedResult.Reset();
-					await this.SearchFile(this.ListBox_Files.SelectedIndex, SearchEngine.SauceNAO, true);
-					this.ListBox_Files.Items.Refresh();
+					await this.SearchSelectedResultWithEngine(SearchEngine.SauceNAO);
 				break;
 				case "resetResult":
 					this.ResetSelectedFilesResult();
