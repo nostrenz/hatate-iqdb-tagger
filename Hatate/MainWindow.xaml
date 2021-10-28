@@ -86,6 +86,8 @@
 				<MenuItem Header="Open program folder" Click="MenuItem_OpenProgramFolder_Click"/>
 				<MenuItem Header="Open matched URLs" Click="MenuItem_OpenMatchedUrls_Click"/>
 			</MenuItem>
+			<MenuItem x:Name="MenuItem_View" Header="View" Height="18">
+			</MenuItem>
 			<MenuItem Header="Maintenance" Height="18">
 				<MenuItem Header="Ignored tags">
 					<MenuItem Header="Reload" Click="MenuItem_ReloadIgnoreds_Click"/>

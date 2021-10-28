@@ -60,6 +60,13 @@ namespace Hatate
 
 			// Prevent closing the window if we have some search results left
 			this.Closing += new System.ComponentModel.CancelEventHandler(CustomClosing);
+
+			// Populate the View menu
+			this.AddParenthesisValueRadioToViewMenu("Number of tags", ParenthesisValue.NumberOfTags);
+			this.AddParenthesisValueRadioToViewMenu("Number of matches", ParenthesisValue.NumberOfMatches);
+			this.AddParenthesisValueRadioToViewMenu("Highest similarity", ParenthesisValue.HighestSimilarity);
+			this.AddParenthesisValueRadioToViewMenu("Match similarity", ParenthesisValue.MatchSimilarity);
+			this.AddParenthesisValueRadioToViewMenu("Match source", ParenthesisValue.MatchSource);
 		}
 
 		/*
@@ -2180,6 +2187,23 @@ namespace Hatate
 			this.ListBox_Files.Items.Refresh();
 		}
 
+		/// <summary>
+		/// Add a new radio button to the View menu.
+		/// </summary>
+		/// <param name="label"></param>
+		/// <param name="tag"></param>
+		private void AddParenthesisValueRadioToViewMenu(string label, ParenthesisValue tag)
+		{
+			RadioButton radioButton = new RadioButton() { Content = label, GroupName = "ParenthesisValue", Tag = tag };
+			radioButton.Checked += this.MenuItem_View_ParenthesisValue_Checked;
+
+			if (Options.Default.SearchedParenthesisValue == (byte)tag) {
+				radioButton.IsChecked = true;
+			}
+
+			this.MenuItem_View.Items.Add(radioButton);
+		}
+
 		#endregion Private
 
 		/*
@@ -2268,10 +2292,6 @@ namespace Hatate
 		{
 			Option option = new Option();
 			option.ShowDialog();
-			
-			if (option.ListRefreshRequired) {
-				this.ListBox_Files.Items.Refresh();
-			}
 		}
 
 		/// <summary>
@@ -3194,6 +3214,19 @@ namespace Hatate
 			this.ImportImageFromClipboard();
 
 			e.Handled = true;
+		}
+
+		/// <summary>
+		/// Called when checking one of the radio buttons in the View menu.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_View_ParenthesisValue_Checked(object sender, RoutedEventArgs e)
+		{
+			RadioButton radioButton = sender as RadioButton;
+			Options.Default.SearchedParenthesisValue = (byte)(ParenthesisValue)radioButton.Tag;
+
+			this.ListBox_Files.Items.Refresh();
 		}
 
 		#endregion Event

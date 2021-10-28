@@ -31,9 +31,6 @@ namespace Hatate
 	/// </summary>
 	public partial class Option : Window
 	{
-		// If the list of results needs to be refreshed after closing the options window
-		private bool listRefreshRequired = false;
-
 		public Option()
 		{
 			InitializeComponent();
@@ -75,15 +72,6 @@ namespace Hatate
 				case (byte)RetryMethod.DontRetry: this.RadioButton_DontRetry.IsChecked = true; break;
 				case (byte)RetryMethod.SameEngine: this.RadioButton_RetrySameEngine.IsChecked = true; break;
 				case (byte)RetryMethod.OtherEngine: this.RadioButton_RetryOtherEngine.IsChecked = true; break;
-			}
-
-			// Parenthesis value
-			switch (Options.Default.SearchedParenthesisValue) {
-				case (byte)ParenthesisValue.NumberOfTags: this.RadioButton_Parenthesis_NumberOfTags.IsChecked = true; break;
-				case (byte)ParenthesisValue.NumberOfMatches: this.RadioButton_Parenthesis_NumberOfMatches.IsChecked = true; break;
-				case (byte)ParenthesisValue.MatchSource: this.RadioButton_Parenthesis_MatchSource.IsChecked = true; break;
-				case (byte)ParenthesisValue.MatchSimilarity: this.RadioButton_Parenthesis_MatchSimilarity.IsChecked = true; break;
-				case (byte)ParenthesisValue.HighestSimilarity: this.RadioButton_Parenthesis_HighestSimilarity.IsChecked = true; break;
 			}
 
 			this.CheckBox_AddRating.IsChecked = Options.Default.AddRating;
@@ -167,17 +155,6 @@ namespace Hatate
 
 		/*
 		============================================
-		Accessor
-		============================================
-		*/
-
-		public bool ListRefreshRequired
-		{
-			get { return this.listRefreshRequired; } 
-		}
-
-		/*
-		============================================
 		Event
 		============================================
 		*/
@@ -251,8 +228,6 @@ namespace Hatate
 				Options.Default.AddTaggedTag = false;
 			}
 
-			byte previousParenthesisValue = Options.Default.SearchedParenthesisValue;
-
 			// Retry method
 			if ((bool)this.RadioButton_RetrySameEngine.IsChecked) {
 				Options.Default.RetryMethod = (byte)RetryMethod.SameEngine;
@@ -260,24 +235,6 @@ namespace Hatate
 				Options.Default.RetryMethod = (byte)RetryMethod.OtherEngine;
 			} else {
 				Options.Default.RetryMethod = (byte)RetryMethod.DontRetry;
-			}
-
-			// Parenthesis value
-			if ((bool)this.RadioButton_Parenthesis_NumberOfTags.IsChecked) {
-				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.NumberOfTags;
-			} else if ((bool)this.RadioButton_Parenthesis_NumberOfMatches.IsChecked) {
-				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.NumberOfMatches;
-			} else if ((bool)this.RadioButton_Parenthesis_MatchSource.IsChecked) {
-				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.MatchSource;
-			} else if ((bool)this.RadioButton_Parenthesis_MatchSimilarity.IsChecked) {
-				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.MatchSimilarity;
-			} else if ((bool)this.RadioButton_Parenthesis_HighestSimilarity.IsChecked) {
-				Options.Default.SearchedParenthesisValue = (byte)ParenthesisValue.HighestSimilarity;
-			}
-
-			// We'll need to refresh the list
-			if (previousParenthesisValue != Options.Default.SearchedParenthesisValue) {
-				this.listRefreshRequired = true;
 			}
 
 			int thumbWidth = 0;
