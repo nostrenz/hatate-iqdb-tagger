@@ -3224,7 +3224,9 @@ namespace Hatate
 		private void MenuItem_View_ParenthesisValue_Checked(object sender, RoutedEventArgs e)
 		{
 			RadioButton radioButton = sender as RadioButton;
+
 			Options.Default.SearchedParenthesisValue = (byte)(ParenthesisValue)radioButton.Tag;
+			Options.Default.Save();
 
 			this.ListBox_Files.Items.Refresh();
 		}
