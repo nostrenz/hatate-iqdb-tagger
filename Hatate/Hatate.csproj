@@ -160,10 +160,15 @@
     <Compile Include="SauceNaoSettings.xaml.cs">
       <DependentUpon>SauceNaoSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SearchEngine.cs" />
+    <Compile Include="Enum\SearchEngine.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="SauceNao.cs" />
+    <Compile Include="Enum\Source.cs" />
     <Compile Include="Source.cs" />
+    <Compile Include="SourceItem.xaml.cs">
+      <DependentUpon>SourceItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources.cs" />
     <Compile Include="Tag.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
@@ -218,6 +223,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SauceNaoSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SourceItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

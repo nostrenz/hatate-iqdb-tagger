@@ -1,4 +1,4 @@
-﻿namespace Hatate
+﻿namespace Hatate.Enum
 {
 	public enum SearchEngine : byte
 	{

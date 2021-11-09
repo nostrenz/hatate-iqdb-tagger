@@ -139,7 +139,7 @@ namespace Hatate
 				match.Rating = iqdbMatch.Rating;
 				match.Score = iqdbMatch.Score;
 				match.Tags = iqdbMatch.Tags;
-				match.Source = (Source)iqdbMatch.Source;
+				match.Source = (Enum.Source)iqdbMatch.Source;
 				match.Resolution = iqdbMatch.Resolution;
 				match.Similarity = (float)iqdbMatch.Similarity;
 
@@ -227,7 +227,7 @@ namespace Hatate
 			get { return this.Match.PreviewUrl; }
 		}
 
-		public Source Source
+		public Enum.Source Source
 		{
 			get { return this.Match.Source; }
 		}

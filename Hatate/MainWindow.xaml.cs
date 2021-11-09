@@ -350,7 +350,7 @@ namespace Hatate
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		private async Task SearchFile(int index, SearchEngine searchEngine)
+		private async Task SearchFile(int index, Enum.SearchEngine searchEngine)
 		{
 			Result result = this.GetResultAt(index);
 			bool isRetry = this.retrySearch;
@@ -380,11 +380,11 @@ namespace Hatate
 
 			// Search the image
 			switch (searchEngine) {
-				case SearchEngine.IQDB:
+				case Enum.SearchEngine.IQDB:
 					this.SetStatus("Searching file with IQDB...");
 					await this.SearchWithIqdb(result);
 				break;
-				case SearchEngine.SauceNAO:
+				case Enum.SearchEngine.SauceNAO:
 					this.SetStatus("Searching file with SauceNAO...");
 					await this.SearchWithSauceNao(result);
 				break;
@@ -404,7 +404,7 @@ namespace Hatate
 					} else if (Options.Default.RetryMethod == (byte)RetryMethod.OtherEngine) {
 						// Retry with the other search engine
 						this.retrySearch = true;
-						searchEngine = (searchEngine == SearchEngine.IQDB ? SearchEngine.SauceNAO : SearchEngine.IQDB);
+						searchEngine = (searchEngine == Enum.SearchEngine.IQDB ? Enum.SearchEngine.SauceNAO : Enum.SearchEngine.IQDB);
 
 						await this.SearchFile(index, searchEngine);
 
@@ -475,7 +475,7 @@ namespace Hatate
 				result.UseIqdbApiMatches(iqdbResult.Matches);
 
 				// Check for matching results
-				this.CheckMatches(result, SearchEngine.IQDB);
+				this.CheckMatches(result, Enum.SearchEngine.IQDB);
 			}
 
 			this.AddAutoTags(result);
@@ -515,13 +515,13 @@ namespace Hatate
 			this.lastSearchedInSeconds = 1;
 			result.Matches = sauceNao.Matches;
 
-			this.CheckMatches(result, SearchEngine.SauceNAO);
+			this.CheckMatches(result, Enum.SearchEngine.SauceNAO);
 			this.AddAutoTags(result);
 		}
 
 		private Match GetMatchWithBestSourceOrdering(Result result, Match currentMatch)
 		{
-			sbyte bestOrdering = 0;
+			byte bestOrdering = 0;
 			byte similarityThreshold = Options.Default.SimilarityThreshold;
 			float lowestAcceptableSimilarity = currentMatch.Similarity - similarityThreshold;
 
@@ -531,16 +531,20 @@ namespace Hatate
 					continue;
 				}
 
-				sbyte sourceOrdering = this.GetSourceOrderingIndex(match.Source);
+				Source source = App.sources.GetByEnumValue(match.Source);
 
-				// Source is disabled
-				if (sourceOrdering < 1) {
+				if (source == null) {
 					continue;
 				}
 
-				if (bestOrdering == 0 || sourceOrdering < bestOrdering) {
+				// Source is disabled
+				if (!source.Enabled) {
+					continue;
+				}
+
+				if (bestOrdering == 0 || source.Ordering < bestOrdering) {
 					currentMatch = match;
-					bestOrdering = sourceOrdering;
+					bestOrdering = source.Ordering;
 				}
 			}
 
@@ -550,7 +554,7 @@ namespace Hatate
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
-		private void CheckMatches(Result result, SearchEngine usedSearchEngine)
+		private void CheckMatches(Result result, Enum.SearchEngine usedSearchEngine)
 		{
 			foreach (Match match in result.Matches) {
 				// Check minimum similarity
@@ -559,17 +563,17 @@ namespace Hatate
 				}
 
 				// Check minimum number of tags (only for IQDB)
-				if (usedSearchEngine == SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
+				if (usedSearchEngine == Enum.SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
 					continue;
 				}
 
 				// Check match type if enabled (only for IQDB)
-				if (usedSearchEngine == SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
+				if (usedSearchEngine == Enum.SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
 					continue;
 				}
 
 				// Check if source is enabled
-				if (this.GetSourceOrderingIndex(match.Source) < 1) {
+				if (App.sources.IsEnabled(match.Source)) {
 					continue;
 				}
 
@@ -634,18 +638,18 @@ namespace Hatate
 			Parser.IParser booru = null;
 
 			switch (result.Source) {
-				case Source.Danbooru: booru = new Parser.Danbooru(); break;
-				case Source.Gelbooru: booru = new Parser.Gelbooru(); break;
-				case Source.Konachan: booru = new Parser.Konachan(); break;
-				case Source.Yandere: booru = new Parser.Yandere(); break;
-				case Source.SankakuChannel: booru = new Parser.SankakuChannel(); break;
-				case Source.Eshuushuu: booru = new Parser.Eshuushuu(); break;
-				case Source.TheAnimeGallery: booru = new Parser.TheAnimeGallery(); break;
-				case Source.Zerochan: booru = new Parser.Zerochan(); break;
-				case Source.AnimePictures: booru = new Parser.AnimePictures(); break;
-				case Source.Pixiv: booru = new Parser.Pixiv(); break;
-				case Source.Seiga: booru = new Parser.NicoNicoSeiga(); break;
-				case Source.DeviantArt: booru = new Parser.DeviantArt(); break;
+				case Enum.Source.Danbooru: booru = new Parser.Danbooru(); break;
+				case Enum.Source.Gelbooru: booru = new Parser.Gelbooru(); break;
+				case Enum.Source.Konachan: booru = new Parser.Konachan(); break;
+				case Enum.Source.Yandere: booru = new Parser.Yandere(); break;
+				case Enum.Source.SankakuChannel: booru = new Parser.SankakuChannel(); break;
+				case Enum.Source.Eshuushuu: booru = new Parser.Eshuushuu(); break;
+				case Enum.Source.TheAnimeGallery: booru = new Parser.TheAnimeGallery(); break;
+				case Enum.Source.Zerochan: booru = new Parser.Zerochan(); break;
+				case Enum.Source.AnimePictures: booru = new Parser.AnimePictures(); break;
+				case Enum.Source.Pixiv: booru = new Parser.Pixiv(); break;
+				case Enum.Source.NicoNicoSeiga: booru = new Parser.NicoNicoSeiga(); break;
+				case Enum.Source.DeviantArt: booru = new Parser.DeviantArt(); break;
 				default: return false;
 			}
 
@@ -724,53 +728,6 @@ namespace Hatate
 
 			this.Label_Remaining.Content = "Remaining: " + remaining + " files (~ " + remainSeconds + " seconds / " + (remainSeconds / 60) + " minutes)";
 			this.Label_Results.Content = "Results: " + this.found + " found, " + this.notFound + " not";
-		}
-
-		/// <summary>
-		/// Check if the given source checked in the options.
-		/// </summary>
-		/// <param name=""></param>
-		/// <returns></returns>
-		private sbyte GetSourceOrderingIndex(Source source)
-		{
-			switch (source) {
-				case Source.Danbooru:
-					return Options.Default.Source_Danbooru;
-				case Source.Konachan:
-					return Options.Default.Source_Konachan;
-				case Source.Yandere:
-					return Options.Default.Source_Yandere;
-				case Source.Gelbooru:
-					return Options.Default.Source_Gelbooru;
-				case Source.SankakuChannel:
-					return Options.Default.Source_SankakuChannel;
-				case Source.Eshuushuu:
-					return Options.Default.Source_Eshuushuu;
-				case Source.TheAnimeGallery:
-					return Options.Default.Source_TheAnimeGallery;
-				case Source.Zerochan:
-					return Options.Default.Source_Zerochan;
-				case Source.AnimePictures:
-					return Options.Default.Source_AnimePictures;
-				case Source.Pixiv:
-					return Options.Default.Source_Pixiv;
-				case Source.Twitter:
-					return Options.Default.Source_Twitter;
-				case Source.Seiga:
-					return Options.Default.Source_Seiga;
-				case Source.DeviantArt:
-					return Options.Default.Source_DeviantArt;
-				case Source.ArtStation:
-					return Options.Default.Source_ArtStation;
-				case Source.Pawoo:
-					return Options.Default.Source_Pawoo;
-				case Source.MangaDex:
-					return Options.Default.Source_MangaDex;
-				case Source.Other:
-					return Options.Default.Source_Other;
-			}
-
-			return 0;
 		}
 
 		/// <summary>
@@ -1942,15 +1899,15 @@ namespace Hatate
 		/// <param name="image"></param>
 		/// <param name="searchEngine"></param>
 		/// <returns></returns>
-		private bool ImageFormatIsSupported(Image image, SearchEngine searchEngine)
+		private bool ImageFormatIsSupported(Image image, Enum.SearchEngine searchEngine)
 		{
 			// webp not supported by IQDB
-			if (searchEngine == SearchEngine.IQDB && image.Format == "webp") {
+			if (searchEngine == Enum.SearchEngine.IQDB && image.Format == "webp") {
 				return false;
 			}
 
 			// tiff not supported by SauceNao
-			if (searchEngine == SearchEngine.SauceNAO && image.Format == "tiff") {
+			if (searchEngine == Enum.SearchEngine.SauceNAO && image.Format == "tiff") {
 				return false;
 			}
 
@@ -2175,7 +2132,7 @@ namespace Hatate
 		/// <summary>
 		/// Search the selected result with the given search engine.
 		/// </summary>
-		private async Task SearchSelectedResultWithEngine(SearchEngine searchEngine)
+		private async Task SearchSelectedResultWithEngine(Enum.SearchEngine searchEngine)
 		{
 			this.SelectedResult.Reset();
 
@@ -2251,9 +2208,9 @@ namespace Hatate
 		/// <summary>
 		/// Selected search engine in settings.
 		/// </summary>
-		private SearchEngine SearchEngine
+		private Enum.SearchEngine SearchEngine
 		{
-			get { return (SearchEngine)Options.Default.SearchEngine; }
+			get { return (Enum.SearchEngine)Options.Default.SearchEngine; }
 		}
 
 		#endregion Accessor
@@ -2425,10 +2382,10 @@ namespace Hatate
 					this.OpenHelpForSelectedTag(this.ListBox_Ignoreds);
 				break;
 				case "searchIqdb":
-					await this.SearchSelectedResultWithEngine(SearchEngine.IQDB);
+					await this.SearchSelectedResultWithEngine(Enum.SearchEngine.IQDB);
 				break;
 				case "searchSauceNao":
-					await this.SearchSelectedResultWithEngine(SearchEngine.SauceNAO);
+					await this.SearchSelectedResultWithEngine(Enum.SearchEngine.SauceNAO);
 				break;
 				case "resetResult":
 					this.ResetSelectedFilesResult();

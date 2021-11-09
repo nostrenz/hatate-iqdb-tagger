@@ -21,6 +21,7 @@ namespace Hatate
 
 		public static string appDir = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 		public static HydrusApi hydrusApi = new HydrusApi();
+		public static Sources sources = new Sources();
 
 		private const string DIR_THUMBS = @"\thumbs\";
 		private const string DIR_TEMP = @"\temp\";
@@ -30,6 +31,8 @@ namespace Hatate
 			#if !DEBUG
 			this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
 			#endif
+
+			App.sources.Init();
 		}
 
 		/*

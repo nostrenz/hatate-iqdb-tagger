@@ -26,42 +26,42 @@ namespace Hatate
 		/// </returns>
 		public void DetermineSourceFromUrl()
 		{
-			this.Source = Source.Other;
+			this.Source = Enum.Source.Other;
 
 			if (this.Url == null) {
 				return;
 			}
 
 			if (this.Url.Contains("danbooru.donmai.us")) {
-				this.Source = Source.Danbooru;
+				this.Source = Enum.Source.Danbooru;
 			} else if (this.Url.Contains("gelbooru.com")) {
-				this.Source = Source.Gelbooru;
+				this.Source = Enum.Source.Gelbooru;
 			} else if (this.Url.Contains("anime-pictures.net")) {
-				this.Source = Source.AnimePictures;
+				this.Source = Enum.Source.AnimePictures;
 			} else if (this.Url.Contains("sankakucomplex.com")) {
-				this.Source = Source.SankakuChannel;
+				this.Source = Enum.Source.SankakuChannel;
 			} else if (this.Url.Contains("konachan.com")) {
-				this.Source = Source.Konachan;
+				this.Source = Enum.Source.Konachan;
 			} else if (this.Url.Contains("yande.re")) {
-				this.Source = Source.Yandere;
+				this.Source = Enum.Source.Yandere;
 			} else if (this.Url.Contains("zerochan.net")) {
-				this.Source = Source.Zerochan;
+				this.Source = Enum.Source.Zerochan;
 			} else if (this.Url.Contains("e-shuushuu.net")) {
-				this.Source = Source.Eshuushuu;
+				this.Source = Enum.Source.Eshuushuu;
 			} else if (this.Url.Contains("pixiv.net")) {
-				this.Source = Source.Pixiv;
+				this.Source = Enum.Source.Pixiv;
 			} else if (this.Url.Contains("twitter.com")) {
-				this.Source = Source.Twitter;
+				this.Source = Enum.Source.Twitter;
 			} else if (this.Url.Contains("seiga.nicovideo.jp")) {
-				this.Source = Source.Seiga;
+				this.Source = Enum.Source.NicoNicoSeiga;
 			} else if (this.Url.Contains("deviantart.com")) {
-				this.Source = Source.DeviantArt;
+				this.Source = Enum.Source.DeviantArt;
 			} else if (this.Url.Contains("artstation.com")) {
-				this.Source = Source.ArtStation;
+				this.Source = Enum.Source.ArtStation;
 			} else if (this.Url.Contains("pawoo.net")) {
-				this.Source = Source.Pawoo;
+				this.Source = Enum.Source.Pawoo;
 			} else if (this.Url.Contains("mangadex.org")) {
-				this.Source = Source.MangaDex;
+				this.Source = Enum.Source.MangaDex;
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace Hatate
 			}
 
 			// Fix danbooru URL from a SauceNAO search
-			if (this.Source == Source.Danbooru) {
+			if (this.Source == Enum.Source.Danbooru) {
 				url = url.Replace("/post/show/", "/posts/");
 			}
 
@@ -121,7 +121,7 @@ namespace Hatate
 
 		public ImmutableList<string> Tags { get; internal set; }
 
-		public Source Source { get; internal set; }
+		public Enum.Source Source { get; internal set; }
 
 		public IqdbApi.Models.Resolution Resolution { get; internal set; }
 
@@ -148,7 +148,7 @@ namespace Hatate
 				string label = this.Source.ToString();
 				string url = this.Url;
 
-				if (this.Source == Source.Other && url != null) {
+				if (this.Source == Enum.Source.Other && url != null) {
 					// We don't recognize the source so we'll display the URL's domain instead
 					try {
 						int start = url.IndexOf("://") + 3;
