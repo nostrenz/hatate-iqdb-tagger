@@ -31,6 +31,7 @@
 					<Grid>
 						<TextBlock x:Name="Label_MatchTips" FontSize="10" TextAlignment="Center" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFD2D2D2"/>
 						<Image x:Name="Image_Match" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="Image_Match_MouseDown" Cursor="Hand"/>
+						<Label x:Name="Label_MatchPages" Content="1/999" VerticalAlignment="Top" FontSize="11" HorizontalAlignment="Right" Width="36" Height="16" Padding="3,0" HorizontalContentAlignment="Center" Visibility="Hidden" Background="#51000000" VerticalContentAlignment="Center" FontWeight="Bold" ToolTip="Match is part of an album"/>
 					</Grid>
 				</Border>
 				<Label x:Name="Label_Local" Content="Local" Margin="4,74,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="Red" Padding="0" FontSize="11" HorizontalAlignment="Left" Width="113"/>

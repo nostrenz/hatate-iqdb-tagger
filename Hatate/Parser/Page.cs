@@ -23,6 +23,7 @@ namespace Hatate.Parser
 		protected string rating = null;
 		protected string source = null;
 		protected bool unavailable = false;
+		protected ushort pages = 0;
 
 		/*
 		============================================
@@ -194,6 +195,11 @@ namespace Hatate.Parser
 		public bool Unavailable
 		{
 			get { return this.unavailable; }
+		}
+
+		public ushort Pages
+		{
+			get { return this.pages; }
 		}
 
 		protected string Url

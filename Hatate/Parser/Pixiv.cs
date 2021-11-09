@@ -51,22 +51,30 @@ namespace Hatate.Parser
 
 				dynamic data = JObject.Parse(json);
 
-				if (data == null || data.body == null || data.body.tags == null || data.body.tags.tags == null) {
+				if (data == null || data.body == null) {
 					return false;
 				}
 
-				foreach (dynamic tag in data.body.tags.tags) {
-					if (tag == null) {
-						continue;
-					}
+				// Get tags
+				if (data.body.tags != null && data.body.tags.tags != null) {
+					foreach (dynamic tag in data.body.tags.tags) {
+						if (tag == null) {
+							continue;
+						}
 
-					if (tag.translation != null && tag.translation.en != null) {
-						this.AddTag((string)tag.translation.en);
-					} else if (tag.romaji != null) {
-						this.AddTag((string)tag.romaji);
-					} else if (tag.tag != null) {
-						this.AddTag((string)tag.tag);
+						if (tag.translation != null && tag.translation.en != null) {
+							this.AddTag((string)tag.translation.en);
+						} else if (tag.romaji != null) {
+							this.AddTag((string)tag.romaji);
+						} else if (tag.tag != null) {
+							this.AddTag((string)tag.tag);
+						}
 					}
+				}
+
+				// If it's an album, get the number of images in it
+				if (data.body.pageCount != null) {
+					ushort.TryParse(data.body.pageCount.ToString(), out this.pages);
 				}
 			}
 

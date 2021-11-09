@@ -21,6 +21,7 @@ namespace Hatate
 		private int matchIndex = -1;
 		private IqdbApi.Enums.Rating overrideRating = IqdbApi.Enums.Rating.Unrated;
 		private bool unavailable = false;
+		private ushort pages = 0;
 
 		public Result(string imagePath)
 		{
@@ -448,6 +449,15 @@ namespace Hatate
 		{
 			get { return this.unavailable; }
 			set { this.unavailable = value; }
+		}
+
+		/// <summary>
+		/// Number of pages in an album.
+		/// </summary>
+		public ushort Pages
+		{
+			get { return this.pages; }
+			set { this.pages = value; }
 		}
 
 		#endregion Accessor

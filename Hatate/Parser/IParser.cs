@@ -18,5 +18,6 @@ namespace Hatate.Parser
 		int Height { get; }
 		string Rating { get; }
 		bool Unavailable { get; }
+		ushort Pages { get; }
 	}
 }

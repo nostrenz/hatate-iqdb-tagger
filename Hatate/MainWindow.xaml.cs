@@ -670,6 +670,7 @@ namespace Hatate
 
 			result.Full = booru.Full;
 			result.Unavailable = booru.Unavailable;
+			result.Pages = booru.Pages;
 			result.Remote = new Image();
 			result.Remote.Size = booru.Size;
 			result.Remote.Width = booru.Width;
@@ -1831,6 +1832,10 @@ namespace Hatate
 				this.Border_Local.BorderBrush = this.GetBrushFromString("#0F0");
 				this.Border_Match.BorderBrush = this.GetBrushFromString("#CC0");
 			}
+
+			// Set album pages counter
+			this.Label_MatchPages.Content = "1/" + result.Pages;
+			this.Label_MatchPages.Visibility = (result.Pages > 0 ? Visibility.Visible : Visibility.Hidden);
 
 			// Set selected match
 			this.ComboBox_Matches.SelectedItem = result.Match;
