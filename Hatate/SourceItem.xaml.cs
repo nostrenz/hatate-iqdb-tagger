@@ -25,6 +25,20 @@ namespace Hatate
 				case Enum.Source.Other: this.Title = "Other sources"; break;
 				default: this.Title = source.Value.ToString(); break;
 			}
+
+			this.EnableOrDisable();
+		}
+
+		/*
+		============================================
+		Private
+		============================================
+		*/
+
+		private void EnableOrDisable()
+		{
+			this.Opacity = this.Enabled ? 1.0 : 0.5;
+			this.Checkbox_GetTags.IsHitTestVisible = this.Enabled;
 		}
 
 		/*
@@ -59,6 +73,17 @@ namespace Hatate
 		{
 			get { return (bool)this.Checkbox_GetTags.IsChecked; }
 			set { this.Checkbox_GetTags.IsChecked = value; }
+		}
+
+		/*
+		============================================
+		Event
+		============================================
+		*/
+
+		private void Checkbox_Enabled_Click(object sender, System.Windows.RoutedEventArgs e)
+		{
+			this.EnableOrDisable();
 		}
 
 		private void Button_Up_Click(object sender, System.Windows.RoutedEventArgs e)

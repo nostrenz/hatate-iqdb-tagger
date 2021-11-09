@@ -7,7 +7,7 @@
              mc:Ignorable="d" Height="17.5" Width="219">
 	<Grid>
 		<Label x:Name="Label_Title" Content="Title" HorizontalAlignment="Left" Margin="18,0,0,0" Padding="5,0" VerticalContentAlignment="Center" Width="112" VerticalAlignment="Center"/>
-		<CheckBox x:Name="Checkbox_Enabled" HorizontalAlignment="Left" Height="Auto" Width="18" VerticalContentAlignment="Center" ToolTip="Enable or disable this source. Matches from disabled sources will be ignored." VerticalAlignment="Center"/>
+		<CheckBox x:Name="Checkbox_Enabled" HorizontalAlignment="Left" Height="Auto" Width="18" VerticalContentAlignment="Center" ToolTip="Enable or disable this source. Matches from disabled sources will be ignored." VerticalAlignment="Center" Click="Checkbox_Enabled_Click"/>
 		<CheckBox x:Name="Checkbox_GetTags" Content="Get tags" Margin="0,0,30,0" VerticalContentAlignment="Center" Height="Auto" HorizontalAlignment="Right" Width="59" ToolTip="If checked, will try to parse tags of matches from this source." VerticalAlignment="Center"/>
 		<Button x:Name="Button_Up" Content="▲" VerticalAlignment="Top" Height="9" IsTabStop="False" FontSize="6" HorizontalAlignment="Right" Width="13" ToolTip="Increase priority" Click="Button_Up_Click"/>
 		<Button x:Name="Button_Down" Content="▼" Height="9" IsTabStop="False" FontSize="6" HorizontalAlignment="Right" Width="13" VerticalAlignment="Bottom" ToolTip="Decrease priority" Click="Button_Down_Click"/>
