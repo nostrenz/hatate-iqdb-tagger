@@ -663,7 +663,10 @@ namespace Hatate
 				return false;
 			}
 
-			this.AddTagsToResult(booru.Tags, result);
+			// Add tags if enabled in the options
+			if (App.sources.ShouldGetTags(result.Source)) {
+				this.AddTagsToResult(booru.Tags, result);
+			}
 
 			result.Full = booru.Full;
 			result.Unavailable = booru.Unavailable;

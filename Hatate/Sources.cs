@@ -117,7 +117,7 @@ namespace Hatate
 			return false;
 		}
 
-		public bool ShouldGetTag(Enum.Source sourceEnumValue)
+		public bool ShouldGetTags(Enum.Source sourceEnumValue)
 		{
 			foreach (Source source in this.sources) {
 				if (source.Value == sourceEnumValue) {
