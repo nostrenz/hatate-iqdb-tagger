@@ -92,6 +92,8 @@ namespace Hatate
 			Settings.Default.HydrusApiAccessKey = this.TextBox_ApiAccessKey.Text.Trim();
 
 			ComboBoxItem selectedTagService = this.ComboBox_TagServices.SelectedItem as ComboBoxItem;
+
+			Settings.Default.HydrusTagService = selectedTagService == null ? null : (string)selectedTagService.Content;
 			Settings.Default.HydrusTagServiceKey = selectedTagService == null ? null : (string)selectedTagService.Tag;
 		}
 
