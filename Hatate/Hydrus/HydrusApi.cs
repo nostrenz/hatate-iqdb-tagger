@@ -46,23 +46,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Get all the available tag services.
-		/// </summary>
-		/// <returns></returns>
-		public async Task<JArray> GetTagServices()
-		{
-			string json = await this.GetRequestAsync("/add_tags/get_tag_services");
-
-			if (string.IsNullOrEmpty(json)) {
-				return null;
-			}
-
-			dynamic services = JObject.Parse(json);
-			
-			return services.local_tags;
-		}
-
-		/// <summary>
 		/// Get all the available services.
 		/// </summary>
 		/// <returns></returns>
@@ -162,8 +145,10 @@ namespace Hatate
 		/// <param name="tags"></param>
 		public async Task<bool> SendTagsForFile(Result result)
 		{
+			string tagServiceNameOrKey = await this.GetTagServiceNameOrKey();
+
 			// Missing tag service
-			if (string.IsNullOrEmpty(Settings.Default.HydrusTagService)) {
+			if (string.IsNullOrEmpty(tagServiceNameOrKey)) {
 				result.AddWarning("Hydrus: tags not sent - please go to Settings > Hydrus API and select a tag service");
 
 				return false;
@@ -171,8 +156,8 @@ namespace Hatate
 
 			string postData = (@"{
 				""hash"": """ + result.Local.Hash + @""",
-				""service_names_to_tags"": {
-					""" + Settings.Default.HydrusTagService + @""": [" + this.TagsListToString(result.Tags) + @"]
+				""" + (this.UseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
+					""" + tagServiceNameOrKey + @""": [" + this.TagsListToString(result.Tags) + @"]
 				}
 			}");
 
@@ -193,16 +178,18 @@ namespace Hatate
 			string tagsPart = "";
 
 			if (Settings.Default.SendUrlWithTags && result.HasTags) {
+				string tagServiceNameOrKey = await this.GetTagServiceNameOrKey();
+
 				// Missing tag service
-				if (string.IsNullOrEmpty(Settings.Default.HydrusTagService)) {
+				if (string.IsNullOrEmpty(tagServiceNameOrKey)) {
 					result.AddWarning("Hydrus: tags not sent alongside the URL - please go to Settings > Hydrus API and select a tag service or disable the \"Send tags alongside a URL\" option.");
 
 					return false;
 				}
 
 				tagsPart = @",
-				""service_names_to_tags"" : {
-					""" + Settings.Default.HydrusTagService + @""" : [" + this.TagsListToString(result.Tags) + @"]
+				""" + (this.UseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
+					""" + tagServiceNameOrKey + @""" : [" + this.TagsListToString(result.Tags) + @"]
 				}";
 			}
 
@@ -543,6 +530,62 @@ namespace Hatate
 			return parsed.metadata;
 		}
 
+		/// <summary>
+		/// Get the tag service name of the tag service key selected in the HydrusSetting window.
+		/// For API versions under 21 we'll use the service name, but for version => 21 we'll use
+		/// the service tag key instead as using the name is deprecated and will eventually be removed later.
+		/// </summary>
+		/// <returns></returns>
+		private async Task<string> GetTagServiceNameOrKey()
+		{
+			// Use the tag service name
+			if (!this.UseTagServiceKeyInsteadOfName) {
+				return Settings.Default.HydrusTagService;
+			}
+
+			// We already have the tag service key
+			if (!string.IsNullOrEmpty(Settings.Default.HydrusTagServiceKey)) {
+				return Settings.Default.HydrusTagServiceKey;
+			}
+
+			// We don't have a tag service name either, abort
+			if (string.IsNullOrEmpty(Settings.Default.HydrusTagService)) {
+				return null;
+			}
+
+			// Service key missing is missing but we'll try to find the one corresponding to the tag service name we have
+			JObject services = await this.GetServices();
+
+			foreach (var item in services) {
+				string key = (string)item.Key;
+
+				// Not a tag service
+				if (key != "local_tags" && key != "tag_repositories" && key != "all_known_tags") {
+					continue;
+				}
+
+				JArray jArray = (JArray)item.Value;
+
+				foreach (JObject service in jArray) {
+					string tagServiceName = (string)service.GetValue("name");
+					string tagServiceKey = (string)service.GetValue("service_key");
+
+					if (tagServiceName != Settings.Default.HydrusTagService) {
+						continue;
+					}
+
+					// Corresponding tag service key found
+					Settings.Default.HydrusTagService = tagServiceName;
+					Settings.Default.HydrusTagServiceKey = tagServiceKey;
+					Settings.Default.Save();
+
+					return tagServiceKey;
+				}
+			}
+
+			return null;
+		}
+
 		#endregion Private
 
 		/*
@@ -574,6 +617,15 @@ namespace Hatate
 		public bool SearchFilesSupportsServiceArguments
 		{
 			get { return this.apiVersion >= 19; }
+		}
+
+		/// <summary>
+		/// Starting with API version 21, we'll use the tag service key instead of
+		/// the tag service name as it's deprecated.
+		/// </summary>
+		public bool UseTagServiceKeyInsteadOfName
+		{
+			get { return this.apiVersion >= 21; }
 		}
 	}
 }

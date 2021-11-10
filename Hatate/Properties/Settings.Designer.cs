@@ -682,5 +682,17 @@ namespace Hatate.Properties {
                 this["Sources"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HydrusTagServiceKey {
+            get {
+                return ((string)(this["HydrusTagServiceKey"]));
+            }
+            set {
+                this["HydrusTagServiceKey"] = value;
+            }
+        }
     }
 }
