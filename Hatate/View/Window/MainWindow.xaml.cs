@@ -1834,8 +1834,9 @@ namespace Hatate
 			}
 
 			// Set album pages counter
-			this.Label_MatchPages.Content = "1/" + result.Pages;
-			this.Label_MatchPages.Visibility = (result.Pages > 0 ? Visibility.Visible : Visibility.Hidden);
+			this.Label_MatchPages.Content = result.Pages;
+			this.Label_MatchPages.ToolTip = "Match is part of a " + result.Pages + " pages album";
+			this.Label_MatchPages.Visibility = (result.Pages > 1 ? Visibility.Visible : Visibility.Hidden);
 
 			// Set selected match
 			this.ComboBox_Matches.SelectedItem = result.Match;
