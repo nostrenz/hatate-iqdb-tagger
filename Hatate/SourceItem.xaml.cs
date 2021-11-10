@@ -37,7 +37,8 @@ namespace Hatate
 
 		private void EnableOrDisable()
 		{
-			this.Opacity = this.Enabled ? 1.0 : 0.5;
+			this.Label_Title.Opacity = this.Enabled ? 1.0 : 0.5;
+			this.Checkbox_GetTags.Opacity = this.Enabled ? 1.0 : 0.5;
 			this.Checkbox_GetTags.IsHitTestVisible = this.Enabled;
 		}
 
