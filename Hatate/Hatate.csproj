@@ -115,28 +115,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="About.xaml.cs">
+    <Compile Include="View\Window\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Capture.xaml.cs">
+    <Compile Include="View\Window\Capture.xaml.cs">
       <DependentUpon>Capture.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Compare.xaml.cs">
+    <Compile Include="View\Window\Compare.xaml.cs">
       <DependentUpon>Compare.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EditTag.xaml.cs">
+    <Compile Include="View\Window\EditTag.xaml.cs">
       <DependentUpon>EditTag.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HydrusApi.cs" />
-    <Compile Include="HydrusMetadata.cs" />
-    <Compile Include="HydrusSettings.xaml.cs">
+    <Compile Include="Hydrus\HydrusApi.cs" />
+    <Compile Include="Hydrus\HydrusMetadata.cs" />
+    <Compile Include="View\Window\HydrusSettings.xaml.cs">
       <DependentUpon>HydrusSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HydrusQuery.xaml.cs">
+    <Compile Include="View\Window\HydrusQuery.xaml.cs">
       <DependentUpon>HydrusQuery.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image.cs" />
-    <Compile Include="Manage.xaml.cs">
+    <Compile Include="View\Window\Manage.xaml.cs">
       <DependentUpon>Manage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Parser\AnimePictures.cs" />
@@ -153,44 +153,44 @@
     <Compile Include="Parser\TheAnimeGallery.cs" />
     <Compile Include="Parser\Yandere.cs" />
     <Compile Include="Parser\Zerochan.cs" />
-    <Compile Include="Release.xaml.cs">
+    <Compile Include="View\Window\Release.xaml.cs">
       <DependentUpon>Release.xaml</DependentUpon>
     </Compile>
     <Compile Include="Result.cs" />
-    <Compile Include="SauceNaoSettings.xaml.cs">
+    <Compile Include="View\Window\SauceNaoSettings.xaml.cs">
       <DependentUpon>SauceNaoSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enum\SearchEngine.cs" />
     <Compile Include="Match.cs" />
-    <Compile Include="SauceNao.cs" />
+    <Compile Include="SearchEngine\SauceNao.cs" />
     <Compile Include="Enum\Source.cs" />
     <Compile Include="Source.cs" />
-    <Compile Include="SourceItem.xaml.cs">
+    <Compile Include="View\Control\SourceItem.xaml.cs">
       <DependentUpon>SourceItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources.cs" />
     <Compile Include="Tag.cs" />
-    <Page Include="About.xaml">
+    <Page Include="View\Window\About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Capture.xaml">
+    <Page Include="View\Window\Capture.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Compare.xaml">
+    <Page Include="View\Window\Compare.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditTag.xaml">
+    <Page Include="View\Window\EditTag.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HydrusSettings.xaml">
+    <Page Include="View\Window\HydrusSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HydrusQuery.xaml">
+    <Page Include="View\Window\HydrusQuery.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -198,7 +198,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="View\Window\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -206,33 +206,33 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="View\Window\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Manage.xaml">
+    <Page Include="View\Window\Manage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Option.xaml">
+    <Page Include="View\Window\Option.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Release.xaml">
+    <Page Include="View\Window\Release.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SauceNaoSettings.xaml">
+    <Page Include="View\Window\SauceNaoSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SourceItem.xaml">
+    <Page Include="View\Control\SourceItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Option.xaml.cs">
+    <Compile Include="View\Window\Option.xaml.cs">
       <DependentUpon>Option.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
