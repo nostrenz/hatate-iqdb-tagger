@@ -121,10 +121,10 @@ namespace Hatate
 
 		private async void GetHydrusServices()
 		{
-			await App.hydrusApi.RetrieveVersions();
+			bool doesSearchFilesSupportsServiceArguments = await App.hydrusApi.DoesSearchFilesSupportsServiceArguments();
 
 			// Hydrus API allows specifying the file and tag service in queries starting from API version 19
-			if (!App.hydrusApi.SearchFilesSupportsServiceArguments) {
+			if (!doesSearchFilesSupportsServiceArguments) {
 				return;
 			}
 
@@ -250,8 +250,9 @@ namespace Hatate
 
 			string tagServiceKey = null;
 			string fileServiceKey = null;
+			bool doesSearchFilesSupportsServiceArguments = await App.hydrusApi.DoesSearchFilesSupportsServiceArguments();
 
-			if (App.hydrusApi.SearchFilesSupportsServiceArguments) {
+			if (doesSearchFilesSupportsServiceArguments) {
 				ComboBoxItem selectedTagService = (ComboBoxItem)this.ComboBox_TagService.SelectedItem;
 				ComboBoxItem selectedFileService = (ComboBoxItem)this.ComboBox_FileService.SelectedItem;
 

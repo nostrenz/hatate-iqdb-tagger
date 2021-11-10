@@ -27,23 +27,6 @@ namespace Hatate
 		*/
 
 		#region Public
-		
-		/// <summary>
-		/// Retrieves client and API versions.
-		/// </summary>
-		public async Task RetrieveVersions()
-		{
-			string json = await this.GetRequestAsync("/api_version");
-
-			if (string.IsNullOrEmpty(json)) {
-				return;
-			}
-
-			dynamic versions = JObject.Parse(json);
-
-			this.clientVersion = (ushort)versions.hydrus_version;
-			this.apiVersion = (ushort)versions.version;
-		}
 
 		/// <summary>
 		/// Get all the available services.
@@ -70,11 +53,12 @@ namespace Hatate
 		public async Task<JArray> SearchFiles(string[] tags, bool inbox=false, bool archive=false, string tagServiceKey = null, string fileServiceKey=null)
 		{
 			string route = "/get_files/search_files?";
+			bool doesSearchFilesSupportsServiceArguments = await this.DoesSearchFilesSupportsServiceArguments();
 
 			route += "system_inbox=" + this.BoolToString(inbox);
 			route += "&system_archive=" + this.BoolToString(archive);
 
-			if (this.SearchFilesSupportsServiceArguments) {
+			if (doesSearchFilesSupportsServiceArguments) {
 				if (tagServiceKey != null) {
 					route += "&tag_service_key=" + tagServiceKey;
 				}
@@ -154,9 +138,11 @@ namespace Hatate
 				return false;
 			}
 
+			bool shouldUseTagServiceKeyInsteadOfName = await this.ShouldUseTagServiceKeyInsteadOfName();
+
 			string postData = (@"{
 				""hash"": """ + result.Local.Hash + @""",
-				""" + (this.UseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
+				""" + (shouldUseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
 					""" + tagServiceNameOrKey + @""": [" + this.TagsListToString(result.Tags) + @"]
 				}
 			}");
@@ -187,8 +173,10 @@ namespace Hatate
 					return false;
 				}
 
+				bool shouldUseTagServiceKeyInsteadOfName = await this.ShouldUseTagServiceKeyInsteadOfName();
+
 				tagsPart = @",
-				""" + (this.UseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
+				""" + (shouldUseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
 					""" + tagServiceNameOrKey + @""" : [" + this.TagsListToString(result.Tags) + @"]
 				}";
 			}
@@ -376,6 +364,28 @@ namespace Hatate
 
 		#region Private
 
+		/// <summary>
+		/// Retrieves client and API versions.
+		/// </summary>
+		private async Task RetrieveVersions()
+		{
+			// Already obtained
+			if (this.clientVersion > 0 && this.apiVersion > 0) {
+				return;
+			}
+
+			string json = await this.GetRequestAsync("/api_version");
+
+			if (string.IsNullOrEmpty(json)) {
+				return;
+			}
+
+			dynamic versions = JObject.Parse(json);
+
+			this.clientVersion = (ushort)versions.hydrus_version;
+			this.apiVersion = (ushort)versions.version;
+		}
+
 		private HttpWebRequest CreateRequest(string route)
 		{
 			// Ensure compatibility with previous versions
@@ -538,8 +548,10 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task<string> GetTagServiceNameOrKey()
 		{
+			bool shouldUseTagServiceKeyInsteadOfName = await this.ShouldUseTagServiceKeyInsteadOfName();
+
 			// Use the tag service name
-			if (!this.UseTagServiceKeyInsteadOfName) {
+			if (!shouldUseTagServiceKeyInsteadOfName) {
 				return Settings.Default.HydrusTagService;
 			}
 
@@ -553,7 +565,7 @@ namespace Hatate
 				return null;
 			}
 
-			// Service key missing is missing but we'll try to find the one corresponding to the tag service name we have
+			// Tag service key is missing but we'll try to find the one corresponding to the tag service name we have
 			JObject services = await this.GetServices();
 
 			foreach (var item in services) {
@@ -586,6 +598,29 @@ namespace Hatate
 			return null;
 		}
 
+		/// <summary>
+		/// Returns true if the /get_files/search_files API supports the following arguments:
+		/// file_service_name, file_service_key, tag_service_name and tag_service_key.
+		/// </summary>
+		/// <returns></returns>
+		public async Task<bool> DoesSearchFilesSupportsServiceArguments()
+		{
+			await this.RetrieveVersions();
+
+			return this.apiVersion >= 19;
+		}
+
+		/// <summary>
+		/// Starting with API version 21, we'll use the tag service key instead of
+		/// the tag service name as it's deprecated.
+		/// </summary>
+		public async Task<bool> ShouldUseTagServiceKeyInsteadOfName()
+		{
+			await this.RetrieveVersions();
+
+			return this.apiVersion >= 21;
+		}
+
 		#endregion Private
 
 		/*
@@ -594,38 +629,9 @@ namespace Hatate
 		============================================
 		*/
 
-		public ushort ClientVersion
-		{
-			get { return this.clientVersion; }
-		}
-
-		public ushort ApiVersion
-		{
-			get { return this.apiVersion; }
-		}
-
 		public bool Unreachable
 		{
 			get { return this.unreachable; }
-		}
-
-		/// <summary>
-		/// Returns true if the /get_files/search_files API supports the following arguments:
-		/// file_service_name, file_service_key, tag_service_name and tag_service_key.
-		/// </summary>
-		/// <returns></returns>
-		public bool SearchFilesSupportsServiceArguments
-		{
-			get { return this.apiVersion >= 19; }
-		}
-
-		/// <summary>
-		/// Starting with API version 21, we'll use the tag service key instead of
-		/// the tag service name as it's deprecated.
-		/// </summary>
-		public bool UseTagServiceKeyInsteadOfName
-		{
-			get { return this.apiVersion >= 21; }
 		}
 	}
 }
