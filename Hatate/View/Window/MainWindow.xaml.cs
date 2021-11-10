@@ -573,7 +573,7 @@ namespace Hatate
 				}
 
 				// Check if source is enabled
-				if (App.sources.IsEnabled(match.Source)) {
+				if (!App.sources.IsEnabled(match.Source)) {
 					continue;
 				}
 
