@@ -1083,6 +1083,26 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Copy file path for all the selected files.
+		/// </summary>
+		private void CopySelectedFilePaths()
+		{
+			string text = "";
+
+			for (int i = 0; i < this.ListBox_Files.SelectedItems.Count; i++) {
+				Result result = this.ListBox_Files.SelectedItems[i] as Result;
+
+				text += result.ImagePath;
+
+				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
+					text += "\n";
+				}
+			}
+
+			Clipboard.SetText(text);
+		}
+
+		/// <summary>
 		/// Copy hashes for all the selected files.
 		/// </summary>
 		private void CopySelectedHashes()
@@ -2367,8 +2387,8 @@ namespace Hatate
 				case "ignore":
 					this.IgnoreSelectItems();
 				break;
-				case "copyFilePath":
-					Clipboard.SetText(this.SelectedResult.ImagePath);
+				case "copyFilePaths":
+					this.CopySelectedFilePaths();
 				break;
 				case "openFolder":
 					if (this.ListBox_Files.SelectedItem != null) {
@@ -2595,14 +2615,12 @@ namespace Hatate
 
 				sub = new MenuItem();
 
-				if (singleSelected) {
-					sub = new MenuItem();
-					sub.Header = "File path";
-					sub.ToolTip = this.SelectedResult.ImagePath;
-					sub.Tag = "copyFilePath";
-					sub.Click += this.ContextMenu_MenuItem_Click;
-					item.Items.Add(sub);
-				}
+				sub = new MenuItem();
+				sub.Header = "File path";
+				sub.ToolTip = this.SelectedResult.ImagePath;
+				sub.Tag = "copyFilePaths";
+				sub.Click += this.ContextMenu_MenuItem_Click;
+				item.Items.Add(sub);
 
 				sub = new MenuItem();
 				sub.Header = "File hash";
