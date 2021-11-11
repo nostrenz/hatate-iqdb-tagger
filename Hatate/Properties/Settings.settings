@@ -14,14 +14,8 @@
     <Setting Name="CheckMatchType" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="LastFolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="Delay" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
-    </Setting>
-    <Setting Name="Setting" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Source_Danbooru" Type="System.SByte" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -111,10 +105,10 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="ThumbWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">150</Value>
+      <Value Profile="(Default)">300</Value>
     </Setting>
     <Setting Name="SearchEngine" Type="System.Byte" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="RemoveResultAfter" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
