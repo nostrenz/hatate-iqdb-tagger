@@ -42,6 +42,10 @@ namespace Hatate
 
 			this.ComboBox_TagServices.Items.Clear();
 
+			if (services == null) {
+				return;
+			}
+
 			foreach (var item in services) {
 				string key = (string)item.Key;
 

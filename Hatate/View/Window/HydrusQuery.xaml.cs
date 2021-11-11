@@ -26,6 +26,7 @@ namespace Hatate
 			if (Options.Default.AddFoundTag) {
 				this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.FoundTag, true));
 			}
+
 			if (Options.Default.AddNotfoundTag) {
 				this.ListBox_Tags.Items.Add(new Tag('-' + Options.Default.NotfoundTag, true));
 			}
@@ -38,7 +39,6 @@ namespace Hatate
 			this.TextBox_Tag.Focus();
 
 			this.GetHydrusServices();
-
 			this.ShowDialog();
 		}
 
@@ -115,16 +115,24 @@ namespace Hatate
 		private void CancelQuery()
 		{
 			this.hydrusMetadataList = null;
-			this.Button_ExecuteQuery.Content = "Execute query";
-			this.Button_ExecuteQuery.IsEnabled = true;
+			this.EnableOrDisableExecuteQueryButton(true);
 		}
 
 		private async void GetHydrusServices()
 		{
 			bool doesSearchFilesSupportsServiceArguments = await App.hydrusApi.DoesSearchFilesSupportsServiceArguments();
 
+			// Cannot contact the API
+			if (App.hydrusApi.Unreachable) {
+				this.Close();
+
+				return;
+			}
+
 			// Hydrus API allows specifying the file and tag service in queries starting from API version 19
 			if (!doesSearchFilesSupportsServiceArguments) {
+				this.Button_ExecuteQuery.IsEnabled = true;
+
 				return;
 			}
 
@@ -162,6 +170,14 @@ namespace Hatate
 
 			this.ComboBox_FileService.ToolTip = null;
 			this.ComboBox_TagService.ToolTip = null;
+
+			this.Button_ExecuteQuery.IsEnabled = true;
+		}
+
+		private void EnableOrDisableExecuteQueryButton(bool enabled)
+		{
+			this.Button_ExecuteQuery.IsEnabled = enabled;
+			this.Button_ExecuteQuery.Content = enabled ? "Execute query" : "Executing query...";
 		}
 
 		#endregion Private
@@ -232,10 +248,9 @@ namespace Hatate
 			this.AddTagToList();
 		}
 
-		private async void Button_Click(object sender, RoutedEventArgs e)
+		private async void Button_ExecuteQuery_Click(object sender, RoutedEventArgs e)
 		{
-			this.Button_ExecuteQuery.IsEnabled = false;
-			this.Button_ExecuteQuery.Content = "Executing query...";
+			this.EnableOrDisableExecuteQueryButton(false);
 
 			int limit = this.Limit;
 
@@ -252,6 +267,12 @@ namespace Hatate
 			string fileServiceKey = null;
 			bool doesSearchFilesSupportsServiceArguments = await App.hydrusApi.DoesSearchFilesSupportsServiceArguments();
 
+			if (App.hydrusApi.Unreachable) {
+				this.CancelQuery();
+
+				return;
+			}
+
 			if (doesSearchFilesSupportsServiceArguments) {
 				ComboBoxItem selectedTagService = (ComboBoxItem)this.ComboBox_TagService.SelectedItem;
 				ComboBoxItem selectedFileService = (ComboBoxItem)this.ComboBox_FileService.SelectedItem;
@@ -267,6 +288,12 @@ namespace Hatate
 
 			// Get files
 			JArray fileIds = await App.hydrusApi.SearchFiles(this.Tags, (bool)this.CheckBox_InboxOnly.IsChecked, (bool)this.CheckBox_ArchiveOnly.IsChecked, tagServiceKey, fileServiceKey);
+
+			if (App.hydrusApi.Unreachable) {
+				this.CancelQuery();
+
+				return;
+			}
 
 			if (fileIds == null || fileIds.Count < 1) {
 				this.NoResult();
@@ -296,6 +323,12 @@ namespace Hatate
 
 			// Get files' metadata
 			JArray jTokens = await App.hydrusApi.GetFilesMetadata(fileIds);
+
+			if (App.hydrusApi.Unreachable) {
+				this.CancelQuery();
+
+				return;
+			}
 
 			if (jTokens == null || jTokens.Count < 1) {
 				this.NoResult();

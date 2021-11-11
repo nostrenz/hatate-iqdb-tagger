@@ -14,7 +14,7 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
-		<Button x:Name="Button_ExecuteQuery" Content="Execute query" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Click"/>
+		<Button x:Name="Button_ExecuteQuery" Content="Execute query" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_ExecuteQuery_Click" IsEnabled="False"/>
 		<TextBox x:Name="TextBox_Tag" Height="23" Margin="10,10,62,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="TextBox_KeyDown"/>
 		<Button Content="Add tag" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="47" Height="23" Click="Button_AddTag_Click"/>
 		<Label Content="Limit results (0 for no limit) :" HorizontalAlignment="Left" Margin="10,0,0,77" Width="160" Height="26" VerticalAlignment="Bottom"/>
