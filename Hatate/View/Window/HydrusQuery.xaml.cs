@@ -36,6 +36,11 @@ namespace Hatate
 			// Register tag paste event
 			DataObject.AddPastingHandler(this.TextBox_Tag, this.TextBox_Tag_Paste);
 
+			this.TextBox_Limit.Text = Options.Default.HydrusQuery_Limit.ToString();
+			this.CheckBox_InboxOnly.IsChecked = Options.Default.HydrusQuery_InboxOnly;
+			this.CheckBox_ArchiveOnly.IsChecked = Options.Default.HydrusQuery_ArchiveOnly;
+			this.CheckBox_WarnBeforeImport.IsChecked = Options.Default.HydrusQuery_WarnBeforeImport;
+
 			this.TextBox_Tag.Focus();
 
 			this.GetHydrusServices();
@@ -204,7 +209,7 @@ namespace Hatate
 			}
 		}
 
-		private int Limit
+		private uint Limit
 		{
 			get
 			{
@@ -214,10 +219,10 @@ namespace Hatate
 					return 0;
 				}
 
-				int limit = 0;
-				int.TryParse(text, out limit);
+				uint limit = 0;
+				uint.TryParse(text, out limit);
 
-				return Math.Abs(limit);
+				return limit;
 			}
 		}
 
@@ -252,7 +257,7 @@ namespace Hatate
 		{
 			this.EnableOrDisableExecuteQueryButton(false);
 
-			int limit = this.Limit;
+			uint limit = this.Limit;
 
 			// Add limit tag
 			if (limit > 0) {
@@ -412,6 +417,16 @@ namespace Hatate
 					this.ListBox_Tags.Items.Refresh();
 				break;
 			}
+		}
+
+		private void Window_Closed(object sender, EventArgs e)
+		{
+			Options.Default.HydrusQuery_Limit = this.Limit;
+			Options.Default.HydrusQuery_InboxOnly = (bool)this.CheckBox_InboxOnly.IsChecked;
+			Options.Default.HydrusQuery_ArchiveOnly = (bool)this.CheckBox_ArchiveOnly.IsChecked;
+			Options.Default.HydrusQuery_WarnBeforeImport = (bool)this.CheckBox_WarnBeforeImport.IsChecked;
+
+			Options.Default.Save();
 		}
 
 		#endregion Event

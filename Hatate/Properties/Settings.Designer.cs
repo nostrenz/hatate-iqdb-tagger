@@ -694,5 +694,53 @@ namespace Hatate.Properties {
                 this["HydrusTagServiceKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HydrusQuery_InboxOnly {
+            get {
+                return ((bool)(this["HydrusQuery_InboxOnly"]));
+            }
+            set {
+                this["HydrusQuery_InboxOnly"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HydrusQuery_ArchiveOnly {
+            get {
+                return ((bool)(this["HydrusQuery_ArchiveOnly"]));
+            }
+            set {
+                this["HydrusQuery_ArchiveOnly"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool HydrusQuery_WarnBeforeImport {
+            get {
+                return ((bool)(this["HydrusQuery_WarnBeforeImport"]));
+            }
+            set {
+                this["HydrusQuery_WarnBeforeImport"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public uint HydrusQuery_Limit {
+            get {
+                return ((uint)(this["HydrusQuery_Limit"]));
+            }
+            set {
+                this["HydrusQuery_Limit"] = value;
+            }
+        }
     }
 }

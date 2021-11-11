@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hydrus query" Height="397" MinHeight="250" Width="300" MinWidth="300" WindowStartupLocation="CenterOwner">
+        Title="Hydrus query" Height="397" MinHeight="250" Width="300" MinWidth="300" WindowStartupLocation="CenterOwner" Closed="Window_Closed">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="10,38,10,164" MouseDoubleClick="ListBox_Tags_MouseDoubleClick">
 			<ListBox.ItemTemplate>
