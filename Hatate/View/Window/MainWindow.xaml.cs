@@ -176,15 +176,8 @@ namespace Hatate
 				return true;
 			}
 
-			string thumbsDir = App.ThumbsDirPath;
-			result.ThumbPath = thumbsDir + this.GetFilenameFromPath(result.ImagePath);
-
-			// Get extension
-			result.Local.Format = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.') + 1);
-
-			// It already exists
+			// Thumbnail already exists, get missing infos about it if missing
 			if (File.Exists(result.ThumbPath)) {
-				// We need to open the file to retrieve its dimensions
 				if (result.Local.Width == 0 || result.Local.Height == 0) {
 					try {
 						System.Drawing.Image img = System.Drawing.Image.FromFile(result.ImagePath);
@@ -202,6 +195,11 @@ namespace Hatate
 
 				return true;
 			}
+
+			string thumbsDir = App.ThumbsDirPath;
+
+			result.Local.Format = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.') + 1);
+			result.ThumbPath = thumbsDir + Guid.NewGuid().ToString() + '.' + result.Local.Format;
 
 			Directory.CreateDirectory(thumbsDir);
 
@@ -1036,14 +1034,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Extract the filename (eg. something.jpg) from a full path (eg. c:/somedir/something.jpg).
-		/// </summary>
-		private string GetFilenameFromPath(string filepath)
-		{
-			return filepath.Substring(filepath.LastIndexOf(@"\") + 1, filepath.Length - filepath.LastIndexOf(@"\") - 1);
-		}
-
-		/// <summary>
 		/// Remove all the selected files from the Files listbox.
 		/// </summary>
 		private void RemoveSelectedFiles()
@@ -1349,7 +1339,6 @@ namespace Hatate
 				return;
 			}
 
-			string filename = this.GetFilenameFromPath(filepath);
 			Result result = new Result(filepath);
 
 			if (//this.ListBox_Files.Items.Contains(result)

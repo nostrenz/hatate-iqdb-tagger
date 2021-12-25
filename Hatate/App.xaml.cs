@@ -167,7 +167,7 @@ namespace Hatate
 		/// <returns></returns>
 		public static string TempPngFilePath
 		{
-			get { return App.TempDirPath +  DateTime.Now.ToString("yyyymmddhhmmssffff") + ".png"; }
+			get { return App.TempDirPath + DateTime.Now.ToString("yyyymmddhhmmssffff") + ".png"; }
 		}
 
 		/// <summary>
