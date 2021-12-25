@@ -1342,7 +1342,7 @@ namespace Hatate
 		/// <summary>
 		/// Add a file to the list if it's not already in it or not in the tagged or notfound folder.
 		/// </summary>
-		private void AddFileToList(string filepath, List<Tag> tags=null, HydrusMetadata hydrusMetadata=null)
+		private void AddFileToList(string filepath, List<Tag> tags=null, HydrusMetadata hydrusMetadata=null, bool focus=false)
 		{
 			// Windows does not support longer file paths, causing a PathTooLongException
 			if (filepath.Length > MAX_PATH_LENGTH) {
@@ -1370,6 +1370,11 @@ namespace Hatate
 			}
 
 			this.ListBox_Files.Items.Add(result);
+
+			// Focus the added file
+			if (focus && this.ListBox_Files.Items.Count > 0) {
+				this.ListBox_Files.SelectedItem = this.ListBox_Files.Items[this.ListBox_Files.Items.Count - 1];
+			}
 		}
 
 		/// <summary>
@@ -2092,7 +2097,7 @@ namespace Hatate
 				encoder.Save(fileStream);
 			}
 
-			this.AddFileToList(filePath);
+			this.AddFileToList(filePath, null, null, true);
 
 			this.UpdateLabels();
 			this.ChangeStartButtonEnabledValue();
@@ -2904,7 +2909,7 @@ namespace Hatate
 				return;
 			}
 
-			this.AddFileToList(captureWindow.FilePath);
+			this.AddFileToList(captureWindow.FilePath, null, null, true);
 
 			this.UpdateLabels();
 			this.ChangeStartButtonEnabledValue();
