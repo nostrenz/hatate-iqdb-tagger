@@ -41,6 +41,15 @@ namespace Hatate.Parser
 
 				try {
 					json = webClient.DownloadString(jsonUrl);
+				} catch (WebException webException) {
+					HttpWebResponse response = (HttpWebResponse)webException.Response;
+
+					// Work has been deleted
+					if  (response.StatusCode == HttpStatusCode.NotFound) {
+						this.unavailable = true;
+					}
+
+					return false;
 				} catch {
 					return false;
 				}
@@ -51,7 +60,7 @@ namespace Hatate.Parser
 
 				dynamic data = JObject.Parse(json);
 
-				if (data == null || data.body == null) {
+				if (data == null || data.body == null || data.error == true) {
 					return false;
 				}
 

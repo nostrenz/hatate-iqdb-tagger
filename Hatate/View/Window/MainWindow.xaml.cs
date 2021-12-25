@@ -654,8 +654,14 @@ namespace Hatate
 			// Add tags from the parsed booru page
 			result.ClearTagsOfSource(Hatate.Tag.SOURCE_BOORU);
 
+			// Parse booru page
+			bool success = booru.FromUrl(result.Url);
+
+			// For some booru we might know if the image is available on the page even if the parsing fails
+			result.Unavailable = booru.Unavailable;
+
 			// Don't go further if we can't retrieve tags from the URL
-			if (!booru.FromUrl(result.Url)) {
+			if (!success) {
 				this.ListBox_Tags.Items.Refresh();
 
 				return false;
@@ -667,7 +673,6 @@ namespace Hatate
 			}
 
 			result.Full = booru.Full;
-			result.Unavailable = booru.Unavailable;
 			result.Pages = booru.Pages;
 			result.Remote = new Image();
 			result.Remote.Size = booru.Size;
