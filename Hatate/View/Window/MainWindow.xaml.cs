@@ -1801,6 +1801,9 @@ namespace Hatate
 			this.GroupBox_Tags.Header = "Tags (" + result.Tags.Count + ")";
 			this.GroupBox_Ignoreds.Header = "Ignoreds (" + result.Ignoreds.Count + ")";
 			this.Label_MatchTips.Text = "";
+			this.Label_MatchPages.Content = "";
+			this.Label_MatchPages.ToolTip = "";
+			this.Label_MatchPages.Visibility = Visibility.Hidden;
 
 			// No matches, nothing to update
 			if (!result.HasMatches) {
@@ -1852,13 +1855,27 @@ namespace Hatate
 				this.Border_Match.BorderBrush = this.GetBrushFromString("#CC0");
 			}
 
+			// Set selected match
+			this.ComboBox_Matches.SelectedItem = result.Match;
+
+			if (result.Unavailable) {
+				this.Label_MatchPages.Content = "DELETED";
+				this.Label_MatchPages.ToolTip = "Work is no longer available on the page";
+				this.Label_MatchPages.Visibility = Visibility.Visible;
+				this.Label_MatchPages.Foreground = this.GetBrushFromString("#F00");
+				this.Label_MatchPages.HorizontalAlignment = HorizontalAlignment.Stretch;
+				this.Label_MatchPages.Width = Double.NaN;
+
+				return;
+			}
+
 			// Set album pages counter
 			this.Label_MatchPages.Content = result.Pages;
 			this.Label_MatchPages.ToolTip = "Match is part of a " + result.Pages + " pages album";
 			this.Label_MatchPages.Visibility = (result.Pages > 1 ? Visibility.Visible : Visibility.Hidden);
-
-			// Set selected match
-			this.ComboBox_Matches.SelectedItem = result.Match;
+			this.Label_MatchPages.Foreground = this.GetBrushFromString("#FFD2D2D2");
+			this.Label_MatchPages.HorizontalAlignment = HorizontalAlignment.Right;
+			this.Label_MatchPages.Width = 29;
 		}
 
 		private void AttachMatchUrlsSubmenuToMenuItem(MenuItem sub, string tag, string tooltip=null)
@@ -1872,7 +1889,7 @@ namespace Hatate
 				if (match.Similarity != similarity) {
 					sub2 = new MenuItem();
 					sub2.Header = "- " + match.Similarity + "% similarity -";
-					sub2.Foreground = (Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FF808080");
+					sub2.Foreground = this.GetBrushFromString("#FF808080");
 					sub.Items.Add(sub2);
 				}
 
