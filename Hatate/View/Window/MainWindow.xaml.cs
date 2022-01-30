@@ -451,7 +451,7 @@ namespace Hatate
 		/// <returns></returns>
 		private async Task SearchWithIqdb(Result result)
 		{
-			FileStream fs = null;
+			FileStream fs;
 
 			try {
 				fs = new FileStream(result.ThumbPath, FileMode.Open);
@@ -466,6 +466,8 @@ namespace Hatate
 			} catch (Exception) {
 				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
 			}
+
+			result.UploadedImageUrl = "https://iqdb.org" + iqdbResult.YourImage.PreviewUrl;
 
 			// Result(s) found
 			if (iqdbResult != null && iqdbResult.Matches != null) {
@@ -511,7 +513,9 @@ namespace Hatate
 			}
 
 			this.lastSearchedInSeconds = 1;
+
 			result.Matches = sauceNao.Matches;
+			result.UploadedImageUrl = sauceNao.UploadedImageUrl;
 
 			this.CheckMatches(result, Enum.SearchEngine.SauceNAO);
 			this.AddAutoTags(result);
@@ -2463,6 +2467,22 @@ namespace Hatate
 		}
 
 		/// <summary>
+		/// Called by clicking on a context menu item with a URL as tag.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ContextMenu_MenuItem_OpenUrl_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem menuItem = sender as MenuItem;
+
+			if (menuItem == null) {
+				return;
+			}
+
+			this.StartProcess((string)menuItem.Tag);
+		}
+
+		/// <summary>
 		/// Called when the Files ListBox's context menu is oppened.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -2608,8 +2628,18 @@ namespace Hatate
 			context.Items.Add(item);
 
 			if (singleSelected) {
+				Result selectedResult = this.SelectedResult;
+				bool hasUploadedImageUrl = (selectedResult != null && !String.IsNullOrEmpty(selectedResult.UploadedImageUrl));
+
 				item = new MenuItem();
 				item.Header = "Search";
+
+					if (hasUploadedImageUrl) {
+						sub = new MenuItem();
+						sub.Header = "Search with Hatate using...";
+						sub.Foreground = this.GetBrushFromString("#FF808080");
+						item.Items.Add(sub);
+					}
 
 					sub = new MenuItem();
 					sub.Header = "IQDB";
@@ -2623,13 +2653,62 @@ namespace Hatate
 					sub.Click += this.ContextMenu_MenuItem_Click;
 					item.Items.Add(sub);
 
+					if (hasUploadedImageUrl) {
+						context.Items.Add(new Separator());
+
+						sub = new MenuItem();
+						sub.Header = "Search externally with...";
+						sub.Foreground = this.GetBrushFromString("#FF808080");
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "Google Images";
+						sub.Tag = "https://www.google.com/searchbyimage?image_url=" + selectedResult.UploadedImageUrl + "&amp;safe=off";
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "TinEye";
+						sub.Tag = "https://tineye.com/search?url=" + selectedResult.UploadedImageUrl;
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "IQDB";
+						sub.Tag = "https://iqdb.org?url=" + selectedResult.UploadedImageUrl;
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "SauceNAO";
+						sub.Tag = "https://saucenao.com/search.php?db=999&amp;dbmaski=32768&amp;url=" + selectedResult.UploadedImageUrl;
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "ascii2d";
+						sub.Tag = "https://ascii2d.net/search/url/" + selectedResult.UploadedImageUrl;
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "Trace.moe";
+						sub.Tag = "https://trace.moe/?auto&amp;url=" + selectedResult.UploadedImageUrl;
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+
+						sub = new MenuItem();
+						sub.Header = "Yandex";
+						sub.Tag = "https://yandex.com/images/search?rpt=imageview&amp;url=" + selectedResult.UploadedImageUrl;
+						sub.Click += this.ContextMenu_MenuItem_OpenUrl_Click;
+						item.Items.Add(sub);
+					}
+
 				context.Items.Add(item);
 			}
 
 			item = new MenuItem();
 			item.Header = "Copy";
-
-				sub = new MenuItem();
 
 				sub = new MenuItem();
 				sub.Header = "File path";

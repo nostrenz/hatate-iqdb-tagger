@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
-using OptionsWindow = Hatate.Option;
 
 namespace Hatate
 {
@@ -458,6 +457,11 @@ namespace Hatate
 		{
 			get { return this.pages; }
 			set { this.pages = value; }
+		}
+
+		public string UploadedImageUrl
+		{
+			get; set;
 		}
 
 		#endregion Accessor

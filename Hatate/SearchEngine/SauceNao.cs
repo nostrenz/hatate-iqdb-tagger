@@ -11,6 +11,7 @@ namespace Hatate
 	class SauceNao
 	{
 		private List<Match> matches = new List<Match>();
+		private string uploadedImageUrl = null;
 		private bool dailyLimitExceeded = false;
 
 		/*
@@ -44,7 +45,7 @@ namespace Hatate
 		/// <param name="filePath"></param>
 		private async Task<string> SearchImage(string filePath)
 		{
-			FileStream fs = null;
+			FileStream fs;
 
 			try {
 				fs = new FileStream(filePath, FileMode.Open);
@@ -76,7 +77,7 @@ namespace Hatate
 		/// </summary>
 		private void ParseResponseHtml(string html)
 		{
-			Supremes.Nodes.Document doc = null;
+			Supremes.Nodes.Document doc;
 
 			try {
 				doc = Supremes.Dcsoup.Parse(html, "utf-8");
@@ -84,7 +85,12 @@ namespace Hatate
 				return;
 			}
 
+			Supremes.Nodes.Element yourImage = doc.Select("#yourimage > a > img").First;
 			Supremes.Nodes.Elements results = doc.Select("#middle > .result");
+
+			if (yourImage != null) {
+				this.uploadedImageUrl = "https://saucenao.com/" + yourImage.Attr("src");
+			}
 
 			if (results.Count < 1) {
 				// Check if search limit was exceeded
@@ -178,6 +184,11 @@ namespace Hatate
 		public ImmutableList<Match> Matches
 		{
 			get { return ImmutableList.Create(this.matches.ToArray()); }
+		}
+
+		public string UploadedImageUrl
+		{
+			get { return this.uploadedImageUrl; }
 		}
 
 		public bool DailyLimitExceeded
