@@ -10,6 +10,8 @@ namespace Hatate
 {
 	class SauceNao
 	{
+		private const string BLOCKED_GIF = "images/static/blocked.gif";
+
 		private List<Match> matches = new List<Match>();
 		private string uploadedImageUrl = null;
 		private bool dailyLimitExceeded = false;
@@ -117,6 +119,13 @@ namespace Hatate
 				Supremes.Nodes.Element resultsimilarityinfo = result.Select(".resultsimilarityinfo").First;
 				Supremes.Nodes.Element originalSourceLink = resultcontent.Select(".resultcontentcolumn a").First;
 
+				// Get preview image
+				string previewUrl = resultimage.Attr("src");
+
+				if (previewUrl == BLOCKED_GIF) {
+					previewUrl = resultimage.Attr("data-src");
+				}
+
 				// Get tags provided by SauceNAO
 				if (this.ShouldGetSauceNaoResultTags) {
 					Supremes.Nodes.Element resulttitle = resultcontent.Select(".resulttitle").First;
@@ -205,7 +214,7 @@ namespace Hatate
 				if (sourceLinks.Count == 0 && originalSourceLink != null) {
 					this.AddMatch(
 						originalSourceLink.Attr("href"),
-						resultimage.Attr("src"),
+						previewUrl,
 						resultsimilarityinfo.Text,
 						resultTags
 					);
@@ -215,11 +224,9 @@ namespace Hatate
 
 				// We have booru links for this result
 				foreach (Supremes.Nodes.Element sourceLink in sourceLinks) {
-					string url = sourceLink.Attr("href");
-
 					this.AddMatch(
-						url,
-						resultimage.Attr("src"),
+						sourceLink.Attr("href"),
+						previewUrl,
 						resultsimilarityinfo.Text,
 						resultTags,
 						originalSourceLink != null ? originalSourceLink.Attr("href") : null
@@ -237,7 +244,7 @@ namespace Hatate
 			match.Similarity = this.ParseSimilarity(similarity);
 			match.DetermineSourceFromUrl();
 
-			if (match.PreviewUrl == "images/static/blocked.gif") {
+			if (match.PreviewUrl == BLOCKED_GIF) {
 				match.PreviewUrl = null;
 			}
 
