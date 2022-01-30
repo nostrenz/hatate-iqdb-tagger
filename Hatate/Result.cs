@@ -99,9 +99,9 @@ namespace Hatate
 		/// <summary>
 		/// Remove all tags obtained from a certain source.
 		/// </summary>
-		public void ClearTagsOfSource(byte source)
+		public void ClearTagsOfSource(Enum.TagSource tagSource)
 		{
-			this.Tags.RemoveAll(tag => tag.Source == source);
+			this.Tags.RemoveAll(tag => tag.Source == tagSource);
 		}
 
 		/// <summary>

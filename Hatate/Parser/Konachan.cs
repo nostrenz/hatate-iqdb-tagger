@@ -70,7 +70,7 @@
 					continue;
 				}
 
-				Tag tag = new Tag(name.Replace("_", " ")) { Source = Hatate.Tag.SOURCE_BOORU };
+				Tag tag = new Tag(name.Replace("_", " ")) { Source = Enum.TagSource.Booru };
 				string type = searchTag.Attr("data-type");
 
 				switch (type) {

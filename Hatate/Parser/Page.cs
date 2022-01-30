@@ -80,7 +80,7 @@ namespace Hatate.Parser
 		/// <param name="nameSpace"></param>
 		protected void AddTag(string value, string nameSpace=null)
 		{
-			this.tags.Add(new Tag(value, nameSpace) { Source = Hatate.Tag.SOURCE_BOORU });
+			this.tags.Add(new Tag(value, nameSpace) { Source = Enum.TagSource.Booru });
 		}
 
 		/// <summary>

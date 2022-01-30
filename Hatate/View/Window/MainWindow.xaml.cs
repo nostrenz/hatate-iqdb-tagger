@@ -601,24 +601,24 @@ namespace Hatate
 		private void AddAutoTags(Result result)
 		{
 			// Remove the previous auto-added tags
-			result.ClearTagsOfSource(Hatate.Tag.SOURCE_AUTO);
+			result.ClearTagsOfSource(Enum.TagSource.Auto);
 
 			// Found on IQDB
 			if (result.Found) {
 				if (Options.Default.AddFoundTag) {
-					result.Tags.Add(new Tag(Options.Default.FoundTag, true) { Source = Hatate.Tag.SOURCE_AUTO });
+					result.Tags.Add(new Tag(Options.Default.FoundTag, true) { Source = Enum.TagSource.Auto });
 				}
 			} else { // Not found on IQDB
 				if (Options.Default.AddNotfoundTag) {
-					result.Tags.Add(new Tag(Options.Default.NotfoundTag, true) { Source = Hatate.Tag.SOURCE_AUTO });
+					result.Tags.Add(new Tag(Options.Default.NotfoundTag, true) { Source = Enum.TagSource.Auto });
 				}
 			}
 
 			// Add tagged tag if at least one booru tags exists
 			if (Options.Default.AddTaggedTag) {
 				foreach (Tag tag in result.Tags) {
-					if (tag.Source == Hatate.Tag.SOURCE_BOORU) {
-						result.Tags.Add(new Tag(Options.Default.TaggedTag, true) { Source = Hatate.Tag.SOURCE_AUTO });
+					if (tag.Source == Enum.TagSource.Booru) {
+						result.Tags.Add(new Tag(Options.Default.TaggedTag, true) { Source = Enum.TagSource.Auto });
 
 						return;
 					}
@@ -652,7 +652,7 @@ namespace Hatate
 			}
 
 			// Add tags from the parsed booru page
-			result.ClearTagsOfSource(Hatate.Tag.SOURCE_BOORU);
+			result.ClearTagsOfSource(Enum.TagSource.Booru);
 
 			// Parse booru page
 			bool success = booru.FromUrl(result.Url);
@@ -706,7 +706,7 @@ namespace Hatate
 			&& result.Rating != IqdbApi.Enums.Rating.Unrated
 			&& !result.Tags.Exists(t => t.Namespace == "rating")
 			) {
-				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating") { Source = Hatate.Tag.SOURCE_BOORU });
+				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating") { Source = Enum.TagSource.Booru });
 			}
 
 			this.ListBox_Tags.Items.Refresh();

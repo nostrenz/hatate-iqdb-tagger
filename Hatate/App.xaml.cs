@@ -80,7 +80,7 @@ namespace Hatate
 
 			// Add each line as a tag
 			foreach (string line in lines) {
-				Tag tag = new Tag(line.Trim(), true) { Source = Hatate.Tag.SOURCE_USER };
+				Tag tag = new Tag(line.Trim(), true) { Source = Enum.TagSource.User };
 
 				if (!listBox.Items.Contains(tag)) {
 					listBox.Items.Add(tag);

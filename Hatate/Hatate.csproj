@@ -115,6 +115,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Enum\TagSource.cs" />
     <Compile Include="View\Window\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
