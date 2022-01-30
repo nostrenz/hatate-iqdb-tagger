@@ -138,10 +138,16 @@ namespace Hatate
 				match.PreviewUrl = "http://iqdb.org" + iqdbMatch.PreviewUrl;
 				match.Rating = iqdbMatch.Rating;
 				match.Score = iqdbMatch.Score;
-				match.Tags = iqdbMatch.Tags;
 				match.Source = (Enum.Source)iqdbMatch.Source;
 				match.Resolution = iqdbMatch.Resolution;
 				match.Similarity = (float)iqdbMatch.Similarity;
+
+				// Add IQDB tags
+				if (Settings.Default.Iqdb_TagNamespace != null && !Settings.Default.Iqdb_TagNamespace.StartsWith("-")) {
+					foreach (string tag in iqdbMatch.Tags) {
+						match.Tags.Add(new Tag(tag, Settings.Default.Iqdb_TagNamespace) { Source = Enum.TagSource.SearchEngine });
+					}
+				}
 
 				matches.Add(match);
 			}

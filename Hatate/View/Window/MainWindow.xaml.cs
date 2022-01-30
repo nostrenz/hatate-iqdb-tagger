@@ -478,7 +478,8 @@ namespace Hatate
 				this.CheckMatches(result, Enum.SearchEngine.IQDB);
 			}
 
-			this.AddAutoTags(result);
+			this.AddSearchEngineTags(result);
+			this.AddHatateTags(result);
 
 			fs.Close();
 			fs.Dispose();
@@ -518,7 +519,9 @@ namespace Hatate
 			result.UploadedImageUrl = sauceNao.UploadedImageUrl;
 
 			this.CheckMatches(result, Enum.SearchEngine.SauceNAO);
-			this.AddAutoTags(result);
+
+			this.AddSearchEngineTags(result);
+			this.AddHatateTags(result);
 		}
 
 		private Match GetMatchWithBestSourceOrdering(Result result, Match currentMatch)
@@ -602,19 +605,38 @@ namespace Hatate
 			}
 		}
 
-		private void AddAutoTags(Result result)
+		/// <summary>
+		/// Add tags from the currently selected Match to the currently selected Result.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <param name="nameSpace"></param>
+		private void AddSearchEngineTags(Result result)
 		{
-			// Remove the previous auto-added tags
-			result.ClearTagsOfSource(Enum.TagSource.Auto);
+			// Remove the previous search engine-added tags
+			result.ClearTagsOfSource(Enum.TagSource.SearchEngine);
+
+			if (result.Match == null) {
+				return;
+			}
+
+			foreach (Tag tag in result.Match.Tags) {
+				result.Tags.Add(tag);
+			}
+		}
+
+		private void AddHatateTags(Result result)
+		{
+			// Remove the previous Hatate-added tags
+			result.ClearTagsOfSource(Enum.TagSource.Hatate);
 
 			// Found on IQDB
 			if (result.Found) {
 				if (Options.Default.AddFoundTag) {
-					result.Tags.Add(new Tag(Options.Default.FoundTag, true) { Source = Enum.TagSource.Auto });
+					result.Tags.Add(new Tag(Options.Default.FoundTag, true) { Source = Enum.TagSource.Hatate });
 				}
 			} else { // Not found on IQDB
 				if (Options.Default.AddNotfoundTag) {
-					result.Tags.Add(new Tag(Options.Default.NotfoundTag, true) { Source = Enum.TagSource.Auto });
+					result.Tags.Add(new Tag(Options.Default.NotfoundTag, true) { Source = Enum.TagSource.Hatate });
 				}
 			}
 
@@ -622,7 +644,7 @@ namespace Hatate
 			if (Options.Default.AddTaggedTag) {
 				foreach (Tag tag in result.Tags) {
 					if (tag.Source == Enum.TagSource.Booru) {
-						result.Tags.Add(new Tag(Options.Default.TaggedTag, true) { Source = Enum.TagSource.Auto });
+						result.Tags.Add(new Tag(Options.Default.TaggedTag, true) { Source = Enum.TagSource.Hatate });
 
 						return;
 					}
@@ -1579,6 +1601,7 @@ namespace Hatate
 			}
 
 			listBox.ItemsSource = tags;
+			listBox.Items.Refresh();
 		}
 
 		/// <summary>
@@ -2308,6 +2331,16 @@ namespace Hatate
 		private void MenuItem_HydrusApi_Click(object sender, RoutedEventArgs e)
 		{
 			new HydrusSettings().ShowDialog();
+		}
+
+		/// <summary>
+		/// Opens a window for editing IQDB settings.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_IqdbSettings_Click(object sender, RoutedEventArgs e)
+		{
+			new IqdbSettings().ShowDialog();
 		}
 
 		/// <summary>
@@ -3242,7 +3275,8 @@ namespace Hatate
 				this.ParseBooruPage(result);
 			}
 
-			this.AddAutoTags(result);
+			this.AddSearchEngineTags(result);
+			this.AddHatateTags(result);
 			this.UpdateRightView(result);
 
 			// Refresh the items to update the foreground color from the Result objets

@@ -137,6 +137,9 @@
       <DependentUpon>HydrusQuery.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image.cs" />
+    <Compile Include="View\Window\IqdbSettings.xaml.cs">
+      <DependentUpon>IqdbSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Window\Manage.xaml.cs">
       <DependentUpon>Manage.xaml</DependentUpon>
     </Compile>
@@ -196,6 +199,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MayaDark.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Window\IqdbSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

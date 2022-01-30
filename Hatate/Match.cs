@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Collections.Generic;
 using IqdbApi.Enums;
 
 /// <summary>
@@ -11,6 +12,7 @@ namespace Hatate
 		private string url = null;
 		private string previewUrl = null;
 		private string sourceUrl = null;
+		private List<Tag> tags = new List<Tag>();
 
 		/*
 		============================================
@@ -28,39 +30,41 @@ namespace Hatate
 		{
 			this.Source = Enum.Source.Other;
 
-			if (this.Url == null) {
+			string url = this.Url;
+
+			if (url == null) {
 				return;
 			}
 
-			if (this.Url.Contains("danbooru.donmai.us")) {
+			if (url.Contains("danbooru.donmai.us")) {
 				this.Source = Enum.Source.Danbooru;
-			} else if (this.Url.Contains("gelbooru.com")) {
+			} else if (url.Contains("gelbooru.com")) {
 				this.Source = Enum.Source.Gelbooru;
-			} else if (this.Url.Contains("anime-pictures.net")) {
+			} else if (url.Contains("anime-pictures.net")) {
 				this.Source = Enum.Source.AnimePictures;
-			} else if (this.Url.Contains("sankakucomplex.com")) {
+			} else if (url.Contains("sankakucomplex.com")) {
 				this.Source = Enum.Source.SankakuChannel;
-			} else if (this.Url.Contains("konachan.com")) {
+			} else if (url.Contains("konachan.com")) {
 				this.Source = Enum.Source.Konachan;
-			} else if (this.Url.Contains("yande.re")) {
+			} else if (url.Contains("yande.re")) {
 				this.Source = Enum.Source.Yandere;
-			} else if (this.Url.Contains("zerochan.net")) {
+			} else if (url.Contains("zerochan.net")) {
 				this.Source = Enum.Source.Zerochan;
-			} else if (this.Url.Contains("e-shuushuu.net")) {
+			} else if (url.Contains("e-shuushuu.net")) {
 				this.Source = Enum.Source.Eshuushuu;
-			} else if (this.Url.Contains("pixiv.net")) {
+			} else if (url.Contains("pixiv.net")) {
 				this.Source = Enum.Source.Pixiv;
-			} else if (this.Url.Contains("twitter.com")) {
+			} else if (url.Contains("twitter.com")) {
 				this.Source = Enum.Source.Twitter;
-			} else if (this.Url.Contains("seiga.nicovideo.jp")) {
+			} else if (url.Contains("seiga.nicovideo.jp")) {
 				this.Source = Enum.Source.NicoNicoSeiga;
-			} else if (this.Url.Contains("deviantart.com")) {
+			} else if (url.Contains("deviantart.com")) {
 				this.Source = Enum.Source.DeviantArt;
-			} else if (this.Url.Contains("artstation.com")) {
+			} else if (url.Contains("artstation.com")) {
 				this.Source = Enum.Source.ArtStation;
-			} else if (this.Url.Contains("pawoo.net")) {
+			} else if (url.Contains("pawoo.net")) {
 				this.Source = Enum.Source.Pawoo;
-			} else if (this.Url.Contains("mangadex.org")) {
+			} else if (url.Contains("mangadex.org")) {
 				this.Source = Enum.Source.MangaDex;
 			}
 		}
@@ -119,7 +123,10 @@ namespace Hatate
 
 		public byte? Score { get; internal set; }
 
-		public ImmutableList<string> Tags { get; internal set; }
+		public List<Tag> Tags
+		{
+			get { return this.tags; }
+		}
 
 		public Enum.Source Source { get; internal set; }
 

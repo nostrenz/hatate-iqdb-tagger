@@ -6,15 +6,35 @@
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
         Title="SauceNAO settings"
-        Height="177.3" Width="606.225"
+        Height="410.303" Width="606.225"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Label Content="Without a registered account, SauceNAO will start refusing requests after reaching 100 in the last 24 hours." Margin="10,10,10,0" VerticalAlignment="Top" Padding="0"/>
 		<Label Content="By creating an account and providing the API key, this limit is increased to 200 or more if you're donating." Margin="10,26,10,0" VerticalAlignment="Top" Padding="0"/>
 		<Label Content="" Margin="10,42,0,0" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" />
-		<TextBlock Margin="10,42,0,71" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" TextDecorations="Underline" HorizontalAlignment="Left" MouseDown="TextBlock_Register_MouseDown">click here to register</TextBlock>
-		<Label Content="API key" Margin="10,0,0,40" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="49"/>
-		<TextBox x:Name="TextBox_ApiKey" Height="26" Margin="64,0,10,40" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+		<TextBlock Margin="10,42,0,0" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" TextDecorations="Underline" HorizontalAlignment="Left" MouseDown="TextBlock_Register_MouseDown" Height="16" VerticalAlignment="Top">click here to register</TextBlock>
+		<Label Content="API key" Margin="10,66,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="42" Padding="0,5"/>
+		<TextBox x:Name="TextBox_ApiKey" Height="26" Margin="57,66,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
 		<Button Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Save_Click"/>
+		<TextBlock Margin="10,128,6,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32"><Run Text="Tags can be obtained from SauceNAO results without parsing their booru page."/><Run Text=" Here you can "/><Run Text="select which tags you want to get and optionally "/><Run Text="prefix "/><Run Text="them "/><Run Text="with a namespace"/><Run Text="."/></TextBlock>
+		<GroupBox x:Name="GroupBox_TagNamepaces" Header="Tag namespaces" Margin="10,172,10,49">
+			<Grid Margin="0,0,-4,-14">
+				<CheckBox x:Name="Checkbox_Tag_Title" Content="Title" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
+				<CheckBox x:Name="Checkbox_Tag_Creator" Content="Creator" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
+				<CheckBox x:Name="Checkbox_Tag_Material" Content="Material" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
+				<CheckBox x:Name="Checkbox_Tag_Character" Content="Character" HorizontalAlignment="Left" Margin="10,100,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
+				<CheckBox x:Name="Checkbox_Tag_PixivIllustId" Content="Pixiv illust ID" HorizontalAlignment="Left" Margin="271,15,0,0" VerticalAlignment="Top" Width="117" Click="CheckBox_TagNamepace_Click"/>
+				<CheckBox x:Name="Checkbox_Tag_PixivMemberId" Content="Pixiv member ID" HorizontalAlignment="Left" Margin="271,43,0,0" VerticalAlignment="Top" Width="117" Click="CheckBox_TagNamepace_Click"/>
+				<CheckBox x:Name="Checkbox_Tag_PixivMemberName" Content="Pixiv member name" HorizontalAlignment="Left" Margin="271,71,0,0" VerticalAlignment="Top" Width="117" Click="CheckBox_TagNamepace_Click"/>
+				<TextBox x:Name="TextBox_TagNamespace_Title" Margin="90,10,345,0" VerticalAlignment="Top" Height="23"/>
+				<TextBox x:Name="TextBox_TagNamespace_Character" Margin="90,94,345,0" VerticalAlignment="Top" Height="23"/>
+				<TextBox x:Name="TextBox_TagNamespace_Material" Margin="90,66,345,0" VerticalAlignment="Top" Height="23"/>
+				<TextBox x:Name="TextBox_TagNamespace_Creator" Margin="90,38,345,0" VerticalAlignment="Top" Height="23"/>
+				<TextBox x:Name="TextBox_TagNamespace_PixivMemberName" Margin="393,66,10,0" VerticalAlignment="Top" Height="23"/>
+				<TextBox x:Name="TextBox_TagNamespace_PixivMemberId" Margin="393,38,10,0" VerticalAlignment="Top" Height="23"/>
+				<TextBox x:Name="TextBox_TagNamespace_PixivIllustId" Margin="393,10,10,0" VerticalAlignment="Top" Height="23"/>
+			</Grid>
+		</GroupBox>
+		<Separator Height="25" Margin="6,97,10,0" VerticalAlignment="Top"/>
 	</Grid>
 </Window>

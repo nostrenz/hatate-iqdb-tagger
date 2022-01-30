@@ -99,8 +99,9 @@
 				<MenuItem Header="Delete temporary images" Click="MenuItem_DeleteTemporary_Click"/>
 			</MenuItem>
 			<MenuItem Header="Settings" Height="18">
-				<MenuItem Header="Options" Height="18" Click="MenuItem_Options_Click" />
+				<MenuItem Header="Hatate" Height="18" Click="MenuItem_Options_Click" />
 				<MenuItem Header="Hydrus API" Height="18" Click="MenuItem_HydrusApi_Click" />
+				<MenuItem Header="IQDB" Height="18" Click="MenuItem_IqdbSettings_Click" />
 				<MenuItem Header="SauceNAO" Height="18" Click="MenuItem_SauceNao_Click" />
 			</MenuItem>
 			<MenuItem Header="Help" Height="18">

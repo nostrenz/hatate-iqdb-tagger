@@ -104,17 +104,110 @@ namespace Hatate
 			}
 
 			foreach (Supremes.Nodes.Element result in results) {
+				Supremes.Nodes.Element resultcontent = result.Select(".resultcontent").First;
+
+				if (resultcontent == null) {
+					continue;
+				}
+
+				List<Tag> resultTags = new List<Tag>();
+
 				Supremes.Nodes.Elements sourceLinks = result.Select(".resultmiscinfo > a");
 				Supremes.Nodes.Element resultimage = result.Select(".resultimage img").First;
 				Supremes.Nodes.Element resultsimilarityinfo = result.Select(".resultsimilarityinfo").First;
-				Supremes.Nodes.Element originalSourceLink = result.Select(".resultcontent .resultcontentcolumn a").First;
+				Supremes.Nodes.Element originalSourceLink = resultcontent.Select(".resultcontentcolumn a").First;
+
+				// Get tags provided by SauceNAO
+				if (this.ShouldGetSauceNaoResultTags) {
+					Supremes.Nodes.Element resulttitle = resultcontent.Select(".resulttitle").First;
+					Supremes.Nodes.Elements resultcontentcolumns = resultcontent.Select(".resultcontentcolumn");
+					Supremes.Nodes.Elements originalSourceLinks = resultcontent.Select(".resultcontentcolumn a");
+
+					// Title tag
+					if (resulttitle != null) {
+						string titleText = resulttitle.Text;
+						string nameSpace = Settings.Default.SauceNao_TagNamespace_Title;
+
+						if (titleText.StartsWith("Creator:")) {
+							titleText = titleText.Replace("Creator:", "");
+							nameSpace = Settings.Default.SauceNao_TagNamespace_Creator;
+						}
+
+						resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+					}
+
+					foreach (Supremes.Nodes.Element resultcontentcolumn in resultcontentcolumns) {
+						string contentHtml = resultcontentcolumn.Html;
+
+						int materialPos = contentHtml.IndexOf("<strong>Material: </strong>");
+						int charactersPos = contentHtml.IndexOf("<strong>Characters: </strong>");
+
+						if (materialPos >= 0) {
+							string materialHtml = contentHtml.Substring(materialPos);
+							materialHtml = materialHtml.Replace("<strong>Material: </strong>", "");
+							materialHtml = materialHtml.Replace("<br>", "");
+
+							resultTags.Add(new Tag(materialHtml.Trim(), Settings.Default.SauceNao_TagNamespace_Material) { Source = Enum.TagSource.SearchEngine });
+						}
+
+						if (charactersPos >= 0) {
+							string charactersHtml = contentHtml.Replace("<strong>Characters: </strong>", "").Trim();
+							charactersHtml = charactersHtml.Replace("<br>", "");
+							string[] characterNames = charactersHtml.Split('\n');
+
+							foreach (string characterName in characterNames) {
+								if (!string.IsNullOrWhiteSpace(characterName)) {
+									resultTags.Add(new Tag(characterName.Trim(), Settings.Default.SauceNao_TagNamespace_Character) { Source = Enum.TagSource.SearchEngine });
+								}
+							}
+						}
+					}
+
+					// Source links
+					foreach (Supremes.Nodes.Element sourceLink in originalSourceLinks) {
+						string url = sourceLink.Attr("href");
+
+						// Not a pixiv URL
+						if (!url.StartsWith("https://www.pixiv.net")) {
+							continue;
+						}
+
+						int questionMarkIndex = url.IndexOf('?');
+
+						// No query string
+						if (questionMarkIndex < 1) {
+							continue;
+						}
+
+						// Get query string
+						string queryString = url.Substring(questionMarkIndex + 1);
+
+						// Parse query string
+						string[] parts = queryString.Split('&');
+
+						foreach (string part in parts) {
+							string[] keyValue = part.Split('=');
+
+							string key = keyValue[0];
+							string value = keyValue[1];
+
+							if (key == "illust_id") {
+								resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivIllustId) { Source = Enum.TagSource.SearchEngine });
+							} else if (key == "id") {
+								resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivMemberId) { Source = Enum.TagSource.SearchEngine });
+								resultTags.Add(new Tag(sourceLink.Text, Settings.Default.SauceNao_TagNamespace_PixivMemberName) { Source = Enum.TagSource.SearchEngine });
+							}
+						}
+					}
+				}
 
 				// There were no booru links for this result but we have the link to pixiv/etc
 				if (sourceLinks.Count == 0 && originalSourceLink != null) {
 					this.AddMatch(
 						originalSourceLink.Attr("href"),
 						resultimage.Attr("src"),
-						resultsimilarityinfo.Text
+						resultsimilarityinfo.Text,
+						resultTags
 					);
 
 					continue;
@@ -122,17 +215,20 @@ namespace Hatate
 
 				// We have booru links for this result
 				foreach (Supremes.Nodes.Element sourceLink in sourceLinks) {
+					string url = sourceLink.Attr("href");
+
 					this.AddMatch(
-						sourceLink.Attr("href"),
+						url,
 						resultimage.Attr("src"),
 						resultsimilarityinfo.Text,
+						resultTags,
 						originalSourceLink != null ? originalSourceLink.Attr("href") : null
 					);
 				}
 			}
 		}
 
-		private void AddMatch(string url, string previewUrl, string similarity, string sourceUrl=null)
+		private void AddMatch(string url, string previewUrl, string similarity, List<Tag> resultTags, string sourceUrl=null)
 		{
 			Match match = new Match();
 
@@ -147,6 +243,10 @@ namespace Hatate
 
 			if (sourceUrl != null) {
 				match.SourceUrl = sourceUrl;
+			}
+
+			foreach (Tag tag in resultTags) {
+				match.Tags.Add(tag);
 			}
 
 			this.matches.Add(match);
@@ -194,6 +294,20 @@ namespace Hatate
 		public bool DailyLimitExceeded
 		{
 			get { return this.dailyLimitExceeded; }
+		}
+
+		private bool ShouldGetSauceNaoResultTags
+		{
+			get
+			{
+				return (Settings.Default.SauceNao_TagNamespace_Title != null && !Settings.Default.SauceNao_TagNamespace_Title.StartsWith("-"))
+					|| (Settings.Default.SauceNao_TagNamespace_Creator != null && !Settings.Default.SauceNao_TagNamespace_Creator.StartsWith("-"))
+					|| (Settings.Default.SauceNao_TagNamespace_Material != null && !Settings.Default.SauceNao_TagNamespace_Material.StartsWith("-"))
+					|| (Settings.Default.SauceNao_TagNamespace_Character != null && !Settings.Default.SauceNao_TagNamespace_Character.StartsWith("-"))
+					|| (Settings.Default.SauceNao_TagNamespace_PixivIllustId != null && !Settings.Default.SauceNao_TagNamespace_PixivIllustId.StartsWith("-"))
+					|| (Settings.Default.SauceNao_TagNamespace_PixivMemberId != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberId.StartsWith("-"))
+					|| (Settings.Default.SauceNao_TagNamespace_PixivMemberName != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberName.StartsWith("-"));
+			}
 		}
 
 		#endregion Accessor

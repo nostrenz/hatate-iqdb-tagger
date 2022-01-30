@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Options" Width="608" MinWidth="608" Height="508" MinHeight="510" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Hatate settings" Width="608" MinWidth="608" Height="508" MinHeight="510" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 	<Window.Resources>
 		<Style x:Key="ListViewDragDrop" TargetType="{x:Type ListViewItem}">
 			<Setter Property="AllowDrop" Value="true"/>

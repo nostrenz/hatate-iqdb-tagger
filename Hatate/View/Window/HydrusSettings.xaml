@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hydrus settings" Width="550" MinWidth="550" Height="305" MinHeight="305" MaxHeight="305" WindowStartupLocation="CenterOwner">
+        Title="Hydrus API settings" Width="550" MinWidth="550" Height="305" MinHeight="305" MaxHeight="305" WindowStartupLocation="CenterOwner">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Label Content="API URL" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
 		<Label Content="API access key" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
