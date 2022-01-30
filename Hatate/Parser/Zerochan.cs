@@ -64,10 +64,13 @@ namespace Hatate.Parser
 
 			// Get informations
 			Supremes.Nodes.Element imageLink = doc.Select("#large > a.preview").First;
+			Supremes.Nodes.Element imageElement = doc.Select("#large > img").First;
 			Supremes.Nodes.Elements paragraphs = doc.Select("#large > p");
 
 			if (imageLink != null) {
 				this.full = imageLink.Attr("href");
+			} else if (imageElement != null) {
+				this.full = imageElement.Attr("src");
 			}
 
 			Regex resolutionnRegex = new Regex(@"\d+x\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
