@@ -143,7 +143,7 @@ namespace Hatate
 			string postData = (@"{
 				""hash"": """ + result.Local.Hash + @""",
 				""" + (shouldUseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
-					""" + tagServiceNameOrKey + @""": [" + this.TagsListToString(result.Tags) + @"]
+					""" + tagServiceNameOrKey + @""": [" + this.TagsListToString(result.NonHiddenTags) + @"]
 				}
 			}");
 
@@ -177,7 +177,7 @@ namespace Hatate
 
 				tagsPart = @",
 				""" + (shouldUseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
-					""" + tagServiceNameOrKey + @""" : [" + this.TagsListToString(result.Tags) + @"]
+					""" + tagServiceNameOrKey + @""" : [" + this.TagsListToString(result.NonHiddenTags) + @"]
 				}";
 			}
 

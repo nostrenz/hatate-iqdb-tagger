@@ -108,6 +108,12 @@ namespace Hatate
 		public Enum.TagSource Source { get; set; }
 
 		/// <summary>
+		/// A tag can be set as hidden when its Source doesn't match the ones selected in the GUI.
+		/// Hidden tags won't show up in the GUI and won't be sent to Hydrus.
+		/// </summary>
+		public bool Hidden { get; set; }
+
+		/// <summary>
 		/// Return in format "namespace:value".
 		/// </summary>
 		public string Namespaced

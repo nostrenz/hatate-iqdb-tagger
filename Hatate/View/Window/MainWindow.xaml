@@ -70,6 +70,13 @@
 							</ListBox.ItemTemplate>
 						</ListBox>
 					</GroupBox>
+					<ComboBox Margin="213,0,0,0" VerticalAlignment="Top" ToolTip="Toggle tag sources">
+						<CheckBox x:Name="Checkbox_TagSource_User" Content="User" ToolTip="Tags added by you" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<CheckBox x:Name="Checkbox_TagSource_Booru" Content="Booru" ToolTip="Tags added by parsing a booru page" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<CheckBox x:Name="Checkbox_TagSource_SearchEngine" Content="Search Engine" ToolTip="Tags added by parsing IQDB or SauceNAO results" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<CheckBox x:Name="Checkbox_TagSource_Hatate" Content="Hatate" ToolTip="Tags added by Hatate when enabled in settings" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<Button Content="set as default" Width="87" Height="15" Click="Button_SetSelectedTagSourcesAsDefault_Click"/>
+					</ComboBox>
 				</Grid>
 			</Grid>
 		</Grid>

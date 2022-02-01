@@ -814,5 +814,53 @@ namespace Hatate.Properties {
                 this["SauceNao_TagNamespace_PixivMemberName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TagSource_User {
+            get {
+                return ((bool)(this["TagSource_User"]));
+            }
+            set {
+                this["TagSource_User"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TagSource_Booru {
+            get {
+                return ((bool)(this["TagSource_Booru"]));
+            }
+            set {
+                this["TagSource_Booru"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TagSource_SearchEngine {
+            get {
+                return ((bool)(this["TagSource_SearchEngine"]));
+            }
+            set {
+                this["TagSource_SearchEngine"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TagSource_Hatate {
+            get {
+                return ((bool)(this["TagSource_Hatate"]));
+            }
+            set {
+                this["TagSource_Hatate"] = value;
+            }
+        }
     }
 }

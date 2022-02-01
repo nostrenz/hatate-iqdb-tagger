@@ -1,9 +1,10 @@
-﻿using Hatate.Properties;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Hatate.Properties;
 
 namespace Hatate
 {
@@ -206,6 +207,22 @@ namespace Hatate
 		public string Full { get; set; }
 		public string HydrusFileId { get; set; }
 		public ImmutableList<Match> Matches { get; set; }
+
+		/// <summary>
+		/// Returns all tags where Hidden is False.
+		/// </summary>
+		public List<Tag> NonHiddenTags
+		{
+			get
+			{
+				IEnumerable<Tag> tagsFromSelectedSources =
+					from tag in this.Tags
+					where !tag.Hidden
+					select tag;
+
+				return tagsFromSelectedSources.ToList();
+			}
+		}
 
 		public Match Match
 		{

@@ -67,6 +67,12 @@ namespace Hatate
 			this.AddParenthesisValueRadioToViewMenu("Highest similarity", ParenthesisValue.HighestSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match similarity", ParenthesisValue.MatchSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match source", ParenthesisValue.MatchSource);
+
+			// Set default tag sources
+			this.Checkbox_TagSource_User.IsChecked = Options.Default.TagSource_User;
+			this.Checkbox_TagSource_Booru.IsChecked = Options.Default.TagSource_Booru;
+			this.Checkbox_TagSource_SearchEngine.IsChecked = Options.Default.TagSource_SearchEngine;
+			this.Checkbox_TagSource_Hatate.IsChecked = Options.Default.TagSource_Hatate;
 		}
 
 		/*
@@ -829,14 +835,6 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Add tags";
-			item.Tag = "addTagsForSelectedResult";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			context.Items.Add(new Separator());
-
-			item = new MenuItem();
 			item.Header = "Copy to clipboard";
 			item.Tag = "copyTags";
 			item.Click += this.ContextMenu_MenuItem_Click;
@@ -845,6 +843,14 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Search on Danbooru";
 			item.Tag = "helpTag";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Add tags";
+			item.Tag = "addTagsForSelectedResult";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1822,7 +1828,7 @@ namespace Hatate
 			result.Tags.Sort();
 			result.Ignoreds.Sort();
 
-			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
+			this.SetListBoxItemsSource(this.ListBox_Tags, result.NonHiddenTags);
 			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
 
 			this.GroupBox_Tags.Header = "Tags (" + result.Tags.Count + ")";
@@ -3345,5 +3351,57 @@ namespace Hatate
 		}
 
 		#endregion Event
+
+		private void Checkbox_TagSource_Click(object sender, RoutedEventArgs e)
+		{
+			Result selectedResult = this.SelectedResult;
+
+			if (selectedResult == null) {
+				return;
+			}
+
+			List<Enum.TagSource> selectedTagSources = new List<Enum.TagSource>();
+
+			if ((bool)this.Checkbox_TagSource_User.IsChecked) {
+				selectedTagSources.Add(Enum.TagSource.User);
+			}
+
+			if ((bool)this.Checkbox_TagSource_Booru.IsChecked) {
+				selectedTagSources.Add(Enum.TagSource.Booru);
+			}
+
+			if ((bool)this.Checkbox_TagSource_SearchEngine.IsChecked) {
+				selectedTagSources.Add(Enum.TagSource.SearchEngine);
+			}
+
+			if ((bool)this.Checkbox_TagSource_Hatate.IsChecked) {
+				selectedTagSources.Add(Enum.TagSource.Hatate);
+			}
+
+			// Hide all tags
+			foreach (Tag tag in selectedResult.Tags) {
+				tag.Hidden = true;
+			}
+			
+			IEnumerable<Tag> tagsFromSelectedSources =
+				from tag in selectedResult.Tags
+				where selectedTagSources.Contains(tag.Source)
+				select tag;
+
+			// Unhide tags from selected sources
+			foreach (Tag tag in tagsFromSelectedSources) {
+				tag.Hidden = false;
+			}
+
+			this.SetListBoxItemsSource(this.ListBox_Tags, selectedResult.NonHiddenTags);
+		}
+
+		private void Button_SetSelectedTagSourcesAsDefault_Click(object sender, RoutedEventArgs e)
+		{
+			Options.Default.TagSource_User = (bool)this.Checkbox_TagSource_User.IsChecked;
+			Options.Default.TagSource_Booru = (bool)this.Checkbox_TagSource_Booru.IsChecked;
+			Options.Default.TagSource_SearchEngine = (bool)this.Checkbox_TagSource_SearchEngine.IsChecked;
+			Options.Default.TagSource_Hatate = (bool)this.Checkbox_TagSource_Hatate.IsChecked;
+		}
 	}
 }
