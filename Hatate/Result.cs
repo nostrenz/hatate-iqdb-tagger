@@ -175,6 +175,10 @@ namespace Hatate
 		/// <param name="tag"></param>
 		public void AddTag(Tag tag)
 		{
+			if (this.Tags.Contains(tag)) {
+				return;
+			}
+
 			tag.Hidden = !this.SelectedTagSources.Contains(tag.Source);
 
 			this.Tags.Add(tag);

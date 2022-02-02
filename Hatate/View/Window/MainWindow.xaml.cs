@@ -1581,10 +1581,6 @@ namespace Hatate
 		private void AddTagsToResult(List<Tag> tags, Result result)
 		{
 			foreach (Tag tag in tags) {
-				if (result.Tags.Contains(tag)) {
-					continue;
-				}
-
 				result.AddTag(tag);
 			}
 		}
@@ -3411,6 +3407,7 @@ namespace Hatate
 			this.GroupBox_Tags.Header = "Tags (" + count + ")";
 
 			// Refresh tags
+			selectedResult.Tags.Sort();
 			this.ListBox_Tags.Items.Refresh();
 
 			// Set-as-default button status

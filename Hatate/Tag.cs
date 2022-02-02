@@ -3,7 +3,6 @@ using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using SolidColorBrush = System.Windows.Media.SolidColorBrush;
-using Hatate.Properties;
 
 namespace Hatate
 {
@@ -83,7 +82,8 @@ namespace Hatate
 				return false;
 			}
 
-			return this.Namespaced.Equals(item.Namespaced);
+			return this.Namespaced.Equals(item.Namespaced)
+				&& this.Source.Equals(item.Source);
 		}
 
 		/// <summary>
@@ -92,7 +92,7 @@ namespace Hatate
 		/// <returns></returns>
 		public override int GetHashCode()
 		{
-			return this.Namespaced.GetHashCode();
+			return (this.Namespaced + this.Source.ToString()).GetHashCode();
 		}
 
 		#endregion Public
@@ -188,6 +188,11 @@ namespace Hatate
 		public int Height
 		{
 			get { return this.Hidden ? 0 : 18; }
+		}
+
+		public string ToolTip
+		{
+			get { return "source: " + this.Source.ToString(); }
 		}
 
 		#endregion Accessor

@@ -60,7 +60,7 @@
 							</ListBox.ItemContainerStyle>
 							<ListBox.ItemTemplate>
 								<DataTemplate>
-									<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}" Visibility="{Binding Visibility}" IsHitTestVisible="{Binding IsHitTestVisible}"/>
+									<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}" Visibility="{Binding Visibility}" IsHitTestVisible="{Binding IsHitTestVisible}" ToolTip="{Binding ToolTip}"/>
 								</DataTemplate>
 							</ListBox.ItemTemplate>
 						</ListBox>
