@@ -176,29 +176,38 @@
     <Setting Name="HydrusQuery_Limit" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Iqdb_TagNamespace" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-iqdb</Value>
-    </Setting>
     <Setting Name="SauceNao_TagNamespace_Title" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-title</Value>
+      <Value Profile="(Default)">title</Value>
     </Setting>
     <Setting Name="SauceNao_TagNamespace_Creator" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-creator</Value>
+      <Value Profile="(Default)">creator</Value>
     </Setting>
     <Setting Name="SauceNao_TagNamespace_Material" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-material</Value>
+      <Value Profile="(Default)">series</Value>
     </Setting>
     <Setting Name="SauceNao_TagNamespace_Character" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-character</Value>
+      <Value Profile="(Default)">character</Value>
     </Setting>
     <Setting Name="SauceNao_TagNamespace_PixivIllustId" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-pixiv-illust-id</Value>
+      <Value Profile="(Default)">pixiv-illust-id</Value>
     </Setting>
     <Setting Name="SauceNao_TagNamespace_PixivMemberId" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-pixiv-member-id</Value>
+      <Value Profile="(Default)">pixiv-member-id</Value>
     </Setting>
     <Setting Name="SauceNao_TagNamespace_PixivMemberName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-pixiv-illust-name</Value>
+      <Value Profile="(Default)">pixiv-illust-name</Value>
+    </Setting>
+    <Setting Name="TagSource_User" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="TagSource_Booru" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="TagSource_SearchEngine" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TagSource_Hatate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

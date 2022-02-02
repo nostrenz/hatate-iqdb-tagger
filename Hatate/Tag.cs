@@ -3,6 +3,7 @@ using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using SolidColorBrush = System.Windows.Media.SolidColorBrush;
+using Hatate.Properties;
 
 namespace Hatate
 {
@@ -13,6 +14,7 @@ namespace Hatate
 			this.Value = value;
 			this.Namespace = nameSpace;
 			this.Exclude = exclude;
+			this.Source = Enum.TagSource.Undefined;
 		}
 
 		public Tag(string namespaced, bool parseNamespace)
@@ -24,6 +26,7 @@ namespace Hatate
 
 			this.Value = namespaced;
 			this.Namespace = null;
+			this.Source = Enum.TagSource.Undefined;
 
 			if (!parseNamespace) {
 				return;
@@ -108,6 +111,12 @@ namespace Hatate
 		public Enum.TagSource Source { get; set; }
 
 		/// <summary>
+		/// A tag can be set as hidden when its Source doesn't match the ones selected in the GUI.
+		/// Hidden tags won't show up in the GUI and won't be sent to Hydrus.
+		/// </summary>
+		public bool Hidden { get; set; }
+
+		/// <summary>
 		/// Return in format "namespace:value".
 		/// </summary>
 		public string Namespaced
@@ -161,6 +170,24 @@ namespace Hatate
 					};
 				}
 			}
+		}
+
+		/// <summary>
+		/// A hidden tag should not appear in the listbox.
+		/// </summary>
+		public System.Windows.Visibility Visibility
+		{
+			get { return this.Hidden ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible; }
+		}
+
+		public bool IsHitTestVisible
+		{
+			get { return !this.Hidden; }
+		}
+
+		public int Height
+		{
+			get { return this.Hidden ? 0 : 18; }
 		}
 
 		#endregion Accessor

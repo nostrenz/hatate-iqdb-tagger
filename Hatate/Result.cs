@@ -1,9 +1,10 @@
-﻿using Hatate.Properties;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Hatate.Properties;
 
 namespace Hatate
 {
@@ -28,6 +29,13 @@ namespace Hatate
 
 			this.Tags = new List<Tag>();
 			this.Ignoreds = new List<Tag>();
+			this.SelectedTagSources = new List<Enum.TagSource>();
+
+			// Set default tag sources
+			if (Settings.Default.TagSource_User) this.SelectedTagSources.Add(Enum.TagSource.User);
+			if (Settings.Default.TagSource_Booru) this.SelectedTagSources.Add(Enum.TagSource.Booru);
+			if (Settings.Default.TagSource_SearchEngine) this.SelectedTagSources.Add(Enum.TagSource.SearchEngine);
+			if (Settings.Default.TagSource_Hatate) this.SelectedTagSources.Add(Enum.TagSource.Hatate);
 		}
 
 		/*
@@ -143,10 +151,8 @@ namespace Hatate
 				match.Similarity = (float)iqdbMatch.Similarity;
 
 				// Add IQDB tags
-				if (Settings.Default.Iqdb_TagNamespace != null && !Settings.Default.Iqdb_TagNamespace.StartsWith("-")) {
-					foreach (string tag in iqdbMatch.Tags) {
-						match.Tags.Add(new Tag(tag, Settings.Default.Iqdb_TagNamespace) { Source = Enum.TagSource.SearchEngine });
-					}
+				foreach (string tag in iqdbMatch.Tags) {
+					match.Tags.Add(new Tag(tag) { Source = Enum.TagSource.SearchEngine });
 				}
 
 				matches.Add(match);
@@ -161,6 +167,17 @@ namespace Hatate
 		public void ClearWarnings()
 		{
 			this.warnings.Clear();
+		}
+
+		/// <summary>
+		/// Add a tag and ensures it's properly hidden according to the selected tag sources.
+		/// </summary>
+		/// <param name="tag"></param>
+		public void AddTag(Tag tag)
+		{
+			tag.Hidden = !this.SelectedTagSources.Contains(tag.Source);
+
+			this.Tags.Add(tag);
 		}
 
 		/*
@@ -206,6 +223,30 @@ namespace Hatate
 		public string Full { get; set; }
 		public string HydrusFileId { get; set; }
 		public ImmutableList<Match> Matches { get; set; }
+		public List<Enum.TagSource> SelectedTagSources { get; set; }
+
+		/// <summary>
+		/// Returns all tags where Hidden is False.
+		/// </summary>
+		public IEnumerable<Tag> NonHiddenTags
+		{
+			get { return from tag in this.Tags where !tag.Hidden select tag; }
+		}
+
+		public uint CountNonHiddenTags
+		{
+			get
+			{
+				IEnumerable<Tag> nonHiddenTags = this.NonHiddenTags;
+				uint count = 0;
+
+				foreach (Tag tag in nonHiddenTags) {
+					count++;
+				}
+
+				return count;
+			}
+		}
 
 		public Match Match
 		{
@@ -466,6 +507,11 @@ namespace Hatate
 		}
 
 		public string UploadedImageUrl
+		{
+			get; set;
+		}
+
+		public Enum.SearchEngine UsedSearchEngine
 		{
 			get; set;
 		}

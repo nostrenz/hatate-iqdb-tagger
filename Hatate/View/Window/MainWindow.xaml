@@ -53,9 +53,14 @@
 					</Grid.RowDefinitions>
 					<GroupBox x:Name="GroupBox_Tags" Header="Tags" Margin="0,0,0,2">
 						<ListBox x:Name="ListBox_Tags" SelectionMode="Extended" BorderThickness="0" Margin="-2" ContextMenuOpening="ListBox_Tags_ContextMenuOpening" MouseDoubleClick="ListBox_Tags_MouseDoubleClick">
+							<ListBox.ItemContainerStyle>
+								<Style>
+									<Setter Property="Control.Height" Value="{Binding Height}"/>
+								</Style>
+							</ListBox.ItemContainerStyle>
 							<ListBox.ItemTemplate>
 								<DataTemplate>
-									<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}"/>
+									<TextBlock Text="{Binding Namespaced}" Foreground="{Binding Foreground}" Visibility="{Binding Visibility}" IsHitTestVisible="{Binding IsHitTestVisible}"/>
 								</DataTemplate>
 							</ListBox.ItemTemplate>
 						</ListBox>
@@ -70,6 +75,13 @@
 							</ListBox.ItemTemplate>
 						</ListBox>
 					</GroupBox>
+					<ComboBox x:Name="ComboBox_TagSources" Margin="213,0,0,0" VerticalAlignment="Top" ToolTip="Toggle tag sources" IsEnabled="False">
+						<CheckBox x:Name="Checkbox_TagSource_User" Content="User" ToolTip="Tags added by you" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<CheckBox x:Name="Checkbox_TagSource_Booru" Content="Booru" ToolTip="Tags added by parsing a booru page" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<CheckBox x:Name="Checkbox_TagSource_SearchEngine" Content="Search Engine" ToolTip="Tags added by parsing the search engine results" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<CheckBox x:Name="Checkbox_TagSource_Hatate" Content="Hatate" ToolTip="Tags added by Hatate when enabled in settings" IsChecked="True" Click="Checkbox_TagSource_Click"/>
+						<Button Content="set as default" Width="87" Height="15" Click="Button_SetSelectedTagSourcesAsDefault_Click"/>
+					</ComboBox>
 				</Grid>
 			</Grid>
 		</Grid>
@@ -101,7 +113,6 @@
 			<MenuItem Header="Settings" Height="18">
 				<MenuItem Header="Hatate" Height="18" Click="MenuItem_Options_Click" />
 				<MenuItem Header="Hydrus API" Height="18" Click="MenuItem_HydrusApi_Click" />
-				<MenuItem Header="IQDB" Height="18" Click="MenuItem_IqdbSettings_Click" />
 				<MenuItem Header="SauceNAO" Height="18" Click="MenuItem_SauceNao_Click" />
 			</MenuItem>
 			<MenuItem Header="Help" Height="18">

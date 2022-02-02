@@ -16,7 +16,7 @@
 		<Label Content="API key" Margin="10,66,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="42" Padding="0,5"/>
 		<TextBox x:Name="TextBox_ApiKey" Height="26" Margin="57,66,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
 		<Button Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Save_Click"/>
-		<TextBlock Margin="10,128,6,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32"><Run Text="Tags can be obtained from SauceNAO results without parsing their booru page."/><Run Text=" Here you can "/><Run Text="select which tags you want to get and optionally "/><Run Text="prefix "/><Run Text="them "/><Run Text="with a namespace"/><Run Text="."/></TextBlock>
+		<TextBlock Margin="10,128,6,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32"><Run Text="Some tags can be obtained directly from SauceNAO results. Here you can select which ones you want to get and optionally prefix them with a namespace."/></TextBlock>
 		<GroupBox x:Name="GroupBox_TagNamepaces" Header="Tag namespaces" Margin="10,172,10,49">
 			<Grid Margin="0,0,-4,-14">
 				<CheckBox x:Name="Checkbox_Tag_Title" Content="Title" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>

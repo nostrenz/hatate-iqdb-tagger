@@ -2,6 +2,7 @@
 {
 	public enum TagSource : byte
 	{
+		Undefined = 0,
 		Booru = 1, // Added from parsing a booru page 
 		Hatate = 2, // Added by Hatate ("found", "not found", "tagged", ...)
 		User = 3, // Added manually by the user

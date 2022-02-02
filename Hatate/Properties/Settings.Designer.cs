@@ -721,19 +721,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-iqdb")]
-        public string Iqdb_TagNamespace {
-            get {
-                return ((string)(this["Iqdb_TagNamespace"]));
-            }
-            set {
-                this["Iqdb_TagNamespace"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-title")]
+        [global::System.Configuration.DefaultSettingValueAttribute("title")]
         public string SauceNao_TagNamespace_Title {
             get {
                 return ((string)(this["SauceNao_TagNamespace_Title"]));
@@ -745,7 +733,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-creator")]
+        [global::System.Configuration.DefaultSettingValueAttribute("creator")]
         public string SauceNao_TagNamespace_Creator {
             get {
                 return ((string)(this["SauceNao_TagNamespace_Creator"]));
@@ -757,7 +745,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-material")]
+        [global::System.Configuration.DefaultSettingValueAttribute("series")]
         public string SauceNao_TagNamespace_Material {
             get {
                 return ((string)(this["SauceNao_TagNamespace_Material"]));
@@ -769,7 +757,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-character")]
+        [global::System.Configuration.DefaultSettingValueAttribute("character")]
         public string SauceNao_TagNamespace_Character {
             get {
                 return ((string)(this["SauceNao_TagNamespace_Character"]));
@@ -781,7 +769,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-pixiv-illust-id")]
+        [global::System.Configuration.DefaultSettingValueAttribute("pixiv-illust-id")]
         public string SauceNao_TagNamespace_PixivIllustId {
             get {
                 return ((string)(this["SauceNao_TagNamespace_PixivIllustId"]));
@@ -793,7 +781,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-pixiv-member-id")]
+        [global::System.Configuration.DefaultSettingValueAttribute("pixiv-member-id")]
         public string SauceNao_TagNamespace_PixivMemberId {
             get {
                 return ((string)(this["SauceNao_TagNamespace_PixivMemberId"]));
@@ -805,13 +793,61 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-pixiv-illust-name")]
+        [global::System.Configuration.DefaultSettingValueAttribute("pixiv-illust-name")]
         public string SauceNao_TagNamespace_PixivMemberName {
             get {
                 return ((string)(this["SauceNao_TagNamespace_PixivMemberName"]));
             }
             set {
                 this["SauceNao_TagNamespace_PixivMemberName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TagSource_User {
+            get {
+                return ((bool)(this["TagSource_User"]));
+            }
+            set {
+                this["TagSource_User"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TagSource_Booru {
+            get {
+                return ((bool)(this["TagSource_Booru"]));
+            }
+            set {
+                this["TagSource_Booru"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TagSource_SearchEngine {
+            get {
+                return ((bool)(this["TagSource_SearchEngine"]));
+            }
+            set {
+                this["TagSource_SearchEngine"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TagSource_Hatate {
+            get {
+                return ((bool)(this["TagSource_Hatate"]));
+            }
+            set {
+                this["TagSource_Hatate"] = value;
             }
         }
     }

@@ -468,6 +468,7 @@ namespace Hatate
 			}
 
 			result.UploadedImageUrl = "https://iqdb.org" + iqdbResult.YourImage.PreviewUrl;
+			result.UsedSearchEngine = Enum.SearchEngine.IQDB;
 
 			// Result(s) found
 			if (iqdbResult != null && iqdbResult.Matches != null) {
@@ -475,7 +476,7 @@ namespace Hatate
 				result.UseIqdbApiMatches(iqdbResult.Matches);
 
 				// Check for matching results
-				this.CheckMatches(result, Enum.SearchEngine.IQDB);
+				this.CheckMatches(result);
 			}
 
 			this.AddSearchEngineTags(result);
@@ -517,8 +518,9 @@ namespace Hatate
 
 			result.Matches = sauceNao.Matches;
 			result.UploadedImageUrl = sauceNao.UploadedImageUrl;
+			result.UsedSearchEngine = Enum.SearchEngine.SauceNAO;
 
-			this.CheckMatches(result, Enum.SearchEngine.SauceNAO);
+			this.CheckMatches(result);
 
 			this.AddSearchEngineTags(result);
 			this.AddHatateTags(result);
@@ -559,7 +561,7 @@ namespace Hatate
 		/// <summary>
 		/// Check the various matches to find the best one.
 		/// </summary>
-		private void CheckMatches(Result result, Enum.SearchEngine usedSearchEngine)
+		private void CheckMatches(Result result)
 		{
 			foreach (Match match in result.Matches) {
 				// Check minimum similarity
@@ -568,12 +570,12 @@ namespace Hatate
 				}
 
 				// Check minimum number of tags (only for IQDB)
-				if (usedSearchEngine == Enum.SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
+				if (result.UsedSearchEngine == Enum.SearchEngine.IQDB && Options.Default.TagsCount > 0 && (match.Tags == null || match.Tags.Count < Options.Default.TagsCount)) {
 					continue;
 				}
 
 				// Check match type if enabled (only for IQDB)
-				if (usedSearchEngine == Enum.SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
+				if (result.UsedSearchEngine == Enum.SearchEngine.IQDB && Options.Default.CheckMatchType && match.MatchType > Options.Default.MatchType) {
 					continue;
 				}
 
@@ -620,7 +622,7 @@ namespace Hatate
 			}
 
 			foreach (Tag tag in result.Match.Tags) {
-				result.Tags.Add(tag);
+				result.AddTag(tag);
 			}
 		}
 
@@ -632,23 +634,28 @@ namespace Hatate
 			// Found on IQDB
 			if (result.Found) {
 				if (Options.Default.AddFoundTag) {
-					result.Tags.Add(new Tag(Options.Default.FoundTag, true) { Source = Enum.TagSource.Hatate });
+					result.AddTag(new Tag(Options.Default.FoundTag, true) { Source = Enum.TagSource.Hatate });
 				}
 			} else { // Not found on IQDB
 				if (Options.Default.AddNotfoundTag) {
-					result.Tags.Add(new Tag(Options.Default.NotfoundTag, true) { Source = Enum.TagSource.Hatate });
+					result.AddTag(new Tag(Options.Default.NotfoundTag, true) { Source = Enum.TagSource.Hatate });
 				}
 			}
 
 			// Add tagged tag if at least one booru tags exists
-			if (Options.Default.AddTaggedTag) {
-				foreach (Tag tag in result.Tags) {
-					if (tag.Source == Enum.TagSource.Booru) {
-						result.Tags.Add(new Tag(Options.Default.TaggedTag, true) { Source = Enum.TagSource.Hatate });
+			if (!Options.Default.AddTaggedTag) {
+				return;
+			}
 
-						return;
-					}
+			foreach (Tag tag in result.Tags) {
+				// Don't add the "hatate:tagged" tag is we only have user-added or hatate-added tags
+				if (tag.Source == Enum.TagSource.User || tag.Source == Enum.TagSource.Hatate) {
+					continue;
 				}
+
+				result.AddTag(new Tag(Options.Default.TaggedTag, true) { Source = Enum.TagSource.Hatate });
+
+				return;
 			}
 		}
 
@@ -732,7 +739,7 @@ namespace Hatate
 			&& result.Rating != IqdbApi.Enums.Rating.Unrated
 			&& !result.Tags.Exists(t => t.Namespace == "rating")
 			) {
-				result.Tags.Add(new Tag(result.Rating.ToString().ToLower(), "rating") { Source = Enum.TagSource.Booru });
+				result.AddTag(new Tag(result.Rating.ToString().ToLower(), "rating") { Source = Enum.TagSource.Booru });
 			}
 
 			this.ListBox_Tags.Items.Refresh();
@@ -829,14 +836,6 @@ namespace Hatate
 			context.Items.Add(item);
 
 			item = new MenuItem();
-			item.Header = "Add tags";
-			item.Tag = "addTagsForSelectedResult";
-			item.Click += this.ContextMenu_MenuItem_Click;
-			context.Items.Add(item);
-
-			context.Items.Add(new Separator());
-
-			item = new MenuItem();
 			item.Header = "Copy to clipboard";
 			item.Tag = "copyTags";
 			item.Click += this.ContextMenu_MenuItem_Click;
@@ -845,6 +844,14 @@ namespace Hatate
 			item = new MenuItem();
 			item.Header = "Search on Danbooru";
 			item.Tag = "helpTag";
+			item.Click += this.ContextMenu_MenuItem_Click;
+			context.Items.Add(item);
+
+			context.Items.Add(new Separator());
+
+			item = new MenuItem();
+			item.Header = "Add tags";
+			item.Tag = "addTagsForSelectedResult";
 			item.Click += this.ContextMenu_MenuItem_Click;
 			context.Items.Add(item);
 
@@ -1246,7 +1253,7 @@ namespace Hatate
 					selectedTag.Value = editedTag.Value;
 				}
 
-				result.Tags.Add(selectedTag);
+				result.AddTag(selectedTag);
 			}
 
 			result.Tags.Sort();
@@ -1380,7 +1387,7 @@ namespace Hatate
 			// Add tags to the result
 			if (tags != null && tags.Count > 0) {
 				foreach (Tag tag in tags) {
-					result.Tags.Add(tag);
+					result.AddTag(tag);
 				}
 			}
 
@@ -1432,7 +1439,7 @@ namespace Hatate
 				}
 
 				result.Ignoreds.Remove(tag);
-				result.Tags.Add(tag);
+				result.AddTag(tag);
 
 				this.RefreshListboxes();
 			}
@@ -1568,7 +1575,7 @@ namespace Hatate
 		{
 			foreach (Tag tag in tags) {
 				if (!result.Tags.Contains(tag)) {
-					result.Tags.Add(tag);
+					result.AddTag(tag);
 				}
 			}
 		}
@@ -1825,12 +1832,19 @@ namespace Hatate
 			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
 			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
 
-			this.GroupBox_Tags.Header = "Tags (" + result.Tags.Count + ")";
+			this.GroupBox_Tags.Header = "Tags (" + result.CountNonHiddenTags + ")";
 			this.GroupBox_Ignoreds.Header = "Ignoreds (" + result.Ignoreds.Count + ")";
 			this.Label_MatchTips.Text = "";
 			this.Label_MatchPages.Content = "";
 			this.Label_MatchPages.ToolTip = "";
 			this.Label_MatchPages.Visibility = Visibility.Hidden;
+			this.ComboBox_TagSources.IsEnabled = true;
+
+			// Set selected tag sources
+			this.Checkbox_TagSource_User.IsChecked = result.SelectedTagSources.Contains(Enum.TagSource.User);
+			this.Checkbox_TagSource_Booru.IsChecked = result.SelectedTagSources.Contains(Enum.TagSource.Booru);
+			this.Checkbox_TagSource_SearchEngine.IsChecked = result.SelectedTagSources.Contains(Enum.TagSource.SearchEngine);
+			this.Checkbox_TagSource_Hatate.IsChecked = result.SelectedTagSources.Contains(Enum.TagSource.Hatate);
 
 			// No matches, nothing to update
 			if (!result.HasMatches) {
@@ -1885,24 +1899,27 @@ namespace Hatate
 			// Set selected match
 			this.ComboBox_Matches.SelectedItem = result.Match;
 
+			// Set tag sources checkbox names
+			this.Checkbox_TagSource_Booru.Content = result.Source.ToString();
+			this.Checkbox_TagSource_SearchEngine.Content = result.UsedSearchEngine.ToString();
+
 			if (result.Unavailable) {
+				// Set DELETED label
 				this.Label_MatchPages.Content = "DELETED";
 				this.Label_MatchPages.ToolTip = "Work is no longer available on the page";
 				this.Label_MatchPages.Visibility = Visibility.Visible;
 				this.Label_MatchPages.Foreground = this.GetBrushFromString("#F00");
 				this.Label_MatchPages.HorizontalAlignment = HorizontalAlignment.Stretch;
 				this.Label_MatchPages.Width = Double.NaN;
-
-				return;
+			} else {
+				// Set album pages counter
+				this.Label_MatchPages.Content = result.Pages;
+				this.Label_MatchPages.ToolTip = "Match is part of a " + result.Pages + " pages album";
+				this.Label_MatchPages.Visibility = (result.Pages > 1 ? Visibility.Visible : Visibility.Hidden);
+				this.Label_MatchPages.Foreground = this.GetBrushFromString("#FFD2D2D2");
+				this.Label_MatchPages.HorizontalAlignment = HorizontalAlignment.Right;
+				this.Label_MatchPages.Width = 29;
 			}
-
-			// Set album pages counter
-			this.Label_MatchPages.Content = result.Pages;
-			this.Label_MatchPages.ToolTip = "Match is part of a " + result.Pages + " pages album";
-			this.Label_MatchPages.Visibility = (result.Pages > 1 ? Visibility.Visible : Visibility.Hidden);
-			this.Label_MatchPages.Foreground = this.GetBrushFromString("#FFD2D2D2");
-			this.Label_MatchPages.HorizontalAlignment = HorizontalAlignment.Right;
-			this.Label_MatchPages.Width = 29;
 		}
 
 		private void AttachMatchUrlsSubmenuToMenuItem(MenuItem sub, string tag, string tooltip=null)
@@ -2334,16 +2351,6 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Opens a window for editing IQDB settings.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void MenuItem_IqdbSettings_Click(object sender, RoutedEventArgs e)
-		{
-			new IqdbSettings().ShowDialog();
-		}
-
-		/// <summary>
 		/// Opens a window for setting the SauceNAO's API key.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -2367,6 +2374,7 @@ namespace Hatate
 			this.Image_Match.Source = null;
 			this.Border_Local.BorderBrush = this.Border_Match.BorderBrush = this.GetBrushFromString("#505050");
 			this.ComboBox_Matches.IsEnabled = false;
+			this.ComboBox_TagSources.IsEnabled = false;
 
 			if (this.ListBox_Files.SelectedIndex < 0) {
 				return;
@@ -2878,11 +2886,11 @@ namespace Hatate
 
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 0, hasSelecteds);   // "Edit"
 			this.SetContextMenuItemEnabled(this.ListBox_Tags, 1, hasSelecteds);   // "Remove"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 2, hasSelecteds);   // "Remove and ignore"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, this.ListBox_Files.SelectedItems.Count > 0); // "Add tags"
-														   // 4 is a separator
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 5, hasSelecteds); // "Copy to clipboard"
-			this.SetContextMenuItemEnabled(this.ListBox_Tags, 6, singleSelected); // "Search on Danbooru"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 2, hasSelecteds);   // "Ignore"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 3, hasSelecteds); // "Copy to clipboard"
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 4, singleSelected); // "Search on Danbooru"
+														   // 5 is a separator
+			this.SetContextMenuItemEnabled(this.ListBox_Tags, 6, this.ListBox_Files.SelectedItems.Count > 0); // "Add tags"
 		}
 
 		/// <summary>
@@ -3345,5 +3353,67 @@ namespace Hatate
 		}
 
 		#endregion Event
+
+		private void Checkbox_TagSource_Click(object sender, RoutedEventArgs e)
+		{
+			Result selectedResult = this.SelectedResult;
+
+			if (selectedResult == null) {
+				return;
+			}
+
+			// Clear current tag sources
+			selectedResult.SelectedTagSources.Clear();
+
+			// Add new tag sources
+			if ((bool)this.Checkbox_TagSource_User.IsChecked) {
+				selectedResult.SelectedTagSources.Add(Enum.TagSource.User);
+			}
+
+			if ((bool)this.Checkbox_TagSource_Booru.IsChecked) {
+				selectedResult.SelectedTagSources.Add(Enum.TagSource.Booru);
+			}
+
+			if ((bool)this.Checkbox_TagSource_SearchEngine.IsChecked) {
+				selectedResult.SelectedTagSources.Add(Enum.TagSource.SearchEngine);
+			}
+
+			if ((bool)this.Checkbox_TagSource_Hatate.IsChecked) {
+				selectedResult.SelectedTagSources.Add(Enum.TagSource.Hatate);
+			}
+
+			// Hide all tags
+			foreach (Tag tag in selectedResult.Tags) {
+				tag.Hidden = true;
+			}
+
+			ushort count = 0;
+			IEnumerable<Tag> tagsFromSelectedSources =
+				from tag in selectedResult.Tags
+				where selectedResult.SelectedTagSources.Contains(tag.Source)
+				select tag;
+
+			// Unhide tags from selected sources
+			foreach (Tag tag in tagsFromSelectedSources) {
+				tag.Hidden = false;
+				count++;
+			}
+
+			// Update groupbox title
+			this.GroupBox_Tags.Header = "Tags (" + count + ")";
+
+			// Refresh tags
+			this.ListBox_Tags.Items.Refresh();
+		}
+
+		private void Button_SetSelectedTagSourcesAsDefault_Click(object sender, RoutedEventArgs e)
+		{
+			Options.Default.TagSource_User = (bool)this.Checkbox_TagSource_User.IsChecked;
+			Options.Default.TagSource_Booru = (bool)this.Checkbox_TagSource_Booru.IsChecked;
+			Options.Default.TagSource_SearchEngine = (bool)this.Checkbox_TagSource_SearchEngine.IsChecked;
+			Options.Default.TagSource_Hatate = (bool)this.Checkbox_TagSource_Hatate.IsChecked;
+
+			Options.Default.Save();
+		}
 	}
 }

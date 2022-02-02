@@ -127,46 +127,55 @@ namespace Hatate
 				}
 
 				// Get tags provided by SauceNAO
-				if (this.ShouldGetSauceNaoResultTags) {
+				if (this.ShouldGetTags) {
 					Supremes.Nodes.Element resulttitle = resultcontent.Select(".resulttitle").First;
 					Supremes.Nodes.Elements resultcontentcolumns = resultcontent.Select(".resultcontentcolumn");
 					Supremes.Nodes.Elements originalSourceLinks = resultcontent.Select(".resultcontentcolumn a");
 
-					// Title tag
+					// Title or creator tag
 					if (resulttitle != null) {
 						string titleText = resulttitle.Text;
 						string nameSpace = Settings.Default.SauceNao_TagNamespace_Title;
 
-						if (titleText.StartsWith("Creator:")) {
+						if (titleText.StartsWith("Creator:") && this.ShouldGetCreatorTag) {
 							titleText = titleText.Replace("Creator:", "");
 							nameSpace = Settings.Default.SauceNao_TagNamespace_Creator;
-						}
 
-						resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+							resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+						} else if (this.ShouldGetTitleTag) {
+							resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+						}
 					}
 
 					foreach (Supremes.Nodes.Element resultcontentcolumn in resultcontentcolumns) {
 						string contentHtml = resultcontentcolumn.Html;
 
-						int materialPos = contentHtml.IndexOf("<strong>Material: </strong>");
-						int charactersPos = contentHtml.IndexOf("<strong>Characters: </strong>");
+						// Get material tag
+						if (this.ShouldGetMaterialTag) {
+							int materialPos = contentHtml.IndexOf("<strong>Material: </strong>");
 
-						if (materialPos >= 0) {
-							string materialHtml = contentHtml.Substring(materialPos);
-							materialHtml = materialHtml.Replace("<strong>Material: </strong>", "");
-							materialHtml = materialHtml.Replace("<br>", "");
+							if (materialPos >= 0) {
+								string materialHtml = contentHtml.Substring(materialPos);
+								materialHtml = materialHtml.Replace("<strong>Material: </strong>", "");
+								materialHtml = materialHtml.Replace("<br>", "");
 
-							resultTags.Add(new Tag(materialHtml.Trim(), Settings.Default.SauceNao_TagNamespace_Material) { Source = Enum.TagSource.SearchEngine });
+								resultTags.Add(new Tag(materialHtml.Trim(), Settings.Default.SauceNao_TagNamespace_Material) { Source = Enum.TagSource.SearchEngine });
+							}
 						}
 
-						if (charactersPos >= 0) {
-							string charactersHtml = contentHtml.Replace("<strong>Characters: </strong>", "").Trim();
-							charactersHtml = charactersHtml.Replace("<br>", "");
-							string[] characterNames = charactersHtml.Split('\n');
+						// Get character tags
+						if (this.ShouldGetCharacterTag) {
+							int charactersPos = contentHtml.IndexOf("<strong>Characters: </strong>");
 
-							foreach (string characterName in characterNames) {
-								if (!string.IsNullOrWhiteSpace(characterName)) {
-									resultTags.Add(new Tag(characterName.Trim(), Settings.Default.SauceNao_TagNamespace_Character) { Source = Enum.TagSource.SearchEngine });
+							if (charactersPos >= 0) {
+								string charactersHtml = contentHtml.Replace("<strong>Characters: </strong>", "").Trim();
+								charactersHtml = charactersHtml.Replace("<br>", "");
+								string[] characterNames = charactersHtml.Split('\n');
+
+								foreach (string characterName in characterNames) {
+									if (!string.IsNullOrWhiteSpace(characterName)) {
+										resultTags.Add(new Tag(characterName.Trim(), Settings.Default.SauceNao_TagNamespace_Character) { Source = Enum.TagSource.SearchEngine });
+									}
 								}
 							}
 						}
@@ -201,10 +210,17 @@ namespace Hatate
 							string value = keyValue[1];
 
 							if (key == "illust_id") {
-								resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivIllustId) { Source = Enum.TagSource.SearchEngine });
+								if (this.ShouldGetPixivIllustIdTag) {
+									resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivIllustId) { Source = Enum.TagSource.SearchEngine });
+								}
 							} else if (key == "id") {
-								resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivMemberId) { Source = Enum.TagSource.SearchEngine });
-								resultTags.Add(new Tag(sourceLink.Text, Settings.Default.SauceNao_TagNamespace_PixivMemberName) { Source = Enum.TagSource.SearchEngine });
+								if (this.ShouldGetPixivMemberIdTag) {
+									resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivMemberId) { Source = Enum.TagSource.SearchEngine });
+								}
+
+								if (this.ShouldGetPixivMemberNameTag) {
+									resultTags.Add(new Tag(sourceLink.Text, Settings.Default.SauceNao_TagNamespace_PixivMemberName) { Source = Enum.TagSource.SearchEngine });
+								}
 							}
 						}
 					}
@@ -303,17 +319,52 @@ namespace Hatate
 			get { return this.dailyLimitExceeded; }
 		}
 
-		private bool ShouldGetSauceNaoResultTags
+		private bool ShouldGetTitleTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_Title != null && !Settings.Default.SauceNao_TagNamespace_Title.StartsWith("-"); }
+		}
+
+		private bool ShouldGetCreatorTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_Creator != null && !Settings.Default.SauceNao_TagNamespace_Creator.StartsWith("-"); }
+		}
+
+		private bool ShouldGetMaterialTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_Material != null && !Settings.Default.SauceNao_TagNamespace_Material.StartsWith("-"); }
+		}
+
+		private bool ShouldGetCharacterTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_Character != null && !Settings.Default.SauceNao_TagNamespace_Character.StartsWith("-"); }
+		}
+
+		private bool ShouldGetPixivIllustIdTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_PixivIllustId != null && !Settings.Default.SauceNao_TagNamespace_PixivIllustId.StartsWith("-"); }
+		}
+
+		private bool ShouldGetPixivMemberIdTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_PixivMemberId != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberId.StartsWith("-"); }
+		}
+
+		private bool ShouldGetPixivMemberNameTag
+		{
+			get { return Settings.Default.SauceNao_TagNamespace_PixivMemberName != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberName.StartsWith("-"); }
+		}
+
+		private bool ShouldGetTags
 		{
 			get
 			{
-				return (Settings.Default.SauceNao_TagNamespace_Title != null && !Settings.Default.SauceNao_TagNamespace_Title.StartsWith("-"))
-					|| (Settings.Default.SauceNao_TagNamespace_Creator != null && !Settings.Default.SauceNao_TagNamespace_Creator.StartsWith("-"))
-					|| (Settings.Default.SauceNao_TagNamespace_Material != null && !Settings.Default.SauceNao_TagNamespace_Material.StartsWith("-"))
-					|| (Settings.Default.SauceNao_TagNamespace_Character != null && !Settings.Default.SauceNao_TagNamespace_Character.StartsWith("-"))
-					|| (Settings.Default.SauceNao_TagNamespace_PixivIllustId != null && !Settings.Default.SauceNao_TagNamespace_PixivIllustId.StartsWith("-"))
-					|| (Settings.Default.SauceNao_TagNamespace_PixivMemberId != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberId.StartsWith("-"))
-					|| (Settings.Default.SauceNao_TagNamespace_PixivMemberName != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberName.StartsWith("-"));
+				return this.ShouldGetTitleTag
+					|| this.ShouldGetCreatorTag
+					|| this.ShouldGetMaterialTag
+					|| this.ShouldGetCharacterTag
+					|| this.ShouldGetPixivIllustIdTag
+					|| this.ShouldGetPixivMemberIdTag
+					|| this.ShouldGetPixivMemberNameTag;
 			}
 		}
 
