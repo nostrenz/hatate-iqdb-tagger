@@ -67,12 +67,6 @@ namespace Hatate
 			this.AddParenthesisValueRadioToViewMenu("Highest similarity", ParenthesisValue.HighestSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match similarity", ParenthesisValue.MatchSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match source", ParenthesisValue.MatchSource);
-
-			// Set default tag sources
-			this.Checkbox_TagSource_User.IsChecked = Options.Default.TagSource_User;
-			this.Checkbox_TagSource_Booru.IsChecked = Options.Default.TagSource_Booru;
-			this.Checkbox_TagSource_SearchEngine.IsChecked = Options.Default.TagSource_SearchEngine;
-			this.Checkbox_TagSource_Hatate.IsChecked = Options.Default.TagSource_Hatate;
 		}
 
 		/*
@@ -485,8 +479,7 @@ namespace Hatate
 				this.CheckMatches(result);
 			}
 
-			this.AddSearchEngineTags(result);
-			this.AddHatateTags(result);
+			this.PortTagsOfMatchToResult(result);
 
 			fs.Close();
 			fs.Dispose();
@@ -527,9 +520,7 @@ namespace Hatate
 			result.UsedSearchEngine = Enum.SearchEngine.SauceNAO;
 
 			this.CheckMatches(result);
-
-			this.AddSearchEngineTags(result);
-			this.AddHatateTags(result);
+			this.PortTagsOfMatchToResult(result);
 		}
 
 		private Match GetMatchWithBestSourceOrdering(Result result, Match currentMatch)
@@ -611,6 +602,16 @@ namespace Hatate
 				// We have our match, no need to check the others
 				return;
 			}
+		}
+
+		/// <summary>
+		/// Port tags from the result's selected match to the result's tags list.
+		/// </summary>
+		/// <param name="result"></param>
+		private void PortTagsOfMatchToResult(Result result)
+		{
+			this.AddSearchEngineTags(result);
+			this.AddHatateTags(result);
 		}
 
 		/// <summary>
@@ -1580,9 +1581,11 @@ namespace Hatate
 		private void AddTagsToResult(List<Tag> tags, Result result)
 		{
 			foreach (Tag tag in tags) {
-				if (!result.Tags.Contains(tag)) {
-					result.AddTag(tag);
+				if (result.Tags.Contains(tag)) {
+					continue;
 				}
+
+				result.AddTag(tag);
 			}
 		}
 
@@ -1835,7 +1838,7 @@ namespace Hatate
 			result.Tags.Sort();
 			result.Ignoreds.Sort();
 
-			this.SetListBoxItemsSource(this.ListBox_Tags, result.NonHiddenTags);
+			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
 			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
 
 			this.GroupBox_Tags.Header = "Tags (" + result.CountNonHiddenTags + ")";
@@ -3289,8 +3292,7 @@ namespace Hatate
 				this.ParseBooruPage(result);
 			}
 
-			this.AddSearchEngineTags(result);
-			this.AddHatateTags(result);
+			this.PortTagsOfMatchToResult(result);
 			this.UpdateRightView(result);
 
 			// Refresh the items to update the foreground color from the Result objets
