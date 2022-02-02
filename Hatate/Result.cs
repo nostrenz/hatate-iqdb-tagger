@@ -152,7 +152,7 @@ namespace Hatate
 
 				// Add IQDB tags
 				foreach (string tag in iqdbMatch.Tags) {
-					match.Tags.Add(new Tag(tag) { Source = Enum.TagSource.SearchEngine });
+					match.Tags.Add(new Tag(tag.Replace('_', ' ')) { Source = Enum.TagSource.SearchEngine });
 				}
 
 				matches.Add(match);
