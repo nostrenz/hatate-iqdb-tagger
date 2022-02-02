@@ -749,9 +749,6 @@ namespace Hatate
 				result.AddTag(new Tag(result.Rating.ToString().ToLower(), "rating") { Source = Enum.TagSource.Booru });
 			}
 
-			this.ListBox_Tags.Items.Refresh();
-			this.ListBox_Ignoreds.Items.Refresh();
-
 			return true;
 		}
 
@@ -1032,7 +1029,8 @@ namespace Hatate
 			result.Ignoreds.Clear();
 
 			// Refresh view
-			this.RefreshListboxes();
+			this.ListBox_Tags.Items.Refresh();
+			this.ListBox_Ignoreds.Items.Refresh();
 
 			// Delete thumbnail
 			if (result.ThumbPath != null && result.ThumbPath != result.ImagePath) {
@@ -1263,8 +1261,7 @@ namespace Hatate
 				result.AddTag(selectedTag);
 			}
 
-			result.Tags.Sort();
-			this.ListBox_Tags.Items.Refresh();
+			this.RefreshTagsListBox(result);
 		}
 
 		/// <summary>
@@ -1276,30 +1273,8 @@ namespace Hatate
 				result.Reset();
 			}
 
-			this.RefreshListboxes();
-		}
-
-		/// <summary>
-		/// Refresh the tags and ignored listboxes to update their content from the selected result.
-		/// </summary>
-		private void RefreshListboxes()
-		{
 			this.ListBox_Tags.Items.Refresh();
 			this.ListBox_Ignoreds.Items.Refresh();
-		}
-
-		/// <summary>
-		/// Write all the selected items from the given list into a txt file.
-		/// </summary>
-		private void WriteSelectedItemsToTxt(string filepath, ListBox from)
-		{
-			using (StreamWriter file = new StreamWriter(filepath, true)) {
-				foreach (Tag item in from.SelectedItems) {
-					file.WriteLine(item.Value);
-				}
-			}
-
-			this.LoadIgnoredTags();
 		}
 
 		/// <summary>
@@ -1424,7 +1399,8 @@ namespace Hatate
 				result.Tags.Remove(tag);
 				result.Ignoreds.Add(tag);
 
-				this.RefreshListboxes();
+				this.ListBox_Tags.Items.Refresh();
+				this.ListBox_Ignoreds.Items.Refresh();
 			}
 		}
 
@@ -1448,7 +1424,8 @@ namespace Hatate
 				result.Ignoreds.Remove(tag);
 				result.AddTag(tag);
 
-				this.RefreshListboxes();
+				this.ListBox_Tags.Items.Refresh();
+				this.ListBox_Ignoreds.Items.Refresh();
 			}
 
 			string txtPath = this.IgnoredsTxtPath;
@@ -1553,8 +1530,7 @@ namespace Hatate
 			Result result = this.SelectedResult;
 
 			this.AddTagsToResult(tags, result);
-
-			this.ListBox_Tags.Items.Refresh();
+			this.RefreshTagsListBox(result);
 		}
 
 		/// <summary>
@@ -1572,7 +1548,7 @@ namespace Hatate
 				this.AddTagsToResult(tags, result);
 			}
 
-			this.ListBox_Tags.Items.Refresh();
+			this.RefreshTagsListBox(this.SelectedResult);
 		}
 
 		/// <summary>
@@ -1844,6 +1820,8 @@ namespace Hatate
 			this.Label_MatchPages.ToolTip = "";
 			this.Label_MatchPages.Visibility = Visibility.Hidden;
 			this.ComboBox_TagSources.IsEnabled = true;
+
+			this.RefreshTagsListBox(result);
 
 			// Set selected tag sources
 			this.Checkbox_TagSource_User.IsChecked = result.SelectedTagSources.Contains(Enum.TagSource.User);
@@ -2253,6 +2231,68 @@ namespace Hatate
 			}
 
 			this.MenuItem_View.Items.Add(radioButton);
+		}
+
+		/// <summary>
+		/// Refresh the content of the tags listbox.
+		/// This will do the same thing as this.ListBox_Tags.Items.Refresh() but will also hide tags
+		/// from non-selected sources as well as duplicates (as there can be two identical tags from different sources).
+		/// </summary>
+		/// <param name="result"></param>
+		private void RefreshTagsListBox(Result result)
+		{
+			if (result == null || result.Tags.Count < 1) {
+				this.ListBox_Tags.Items.Refresh();
+
+				return;
+			}
+
+			ushort numberOfTags = 0;
+			Tag previousTag = null;
+
+			// Hide all tags
+			foreach (Tag tag in result.Tags) {
+				tag.Hidden = true;
+			}
+
+			IEnumerable<Tag> tagsFromSelectedSources =
+				from tag in result.Tags
+				where result.SelectedTagSources.Contains(tag.Source)
+				select tag;
+
+			// Unhide tags from selected sources
+			foreach (Tag tag in tagsFromSelectedSources) {
+				tag.Hidden = false;
+				numberOfTags++;
+			}
+
+			// Refresh tags
+			result.Tags.Sort();
+
+			// Hide duplicates in the list
+			foreach (Tag tag in result.Tags) {
+				if (tag.Hidden) {
+					continue;
+				}
+
+				if (previousTag == null) {
+					previousTag = tag;
+					continue;
+				}
+
+				if (tag.Namespaced.Equals(previousTag.Namespaced)) {
+					tag.Hidden = true;
+					numberOfTags--;
+				}
+
+				previousTag = tag;
+			}
+
+			// Update groupbox title
+			this.GroupBox_Tags.Header = "Tags (" + numberOfTags + ")";
+
+			// Update listbox content.
+			this.ListBox_Tags.Items.Refresh();
 		}
 
 		#endregion Private
@@ -3386,29 +3426,7 @@ namespace Hatate
 				selectedResult.SelectedTagSources.Add(Enum.TagSource.Hatate);
 			}
 
-			// Hide all tags
-			foreach (Tag tag in selectedResult.Tags) {
-				tag.Hidden = true;
-			}
-
-			ushort count = 0;
-			IEnumerable<Tag> tagsFromSelectedSources =
-				from tag in selectedResult.Tags
-				where selectedResult.SelectedTagSources.Contains(tag.Source)
-				select tag;
-
-			// Unhide tags from selected sources
-			foreach (Tag tag in tagsFromSelectedSources) {
-				tag.Hidden = false;
-				count++;
-			}
-
-			// Update groupbox title
-			this.GroupBox_Tags.Header = "Tags (" + count + ")";
-
-			// Refresh tags
-			selectedResult.Tags.Sort();
-			this.ListBox_Tags.Items.Refresh();
+			this.RefreshTagsListBox(selectedResult);
 
 			// Set-as-default button status
 			this.Button_TagSources_SetAsDefault.IsEnabled = (bool)this.Checkbox_TagSource_User.IsChecked != Options.Default.TagSource_User
