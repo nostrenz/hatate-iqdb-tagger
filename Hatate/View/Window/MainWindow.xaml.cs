@@ -3412,9 +3412,15 @@ namespace Hatate
 
 			// Refresh tags
 			this.ListBox_Tags.Items.Refresh();
+
+			// Set-as-default button status
+			this.Button_TagSources_SetAsDefault.IsEnabled = (bool)this.Checkbox_TagSource_User.IsChecked != Options.Default.TagSource_User
+				|| (bool)this.Checkbox_TagSource_Booru.IsChecked != Options.Default.TagSource_Booru
+				|| (bool)this.Checkbox_TagSource_SearchEngine.IsChecked != Options.Default.TagSource_SearchEngine
+				|| (bool)this.Checkbox_TagSource_Hatate.IsChecked != Options.Default.TagSource_Hatate;
 		}
 
-		private void Button_SetSelectedTagSourcesAsDefault_Click(object sender, RoutedEventArgs e)
+		private void Button_TagSources_SetAsDefault_Click(object sender, RoutedEventArgs e)
 		{
 			Options.Default.TagSource_User = (bool)this.Checkbox_TagSource_User.IsChecked;
 			Options.Default.TagSource_Booru = (bool)this.Checkbox_TagSource_Booru.IsChecked;
@@ -3422,6 +3428,8 @@ namespace Hatate
 			Options.Default.TagSource_Hatate = (bool)this.Checkbox_TagSource_Hatate.IsChecked;
 
 			Options.Default.Save();
+
+			this.Button_TagSources_SetAsDefault.IsEnabled = false;
 		}
 	}
 }
