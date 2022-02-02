@@ -79,7 +79,7 @@ namespace Hatate
 			}
 
 			dynamic parsed = JObject.Parse(json);
-			
+
 			return parsed.file_ids;
 		}
 
@@ -96,7 +96,7 @@ namespace Hatate
 			if (fileIds.Count <= METADATA_BATCH_SIZE) {
 				return await this.GetBatchMetadata(fileIds);
 			}
-			
+
 			JArray metadata = new JArray();
 			JArray batch = new JArray();
 
@@ -256,7 +256,7 @@ namespace Hatate
 			if (pages == null || pages.pages == null) {
 				return null;
 			}
-			
+
 			// Returns pages contained in the top page
 			return pages.pages.pages;
 		}

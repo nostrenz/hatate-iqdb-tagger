@@ -67,6 +67,12 @@ namespace Hatate
 			this.AddParenthesisValueRadioToViewMenu("Highest similarity", ParenthesisValue.HighestSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match similarity", ParenthesisValue.MatchSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match source", ParenthesisValue.MatchSource);
+
+			// Set default tag sources
+			this.Checkbox_TagSource_User.IsChecked = Options.Default.TagSource_User;
+			this.Checkbox_TagSource_Booru.IsChecked = Options.Default.TagSource_Booru;
+			this.Checkbox_TagSource_SearchEngine.IsChecked = Options.Default.TagSource_SearchEngine;
+			this.Checkbox_TagSource_Hatate.IsChecked = Options.Default.TagSource_Hatate;
 		}
 
 		/*
@@ -1829,7 +1835,7 @@ namespace Hatate
 			result.Tags.Sort();
 			result.Ignoreds.Sort();
 
-			this.SetListBoxItemsSource(this.ListBox_Tags, result.Tags);
+			this.SetListBoxItemsSource(this.ListBox_Tags, result.NonHiddenTags);
 			this.SetListBoxItemsSource(this.ListBox_Ignoreds, result.Ignoreds);
 
 			this.GroupBox_Tags.Header = "Tags (" + result.CountNonHiddenTags + ")";
@@ -2118,7 +2124,7 @@ namespace Hatate
 				this.compareWindow = new Compare();
 				this.compareWindow.Closed += this.CompareWindow_Closed;
 			}
-			
+
 			this.compareWindow.LoadResultImages(result);
 		}
 

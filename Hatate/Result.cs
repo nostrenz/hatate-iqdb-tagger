@@ -248,6 +248,22 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Returns all tags where Hidden is False.
+		/// </summary>
+		public List<Tag> NonHiddenTags
+		{
+			get
+			{
+				IEnumerable<Tag> tagsFromSelectedSources =
+					from tag in this.Tags
+					where !tag.Hidden
+					select tag;
+
+				return tagsFromSelectedSources.ToList();
+			}
+		}
+
 		public Match Match
 		{
 			get
