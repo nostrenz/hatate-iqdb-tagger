@@ -1059,7 +1059,7 @@ namespace Hatate
 		/// <returns></returns>
 		private Result GetResultAt(int index)
 		{
-			if (index < 0) {
+			if (index < 0 || index >= this.ListBox_Files.Items.Count) {
 				return null;
 			}
 
@@ -2420,6 +2420,8 @@ namespace Hatate
 			this.Border_Local.BorderBrush = this.Border_Match.BorderBrush = this.GetBrushFromString("#505050");
 			this.ComboBox_Matches.IsEnabled = false;
 			this.ComboBox_TagSources.IsEnabled = false;
+			this.GroupBox_Tags.Header = "Tags (0)";
+			this.GroupBox_Ignoreds.Header = "Ignoreds (0)";
 
 			if (this.ListBox_Files.SelectedIndex < 0) {
 				return;
