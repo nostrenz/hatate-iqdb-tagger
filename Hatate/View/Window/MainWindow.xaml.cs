@@ -467,16 +467,22 @@ namespace Hatate
 				// FormatException may happen in case of an invalid HTML response where no tags can be parsed
 			}
 
-			result.UploadedImageUrl = "https://iqdb.org" + iqdbResult.YourImage.PreviewUrl;
 			result.UsedSearchEngine = Enum.SearchEngine.IQDB;
 
 			// Result(s) found
-			if (iqdbResult != null && iqdbResult.Matches != null) {
-				this.lastSearchedInSeconds = (int)iqdbResult.SearchedInSeconds;
-				result.UseIqdbApiMatches(iqdbResult.Matches);
+			if (iqdbResult != null) {
+				if (iqdbResult.YourImage != null) {
+					result.UploadedImageUrl = "https://iqdb.org" + iqdbResult.YourImage.PreviewUrl;
+				}
 
-				// Check for matching results
-				this.CheckMatches(result);
+				if (iqdbResult.Matches != null) {
+					this.lastSearchedInSeconds = (int)iqdbResult.SearchedInSeconds;
+
+					result.UseIqdbApiMatches(iqdbResult.Matches);
+
+					// Check for matching results
+					this.CheckMatches(result);
+				}
 			}
 
 			this.PortTagsOfMatchToResult(result);
@@ -3398,8 +3404,6 @@ namespace Hatate
 			this.ListBox_Files.Items.Refresh();
 		}
 
-		#endregion Event
-
 		private void Checkbox_TagSource_Click(object sender, RoutedEventArgs e)
 		{
 			Result selectedResult = this.SelectedResult;
@@ -3448,5 +3452,7 @@ namespace Hatate
 
 			this.Button_TagSources_SetAsDefault.IsEnabled = false;
 		}
+
+		#endregion Event
 	}
 }

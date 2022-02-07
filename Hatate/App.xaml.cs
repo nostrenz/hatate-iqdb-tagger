@@ -209,6 +209,7 @@ namespace Hatate
 				file.WriteLine(e.Exception.Source);
 				file.WriteLine(e.Exception.Data.ToString());
 				file.WriteLine(e.Exception.ToString());
+				file.WriteLine(e.Exception.StackTrace);
 			}
 
 			MessageBox.Show("Hatate just crashed into the ground.\nA report diary has been written in the logs folder.");
