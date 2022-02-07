@@ -915,7 +915,7 @@ namespace Hatate
 					return false;
 				}
 
-				this.WriteTagsToTxt(result.ImagePath + ".txt", result.Tags);
+				this.WriteTagsToTxt(result.ImagePath + ".txt", result.NonHiddenTags.ToList());
 			}
 
 			// Write the ignored tags to txt
