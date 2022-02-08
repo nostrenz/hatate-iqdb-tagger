@@ -116,6 +116,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Enum\TagSource.cs" />
+    <Compile Include="TagNamespace.cs" />
+    <Compile Include="TagNamespaces.cs" />
+    <Compile Include="View\Control\TagNamespaceItem.xaml.cs">
+      <DependentUpon>TagNamespaceItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Window\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
@@ -171,6 +176,10 @@
     </Compile>
     <Compile Include="Sources.cs" />
     <Compile Include="Tag.cs" />
+    <Page Include="View\Control\TagNamespaceItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Window\About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

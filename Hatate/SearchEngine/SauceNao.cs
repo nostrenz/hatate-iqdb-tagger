@@ -17,6 +17,15 @@ namespace Hatate
 		private string uploadedImageUrl = null;
 		private bool dailyLimitExceeded = false;
 
+		// Tag namespaces
+		private TagNamespace titleTagNamespace = App.tagNamespaces.GetByKeyName("title");
+		private TagNamespace pixivIllustIdNamespace = App.tagNamespaces.GetByKeyName("pixivIllustId");
+		private TagNamespace pixivMemberNameNamespace = App.tagNamespaces.GetByKeyName("pixivMemberName");
+		private TagNamespace pixivMemberIdNamespace = App.tagNamespaces.GetByKeyName("pixivMemberId");
+		private TagNamespace creatorTagNamespace = App.tagNamespaces.GetByKeyName("creator");
+		private TagNamespace materialTagNamespace = App.tagNamespaces.GetByKeyName("material");
+		private TagNamespace characterTagNamespace = App.tagNamespaces.GetByKeyName("character");
+
 		/*
 		============================================
 		Public
@@ -134,100 +143,98 @@ namespace Hatate
 				}
 
 				// Get tags provided by SauceNAO
-				if (this.ShouldGetTags) {
-					Supremes.Nodes.Element resulttitle = resultcontent.Select(".resulttitle").First;
-					Supremes.Nodes.Elements resultcontentcolumns = resultcontent.Select(".resultcontentcolumn");
-					Supremes.Nodes.Elements originalSourceLinks = resultcontent.Select(".resultcontentcolumn a");
+				Supremes.Nodes.Element resulttitle = resultcontent.Select(".resulttitle").First;
+				Supremes.Nodes.Elements resultcontentcolumns = resultcontent.Select(".resultcontentcolumn");
+				Supremes.Nodes.Elements originalSourceLinks = resultcontent.Select(".resultcontentcolumn a");
 
-					// Title or creator tag
-					if (resulttitle != null) {
-						string titleText = resulttitle.Text;
-						string nameSpace = Settings.Default.SauceNao_TagNamespace_Title;
+				// Title or creator tag
+				if (resulttitle != null) {
+					string titleText = resulttitle.Text;
+					string nameSpace = this.titleTagNamespace.Namespace;
 
-						if (titleText.StartsWith("Creator:") && this.ShouldGetCreatorTag) {
-							titleText = titleText.Replace("Creator:", "");
-							nameSpace = Settings.Default.SauceNao_TagNamespace_Creator;
+					if (titleText.StartsWith("Creator:") && this.creatorTagNamespace.Enabled) {
+						titleText = titleText.Replace("Creator:", "");
+						nameSpace = this.creatorTagNamespace.Namespace;
 
-							resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
-						} else if (this.ShouldGetTitleTag) {
-							resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+						resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+					} else if (this.titleTagNamespace.Enabled) {
+						resultTags.Add(new Tag(titleText.Trim(), nameSpace) { Source = Enum.TagSource.SearchEngine });
+					}
+				}
+
+				foreach (Supremes.Nodes.Element resultcontentcolumn in resultcontentcolumns) {
+					string contentHtml = resultcontentcolumn.Html;
+
+					// Get material tag
+					if (this.materialTagNamespace.Enabled) {
+						int materialPos = contentHtml.IndexOf("<strong>Material: </strong>");
+
+						if (materialPos >= 0) {
+							string materialHtml = contentHtml.Substring(materialPos);
+							materialHtml = materialHtml.Replace("<strong>Material: </strong>", "");
+							materialHtml = materialHtml.Replace("<br>", "");
+
+							resultTags.Add(new Tag(materialHtml.Trim(), this.materialTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 						}
 					}
 
-					foreach (Supremes.Nodes.Element resultcontentcolumn in resultcontentcolumns) {
-						string contentHtml = resultcontentcolumn.Html;
+					// Get character tags
+					if (this.characterTagNamespace.Enabled) {
+						int charactersPos = contentHtml.IndexOf("<strong>Characters: </strong>");
 
-						// Get material tag
-						if (this.ShouldGetMaterialTag) {
-							int materialPos = contentHtml.IndexOf("<strong>Material: </strong>");
+						if (charactersPos >= 0) {
+							string charactersHtml = contentHtml.Replace("<strong>Characters: </strong>", "").Trim();
+							charactersHtml = charactersHtml.Replace("<br>", "");
+							string[] characterNames = charactersHtml.Split('\n');
 
-							if (materialPos >= 0) {
-								string materialHtml = contentHtml.Substring(materialPos);
-								materialHtml = materialHtml.Replace("<strong>Material: </strong>", "");
-								materialHtml = materialHtml.Replace("<br>", "");
-
-								resultTags.Add(new Tag(materialHtml.Trim(), Settings.Default.SauceNao_TagNamespace_Material) { Source = Enum.TagSource.SearchEngine });
-							}
-						}
-
-						// Get character tags
-						if (this.ShouldGetCharacterTag) {
-							int charactersPos = contentHtml.IndexOf("<strong>Characters: </strong>");
-
-							if (charactersPos >= 0) {
-								string charactersHtml = contentHtml.Replace("<strong>Characters: </strong>", "").Trim();
-								charactersHtml = charactersHtml.Replace("<br>", "");
-								string[] characterNames = charactersHtml.Split('\n');
-
-								foreach (string characterName in characterNames) {
-									if (!string.IsNullOrWhiteSpace(characterName)) {
-										resultTags.Add(new Tag(characterName.Trim(), Settings.Default.SauceNao_TagNamespace_Character) { Source = Enum.TagSource.SearchEngine });
-									}
+							foreach (string characterName in characterNames) {
+								if (!string.IsNullOrWhiteSpace(characterName)) {
+									resultTags.Add(new Tag(characterName.Trim(), this.characterTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 								}
 							}
 						}
 					}
+				}
 
-					// Source links
-					foreach (Supremes.Nodes.Element sourceLink in originalSourceLinks) {
-						string url = sourceLink.Attr("href");
+				// Source links
+				foreach (Supremes.Nodes.Element sourceLink in originalSourceLinks) {
+					string url = sourceLink.Attr("href");
 
-						// Not a pixiv URL
-						if (!url.StartsWith("https://www.pixiv.net")) {
-							continue;
-						}
+					// Not a pixiv URL
+					if (!url.StartsWith("https://www.pixiv.net")) {
+						continue;
+					}
 
-						int questionMarkIndex = url.IndexOf('?');
+					int questionMarkIndex = url.IndexOf('?');
 
-						// No query string
-						if (questionMarkIndex < 1) {
-							continue;
-						}
+					// No query string
+					if (questionMarkIndex < 1) {
+						continue;
+					}
 
-						// Get query string
-						string queryString = url.Substring(questionMarkIndex + 1);
+					// Get query string
+					string queryString = url.Substring(questionMarkIndex + 1);
 
-						// Parse query string
-						string[] parts = queryString.Split('&');
+					// Parse query string
+					string[] parts = queryString.Split('&');
 
-						foreach (string part in parts) {
-							string[] keyValue = part.Split('=');
+					foreach (string part in parts) {
+						string[] keyValue = part.Split('=');
 
-							string key = keyValue[0];
-							string value = keyValue[1];
+						string key = keyValue[0];
+						string value = keyValue[1];
 
-							if (key == "illust_id") {
-								if (this.ShouldGetPixivIllustIdTag) {
-									resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivIllustId) { Source = Enum.TagSource.SearchEngine });
-								}
-							} else if (key == "id") {
-								if (this.ShouldGetPixivMemberIdTag) {
-									resultTags.Add(new Tag(value, Settings.Default.SauceNao_TagNamespace_PixivMemberId) { Source = Enum.TagSource.SearchEngine });
-								}
+						if (key == "illust_id") {
+							if (this.pixivIllustIdNamespace.Enabled) {
+								resultTags.Add(new Tag(value, this.pixivIllustIdNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+							}
+						} else if (key == "id") {
+							if (this.pixivMemberIdNamespace.Enabled) {
+								resultTags.Add(new Tag(value, this.pixivMemberIdNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+							}
 
-								if (this.ShouldGetPixivMemberNameTag) {
-									resultTags.Add(new Tag(sourceLink.Text, Settings.Default.SauceNao_TagNamespace_PixivMemberName) { Source = Enum.TagSource.SearchEngine });
-								}
+							if (this.pixivMemberNameNamespace.Enabled) {
+								resultTags.Add(new Tag(sourceLink.Text, this.pixivMemberNameNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 							}
 						}
 					}
@@ -292,16 +299,16 @@ namespace Hatate
 				string memberName = (string)data.GetValue("member_name");
 				string memberId = (string)data.GetValue("member_id");
 
-				if (this.ShouldGetTitleTag && !string.IsNullOrWhiteSpace(title)) resultTags.Add(new Tag(title, Settings.Default.SauceNao_TagNamespace_Title) { Source = Enum.TagSource.SearchEngine });
+				if (this.titleTagNamespace.Enabled && !string.IsNullOrWhiteSpace(title)) resultTags.Add(new Tag(title, this.titleTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 
 				// Pixiv
 				string pixivId = (string)data.GetValue("pixiv_id");
 				bool hasPixivId = !string.IsNullOrWhiteSpace(pixivId);
 
 				if (hasPixivId) {
-					if (this.ShouldGetPixivIllustIdTag) resultTags.Add(new Tag(pixivId, Settings.Default.SauceNao_TagNamespace_PixivIllustId) { Source = Enum.TagSource.SearchEngine });
-					if (this.ShouldGetPixivMemberNameTag && !string.IsNullOrWhiteSpace(memberName)) resultTags.Add(new Tag(memberName, Settings.Default.SauceNao_TagNamespace_PixivMemberName) { Source = Enum.TagSource.SearchEngine });
-					if (this.ShouldGetPixivMemberIdTag && !string.IsNullOrWhiteSpace(memberId)) resultTags.Add(new Tag(memberId, Settings.Default.SauceNao_TagNamespace_PixivMemberId) { Source = Enum.TagSource.SearchEngine });
+					if (this.pixivIllustIdNamespace.Enabled) resultTags.Add(new Tag(pixivId, this.pixivIllustIdNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+					if (this.pixivMemberNameNamespace.Enabled && !string.IsNullOrWhiteSpace(memberName)) resultTags.Add(new Tag(memberName, this.pixivMemberNameNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+					if (this.pixivMemberIdNamespace.Enabled && !string.IsNullOrWhiteSpace(memberId)) resultTags.Add(new Tag(memberId, this.pixivMemberIdNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 				}
 
 				// Danbooru / Gelbooru
@@ -313,9 +320,9 @@ namespace Hatate
 
 				if (!string.IsNullOrWhiteSpace(danbooruId)) resultTags.Add(new Tag(danbooruId, "danbooru-id") { Source = Enum.TagSource.SearchEngine });
 				if (!string.IsNullOrWhiteSpace(gelbooruId)) resultTags.Add(new Tag(gelbooruId, "gelbooru-id") { Source = Enum.TagSource.SearchEngine });
-				if (this.ShouldGetCreatorTag && !string.IsNullOrWhiteSpace(creator)) resultTags.Add(new Tag(creator, Settings.Default.SauceNao_TagNamespace_Creator) { Source = Enum.TagSource.SearchEngine });
-				if (this.ShouldGetMaterialTag && !string.IsNullOrWhiteSpace(material)) resultTags.Add(new Tag(material, Settings.Default.SauceNao_TagNamespace_Material) { Source = Enum.TagSource.SearchEngine });
-				if (this.ShouldGetCharacterTag && !string.IsNullOrWhiteSpace(characters)) resultTags.Add(new Tag(characters, Settings.Default.SauceNao_TagNamespace_Character) { Source = Enum.TagSource.SearchEngine });
+				if (this.creatorTagNamespace.Enabled && !string.IsNullOrWhiteSpace(creator)) resultTags.Add(new Tag(creator, this.creatorTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.materialTagNamespace.Enabled && !string.IsNullOrWhiteSpace(material)) resultTags.Add(new Tag(material, this.materialTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.characterTagNamespace.Enabled && !string.IsNullOrWhiteSpace(characters)) resultTags.Add(new Tag(characters, this.characterTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 
 				// Mangaupdates (overwrite the source from Danbooru/Gelbooru as there's normally only one or the other for a result)
 				string muId = (string)data.GetValue("mu_id");
@@ -421,55 +428,6 @@ namespace Hatate
 		public bool DailyLimitExceeded
 		{
 			get { return this.dailyLimitExceeded; }
-		}
-
-		private bool ShouldGetTitleTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_Title != null && !Settings.Default.SauceNao_TagNamespace_Title.StartsWith("-"); }
-		}
-
-		private bool ShouldGetCreatorTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_Creator != null && !Settings.Default.SauceNao_TagNamespace_Creator.StartsWith("-"); }
-		}
-
-		private bool ShouldGetMaterialTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_Material != null && !Settings.Default.SauceNao_TagNamespace_Material.StartsWith("-"); }
-		}
-
-		private bool ShouldGetCharacterTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_Character != null && !Settings.Default.SauceNao_TagNamespace_Character.StartsWith("-"); }
-		}
-
-		private bool ShouldGetPixivIllustIdTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_PixivIllustId != null && !Settings.Default.SauceNao_TagNamespace_PixivIllustId.StartsWith("-"); }
-		}
-
-		private bool ShouldGetPixivMemberIdTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_PixivMemberId != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberId.StartsWith("-"); }
-		}
-
-		private bool ShouldGetPixivMemberNameTag
-		{
-			get { return Settings.Default.SauceNao_TagNamespace_PixivMemberName != null && !Settings.Default.SauceNao_TagNamespace_PixivMemberName.StartsWith("-"); }
-		}
-
-		private bool ShouldGetTags
-		{
-			get
-			{
-				return this.ShouldGetTitleTag
-					|| this.ShouldGetCreatorTag
-					|| this.ShouldGetMaterialTag
-					|| this.ShouldGetCharacterTag
-					|| this.ShouldGetPixivIllustIdTag
-					|| this.ShouldGetPixivMemberIdTag
-					|| this.ShouldGetPixivMemberNameTag;
-			}
 		}
 
 		#endregion Accessor

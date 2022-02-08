@@ -17,23 +17,8 @@
 		<TextBox x:Name="TextBox_ApiKey" Height="26" Margin="57,66,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
 		<Button Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Save_Click"/>
 		<TextBlock Margin="10,128,6,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32"><Run Text="Some tags can be obtained directly from SauceNAO results. Here you can select which ones you want to get and optionally prefix them with a namespace."/></TextBlock>
-		<GroupBox x:Name="GroupBox_TagNamepaces" Header="Tag namespaces" Margin="10,172,10,49">
-			<Grid Margin="0,0,-4,-14">
-				<CheckBox x:Name="Checkbox_Tag_Title" Content="Title" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
-				<CheckBox x:Name="Checkbox_Tag_Creator" Content="Creator" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
-				<CheckBox x:Name="Checkbox_Tag_Material" Content="Material" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
-				<CheckBox x:Name="Checkbox_Tag_Character" Content="Character" HorizontalAlignment="Left" Margin="10,100,0,0" VerticalAlignment="Top" Width="75" Click="CheckBox_TagNamepace_Click"/>
-				<CheckBox x:Name="Checkbox_Tag_PixivIllustId" Content="Pixiv illust ID" HorizontalAlignment="Left" Margin="271,15,0,0" VerticalAlignment="Top" Width="117" Click="CheckBox_TagNamepace_Click"/>
-				<CheckBox x:Name="Checkbox_Tag_PixivMemberId" Content="Pixiv member ID" HorizontalAlignment="Left" Margin="271,43,0,0" VerticalAlignment="Top" Width="117" Click="CheckBox_TagNamepace_Click"/>
-				<CheckBox x:Name="Checkbox_Tag_PixivMemberName" Content="Pixiv member name" HorizontalAlignment="Left" Margin="271,71,0,0" VerticalAlignment="Top" Width="117" Click="CheckBox_TagNamepace_Click"/>
-				<TextBox x:Name="TextBox_TagNamespace_Title" Margin="90,10,345,0" VerticalAlignment="Top" Height="23"/>
-				<TextBox x:Name="TextBox_TagNamespace_Character" Margin="90,94,345,0" VerticalAlignment="Top" Height="23"/>
-				<TextBox x:Name="TextBox_TagNamespace_Material" Margin="90,66,345,0" VerticalAlignment="Top" Height="23"/>
-				<TextBox x:Name="TextBox_TagNamespace_Creator" Margin="90,38,345,0" VerticalAlignment="Top" Height="23"/>
-				<TextBox x:Name="TextBox_TagNamespace_PixivMemberName" Margin="393,66,10,0" VerticalAlignment="Top" Height="23"/>
-				<TextBox x:Name="TextBox_TagNamespace_PixivMemberId" Margin="393,38,10,0" VerticalAlignment="Top" Height="23"/>
-				<TextBox x:Name="TextBox_TagNamespace_PixivIllustId" Margin="393,10,10,0" VerticalAlignment="Top" Height="23"/>
-			</Grid>
+		<GroupBox Header="Tag namespaces" Margin="10,172,10,49">
+			<ListView x:Name="ListView_TagNamespaces" Margin="0,0,0,0" SelectionMode="Single"/>
 		</GroupBox>
 		<Separator Height="25" Margin="6,97,10,0" VerticalAlignment="Top"/>
 	</Grid>

@@ -22,6 +22,7 @@ namespace Hatate
 		public static string appDir = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 		public static HydrusApi hydrusApi = new HydrusApi();
 		public static Sources sources = new Sources();
+		public static TagNamespaces tagNamespaces = new TagNamespaces();
 
 		private const string DIR_THUMBS = @"\thumbs\";
 		private const string DIR_TEMP = @"\temp\";

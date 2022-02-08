@@ -721,90 +721,6 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("title")]
-        public string SauceNao_TagNamespace_Title {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_Title"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_Title"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("creator")]
-        public string SauceNao_TagNamespace_Creator {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_Creator"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_Creator"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("series")]
-        public string SauceNao_TagNamespace_Material {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_Material"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_Material"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("character")]
-        public string SauceNao_TagNamespace_Character {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_Character"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_Character"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("pixiv-illust-id")]
-        public string SauceNao_TagNamespace_PixivIllustId {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_PixivIllustId"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_PixivIllustId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("pixiv-member-id")]
-        public string SauceNao_TagNamespace_PixivMemberId {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_PixivMemberId"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_PixivMemberId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("pixiv-illust-name")]
-        public string SauceNao_TagNamespace_PixivMemberName {
-            get {
-                return ((string)(this["SauceNao_TagNamespace_PixivMemberName"]));
-            }
-            set {
-                this["SauceNao_TagNamespace_PixivMemberName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool TagSource_User {
             get {
@@ -848,6 +764,18 @@ namespace Hatate.Properties {
             }
             set {
                 this["TagSource_Hatate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TagNamespaces {
+            get {
+                return ((string)(this["TagNamespaces"]));
+            }
+            set {
+                this["TagNamespaces"] = value;
             }
         }
     }

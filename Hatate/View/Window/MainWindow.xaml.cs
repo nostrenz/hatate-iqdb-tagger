@@ -521,6 +521,19 @@ namespace Hatate
 
 			this.lastSearchedInSeconds = 1;
 
+			///TEST
+			foreach (Match match in sauceNao.Matches) {
+				Console.WriteLine("-----------------------");
+				Console.WriteLine("Rating: " + match.Rating);
+				Console.WriteLine("PreviewUrl: " + match.PreviewUrl);
+				Console.WriteLine("Tags:");
+				foreach (Tag tag in match.Tags) {
+					Console.WriteLine("- " + tag.Namespaced);
+				}
+			}
+			//return;
+			///TEST
+
 			result.Matches = sauceNao.Matches;
 			result.UploadedImageUrl = sauceNao.UploadedImageUrl;
 			result.UsedSearchEngine = Enum.SearchEngine.SauceNAO;
@@ -3473,6 +3486,11 @@ namespace Hatate
 				Options.Default.TagSource_Hatate = (bool)this.Checkbox_TagSource_Hatate.IsChecked;
 
 				Options.Default.Save();
+
+				// There's no other files to apply those changes to
+				if (this.ListBox_Files.Items.Count < 2) {
+					return;
+				}
 
 				// Ask if we want to apply the selected sources for all the other images in the list
 				if (!App.AskUser("Also apply those tag sources for all the " + this.ListBox_Files.Items.Count + " images in the list?")) {
