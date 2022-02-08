@@ -75,12 +75,12 @@
 							</ListBox.ItemTemplate>
 						</ListBox>
 					</GroupBox>
-					<ComboBox x:Name="ComboBox_TagSources" VerticalAlignment="Top" ToolTip="Toggle tag sources" IsEnabled="False" MaxWidth="18" HorizontalAlignment="Right" Width="18">
+					<ComboBox x:Name="ComboBox_TagSources" VerticalAlignment="Top" ToolTip="Toggle tag sources" IsEnabled="False" MaxWidth="18" HorizontalAlignment="Right" Width="18" DropDownOpened="ComboBox_TagSources_DropDownOpened">
 						<CheckBox x:Name="Checkbox_TagSource_User" Content="User" ToolTip="Tags added by you" IsChecked="True" Click="Checkbox_TagSource_Click"/>
 						<CheckBox x:Name="Checkbox_TagSource_SearchEngine" Content="Search Engine" ToolTip="Tags added by parsing the search engine results" IsChecked="True" Click="Checkbox_TagSource_Click"/>
 						<CheckBox x:Name="Checkbox_TagSource_Booru" Content="Booru" ToolTip="Tags added by parsing a booru page" IsChecked="True" Click="Checkbox_TagSource_Click"/>
 						<CheckBox x:Name="Checkbox_TagSource_Hatate" Content="Hatate" ToolTip="Tags added by Hatate when enabled in settings" IsChecked="True" Click="Checkbox_TagSource_Click"/>
-						<Button x:Name="Button_TagSources_SetAsDefault" Content="set as default" Width="87" Height="15" Click="Button_TagSources_SetAsDefault_Click" IsEnabled="False"/>
+						<Button x:Name="Button_TagSources_SetAsDefault" Content="set as default" Width="93" Height="15" Click="Button_TagSources_SetAsDefault_Click"/>
 					</ComboBox>
 				</Grid>
 			</Grid>

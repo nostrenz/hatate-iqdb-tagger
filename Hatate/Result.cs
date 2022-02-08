@@ -184,6 +184,16 @@ namespace Hatate
 			this.Tags.Add(tag);
 		}
 
+		/// <summary>
+		/// Update the Hidden property for all the tags according to the selected sources.
+		/// </summary>
+		public void UpdateHiddenTagsFromSelectedSources()
+		{
+			foreach (Tag tag in this.Tags) {
+				tag.Hidden = !this.SelectedTagSources.Contains(tag.Source);
+			}
+		}
+
 		/*
 		============================================
 		Private

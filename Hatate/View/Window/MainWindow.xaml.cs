@@ -2301,6 +2301,14 @@ namespace Hatate
 			this.ListBox_Tags.Items.Refresh();
 		}
 
+		private bool SetAsDefaultButtonEnabledStatus()
+		{
+			return (bool)this.Checkbox_TagSource_User.IsChecked != Options.Default.TagSource_User
+				|| (bool)this.Checkbox_TagSource_Booru.IsChecked != Options.Default.TagSource_Booru
+				|| (bool)this.Checkbox_TagSource_SearchEngine.IsChecked != Options.Default.TagSource_SearchEngine
+				|| (bool)this.Checkbox_TagSource_Hatate.IsChecked != Options.Default.TagSource_Hatate;
+		}
+
 		#endregion Private
 
 		/*
@@ -3404,6 +3412,11 @@ namespace Hatate
 			this.ListBox_Files.Items.Refresh();
 		}
 
+		/// <summary>
+		/// Called when clicking on a tag source checkbox.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Checkbox_TagSource_Click(object sender, RoutedEventArgs e)
 		{
 			Result selectedResult = this.SelectedResult;
@@ -3435,22 +3448,67 @@ namespace Hatate
 			this.RefreshTagsListBox(selectedResult);
 
 			// Set-as-default button status
-			this.Button_TagSources_SetAsDefault.IsEnabled = (bool)this.Checkbox_TagSource_User.IsChecked != Options.Default.TagSource_User
-				|| (bool)this.Checkbox_TagSource_Booru.IsChecked != Options.Default.TagSource_Booru
-				|| (bool)this.Checkbox_TagSource_SearchEngine.IsChecked != Options.Default.TagSource_SearchEngine
-				|| (bool)this.Checkbox_TagSource_Hatate.IsChecked != Options.Default.TagSource_Hatate;
+			if (this.ListBox_Files.SelectedItems.Count == 1) {
+				this.Button_TagSources_SetAsDefault.IsEnabled = this.SetAsDefaultButtonEnabledStatus();
+			}
 		}
 
+		/// <summary>
+		/// Called when clicking on the button under the tag source checkboxes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Button_TagSources_SetAsDefault_Click(object sender, RoutedEventArgs e)
 		{
-			Options.Default.TagSource_User = (bool)this.Checkbox_TagSource_User.IsChecked;
-			Options.Default.TagSource_Booru = (bool)this.Checkbox_TagSource_Booru.IsChecked;
-			Options.Default.TagSource_SearchEngine = (bool)this.Checkbox_TagSource_SearchEngine.IsChecked;
-			Options.Default.TagSource_Hatate = (bool)this.Checkbox_TagSource_Hatate.IsChecked;
+			System.Collections.IList results;
 
-			Options.Default.Save();
+			if (this.ListBox_Files.SelectedItems.Count > 1) { // "apply for selection"
+				results = this.ListBox_Files.SelectedItems;
+			} else { // "set as default"
+				results = this.ListBox_Files.Items;
+
+				Options.Default.TagSource_User = (bool)this.Checkbox_TagSource_User.IsChecked;
+				Options.Default.TagSource_Booru = (bool)this.Checkbox_TagSource_Booru.IsChecked;
+				Options.Default.TagSource_SearchEngine = (bool)this.Checkbox_TagSource_SearchEngine.IsChecked;
+				Options.Default.TagSource_Hatate = (bool)this.Checkbox_TagSource_Hatate.IsChecked;
+
+				Options.Default.Save();
+
+				// Ask if we want to apply the selected sources for all the other images in the list
+				if (!App.AskUser("Also apply those tag sources for all the " + this.ListBox_Files.Items.Count + " images in the list?")) {
+					return;
+				}
+			}
+
+			// Update selected sources and hidden tags for all results in the list (or just the selected ones)
+			foreach (Result result in results) {
+				result.SelectedTagSources.Clear();
+
+				if ((bool)this.Checkbox_TagSource_User.IsChecked) result.SelectedTagSources.Add(Enum.TagSource.User);
+				if ((bool)this.Checkbox_TagSource_Booru.IsChecked) result.SelectedTagSources.Add(Enum.TagSource.Booru);
+				if ((bool)this.Checkbox_TagSource_SearchEngine.IsChecked) result.SelectedTagSources.Add(Enum.TagSource.SearchEngine);
+				if ((bool)this.Checkbox_TagSource_Hatate.IsChecked) result.SelectedTagSources.Add(Enum.TagSource.Hatate);
+
+				result.UpdateHiddenTagsFromSelectedSources();
+			}
 
 			this.Button_TagSources_SetAsDefault.IsEnabled = false;
+		}
+
+		/// <summary>
+		/// Called when the tag sources dropdown is opened.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ComboBox_TagSources_DropDownOpened(object sender, EventArgs e)
+		{
+			if (this.ListBox_Files.SelectedItems.Count > 1) {
+				this.Button_TagSources_SetAsDefault.Content = "apply for selection";
+				this.Button_TagSources_SetAsDefault.IsEnabled = true;
+			} else {
+				this.Button_TagSources_SetAsDefault.Content = "set as default";
+				this.Button_TagSources_SetAsDefault.IsEnabled = this.SetAsDefaultButtonEnabledStatus();
+			}
 		}
 
 		#endregion Event
