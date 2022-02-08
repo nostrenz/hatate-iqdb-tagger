@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
+using Newtonsoft.Json.Linq;
 using Hatate.Properties;
 
 namespace Hatate
@@ -26,9 +27,14 @@ namespace Hatate
 
 		public async Task SearchFile(string filePath)
 		{
-			string response = await this.SearchImage(filePath);
+			bool useJsonApi = !string.IsNullOrWhiteSpace(Settings.Default.SauceNaoApiKey);
+			string response = await this.SearchImage(filePath, useJsonApi);
 
-			this.ParseResponseHtml(response);
+			if (useJsonApi) {
+				this.ParseJsonResponse(response);
+			} else {
+				this.ParseResponseHtml(response);
+			}
 		}
 
 		#endregion Public
@@ -45,7 +51,7 @@ namespace Hatate
 		/// Search an image on SauceNAO and return the HTML response.
 		/// </summary>
 		/// <param name="filePath"></param>
-		private async Task<string> SearchImage(string filePath)
+		private async Task<string> SearchImage(string filePath, bool useJsonApi)
 		{
 			FileStream fs;
 
@@ -61,8 +67,9 @@ namespace Hatate
 			string url = "https://saucenao.com/search.php";
 
 			// Add API key if available
-			if (!string.IsNullOrWhiteSpace(Settings.Default.SauceNaoApiKey)) {
+			if (useJsonApi) {
 				url += "?api_key=" + Settings.Default.SauceNaoApiKey;
+				url += "&output_type=2";
 			}
 
 			HttpClient httpClient = new HttpClient(new HttpClientHandler());
@@ -251,6 +258,101 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Parse JSON responded by SauceNAO.
+		/// </summary>
+		/// <param name="json"></param>
+		private void ParseJsonResponse(string json)
+		{
+			dynamic parsedJson = JObject.Parse(json);
+
+			JObject header = parsedJson.header;
+			JArray results = parsedJson.results;
+
+			string queryImageDisplay = (string)header.GetValue("query_image_display");
+			//string queryImage = (string)header.GetValue("query_image");
+
+			if (!string.IsNullOrWhiteSpace(queryImageDisplay)) {
+				this.uploadedImageUrl = "https://saucenao.com/" + queryImageDisplay;
+			}
+
+			foreach (JObject result in results) {
+				List<Tag> resultTags = new List<Tag>();
+
+				JObject header2 = (JObject)result.GetValue("header");
+				JObject data = (JObject)result.GetValue("data");
+				JArray extUrls = (JArray)data.GetValue("ext_urls");
+
+				string similarity = (string)header2.GetValue("similarity");
+				string thumbnail = (string)header2.GetValue("thumbnail");
+
+				// Common
+				string source = (string)data.GetValue("source");
+				string title = (string)data.GetValue("title");
+				string memberName = (string)data.GetValue("member_name");
+				string memberId = (string)data.GetValue("member_id");
+
+				if (this.ShouldGetTitleTag && !string.IsNullOrWhiteSpace(title)) resultTags.Add(new Tag(title, Settings.Default.SauceNao_TagNamespace_Title) { Source = Enum.TagSource.SearchEngine });
+
+				// Pixiv
+				string pixivId = (string)data.GetValue("pixiv_id");
+				bool hasPixivId = !string.IsNullOrWhiteSpace(pixivId);
+
+				if (hasPixivId) {
+					if (this.ShouldGetPixivIllustIdTag) resultTags.Add(new Tag(pixivId, Settings.Default.SauceNao_TagNamespace_PixivIllustId) { Source = Enum.TagSource.SearchEngine });
+					if (this.ShouldGetPixivMemberNameTag && !string.IsNullOrWhiteSpace(memberName)) resultTags.Add(new Tag(memberName, Settings.Default.SauceNao_TagNamespace_PixivMemberName) { Source = Enum.TagSource.SearchEngine });
+					if (this.ShouldGetPixivMemberIdTag && !string.IsNullOrWhiteSpace(memberId)) resultTags.Add(new Tag(memberId, Settings.Default.SauceNao_TagNamespace_PixivMemberId) { Source = Enum.TagSource.SearchEngine });
+				}
+
+				// Danbooru / Gelbooru
+				string danbooruId = (string)data.GetValue("danbooru_id");
+				string gelbooruId = (string)data.GetValue("gelbooru_id");
+				string creator = (string)data.GetValue("creator");
+				string material = (string)data.GetValue("material");
+				string characters = (string)data.GetValue("characters");
+
+				if (!string.IsNullOrWhiteSpace(danbooruId)) resultTags.Add(new Tag(danbooruId, "danbooru-id") { Source = Enum.TagSource.SearchEngine });
+				if (!string.IsNullOrWhiteSpace(gelbooruId)) resultTags.Add(new Tag(gelbooruId, "gelbooru-id") { Source = Enum.TagSource.SearchEngine });
+				if (this.ShouldGetCreatorTag && !string.IsNullOrWhiteSpace(creator)) resultTags.Add(new Tag(creator, Settings.Default.SauceNao_TagNamespace_Creator) { Source = Enum.TagSource.SearchEngine });
+				if (this.ShouldGetMaterialTag && !string.IsNullOrWhiteSpace(material)) resultTags.Add(new Tag(material, Settings.Default.SauceNao_TagNamespace_Material) { Source = Enum.TagSource.SearchEngine });
+				if (this.ShouldGetCharacterTag && !string.IsNullOrWhiteSpace(characters)) resultTags.Add(new Tag(characters, Settings.Default.SauceNao_TagNamespace_Character) { Source = Enum.TagSource.SearchEngine });
+
+				// Mangaupdates (overwrite the source from Danbooru/Gelbooru as there's normally only one or the other for a result)
+				string muId = (string)data.GetValue("mu_id");
+				string part = (string)data.GetValue("part");
+				string type = (string)data.GetValue("type");
+
+				if (!string.IsNullOrWhiteSpace(muId)) resultTags.Add(new Tag(muId, "manga-update-id") { Source = Enum.TagSource.SearchEngine });
+				if (!string.IsNullOrWhiteSpace(part)) resultTags.Add(new Tag(part, "part") { Source = Enum.TagSource.SearchEngine });
+				if (!string.IsNullOrWhiteSpace(type)) resultTags.Add(new Tag(type, "type") { Source = Enum.TagSource.SearchEngine });
+
+				// Twitter
+				string createdAt = (string)data.GetValue("created_at");
+				string tweetId = (string)data.GetValue("tweet_id");
+				string twitterUserId = (string)data.GetValue("twitter_user_id");
+				string twitterUserHandle = (string)data.GetValue("twitter_user_handle");
+
+				if (!string.IsNullOrWhiteSpace(createdAt)) resultTags.Add(new Tag(createdAt, "created-at") { Source = Enum.TagSource.SearchEngine });
+				if (!string.IsNullOrWhiteSpace(tweetId)) resultTags.Add(new Tag(tweetId, "tweet-id") { Source = Enum.TagSource.SearchEngine });
+				if (!string.IsNullOrWhiteSpace(twitterUserId)) resultTags.Add(new Tag(twitterUserId, "twitter-user-id") { Source = Enum.TagSource.SearchEngine });
+				if (!string.IsNullOrWhiteSpace(twitterUserHandle)) resultTags.Add(new Tag(twitterUserHandle, "twitter-user-handle") { Source = Enum.TagSource.SearchEngine });
+
+				// Nico Nico Seiga
+				string seigaId = (string)data.GetValue("seiga_id");
+				bool hasSeigaId = !string.IsNullOrWhiteSpace(seigaId);
+
+				if (hasSeigaId) {
+					resultTags.Add(new Tag(seigaId, "seiga-id") { Source = Enum.TagSource.SearchEngine });
+					if (!string.IsNullOrWhiteSpace(memberName)) resultTags.Add(new Tag(memberName, "seiga-member-name") { Source = Enum.TagSource.SearchEngine });
+					if (!string.IsNullOrWhiteSpace(memberId)) resultTags.Add(new Tag(memberId, "seiga-member-id") { Source = Enum.TagSource.SearchEngine });
+				}
+
+				foreach (string extUrl in extUrls) {
+					this.AddMatch(extUrl, thumbnail, similarity, resultTags, string.IsNullOrWhiteSpace(source) ? source : null);
+				}
+			}
+		}
+
 		private void AddMatch(string url, string previewUrl, string similarity, List<Tag> resultTags, string sourceUrl=null)
 		{
 			Match match = new Match();
@@ -269,7 +371,9 @@ namespace Hatate
 			}
 
 			foreach (Tag tag in resultTags) {
-				match.Tags.Add(tag);
+				if (!match.Tags.Contains(tag)) {
+					match.Tags.Add(tag);
+				}
 			}
 
 			this.matches.Add(match);
