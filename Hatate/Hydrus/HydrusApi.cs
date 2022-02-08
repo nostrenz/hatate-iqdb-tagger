@@ -176,7 +176,7 @@ namespace Hatate
 				bool shouldUseTagServiceKeyInsteadOfName = await this.ShouldUseTagServiceKeyInsteadOfName();
 
 				tagsPart = @",
-				""" + (shouldUseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_tags") + @""": {
+				""" + (shouldUseTagServiceKeyInsteadOfName ? "service_keys_to_tags" : "service_names_to_additional_tags") + @""": {
 					""" + tagServiceNameOrKey + @""" : [" + this.TagsListToString(result.NonHiddenTags.ToList()) + @"]
 				}";
 			}
