@@ -10,14 +10,12 @@ namespace Hatate
 
 		public TagNamespace(TagNamespaceItem tagNamespaceItem)
 		{
-			this.KeyName = tagNamespaceItem.KeyName;
 			this.Enabled = tagNamespaceItem.Enabled;
 			this.Namespace = tagNamespaceItem.Namespace;
 		}
 
-		public TagNamespace(string keyName, string nameSpace)
+		public TagNamespace(string nameSpace)
 		{
-			this.KeyName = keyName;
 			this.Namespace = nameSpace;
 			this.Enabled = true;
 		}
@@ -27,11 +25,6 @@ namespace Hatate
 		Accessor
 		============================================
 		*/
-
-		public string KeyName
-		{
-			get; set;
-		}
 
 		public bool Enabled
 		{

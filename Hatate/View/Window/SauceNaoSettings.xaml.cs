@@ -32,8 +32,8 @@ namespace Hatate
 		{
 			List<TagNamespaceItem> tagNamespaceItems = new List<TagNamespaceItem>();
 
-			foreach (TagNamespace tagNamespace in App.tagNamespaces.TagNamespacesList) {
-				TagNamespaceItem tagNamespaceItem = new TagNamespaceItem(tagNamespace);
+			foreach (KeyValuePair<string, TagNamespace> keyValuePair in App.tagNamespaces.TagNamespacesList) {
+				TagNamespaceItem tagNamespaceItem = new TagNamespaceItem(keyValuePair.Key, keyValuePair.Value);
 				tagNamespaceItems.Add(tagNamespaceItem);
 			}
 
@@ -56,14 +56,15 @@ namespace Hatate
 
 		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
-			Settings.Default.SauceNaoApiKey = this.TextBox_ApiKey.Text;
-
 			// Tag namespaces
 			App.tagNamespaces.Clear();
 
 			foreach (TagNamespaceItem tagNamespaceItem in this.ListView_TagNamespaces.Items) {
-				App.tagNamespaces.Add(new TagNamespace(tagNamespaceItem));
+				App.tagNamespaces.Add(tagNamespaceItem.KeyName, new TagNamespace(tagNamespaceItem));
 			}
+
+			Settings.Default.SauceNaoApiKey = this.TextBox_ApiKey.Text;
+			Settings.Default.TagNamespaces = App.tagNamespaces.Serialize();
 
 			Settings.Default.Save();
 

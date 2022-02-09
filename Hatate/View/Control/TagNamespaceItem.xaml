@@ -7,7 +7,7 @@
              mc:Ignorable="d" Height="33">
 	<Grid>
 		<TextBox x:Name="TextBox_Namespace" Margin="159,5,10,5" Padding="5,0" VerticalContentAlignment="Center" Height="Auto"/>
-		<CheckBox x:Name="Checkbox_Enabled" HorizontalAlignment="Left" Height="Auto" Width="20" VerticalContentAlignment="Center" VerticalAlignment="Center" Click="Checkbox_Enabled_Click" Margin="10,5,0,5"/>
+		<CheckBox x:Name="Checkbox_Enabled" HorizontalAlignment="Left" Height="Auto" Width="20" VerticalContentAlignment="Center" VerticalAlignment="Center" Click="Checkbox_Enabled_Click" Margin="10,5,0,5" IsTabStop="False"/>
 		<Label x:Name="Label_KeyName" HorizontalAlignment="Left" Margin="35,5,0,5" Width="119"/>
 	</Grid>
 </UserControl>

@@ -18,13 +18,25 @@ namespace Hatate
 		private bool dailyLimitExceeded = false;
 
 		// Tag namespaces
-		private TagNamespace titleTagNamespace = App.tagNamespaces.GetByKeyName("title");
-		private TagNamespace pixivIllustIdNamespace = App.tagNamespaces.GetByKeyName("pixivIllustId");
-		private TagNamespace pixivMemberNameNamespace = App.tagNamespaces.GetByKeyName("pixivMemberName");
-		private TagNamespace pixivMemberIdNamespace = App.tagNamespaces.GetByKeyName("pixivMemberId");
-		private TagNamespace creatorTagNamespace = App.tagNamespaces.GetByKeyName("creator");
-		private TagNamespace materialTagNamespace = App.tagNamespaces.GetByKeyName("material");
-		private TagNamespace characterTagNamespace = App.tagNamespaces.GetByKeyName("character");
+		private TagNamespace titleTagNamespace = App.tagNamespaces.Title;
+		private TagNamespace pixivIllustIdNamespace = App.tagNamespaces.PixivIllustId;
+		private TagNamespace pixivMemberNameNamespace = App.tagNamespaces.PixivMemberName;
+		private TagNamespace pixivMemberIdNamespace = App.tagNamespaces.PixivMemberId;
+		private TagNamespace creatorTagNamespace = App.tagNamespaces.Creator;
+		private TagNamespace materialTagNamespace = App.tagNamespaces.Material;
+		private TagNamespace characterTagNamespace = App.tagNamespaces.Character;
+		private TagNamespace partTagNamespace = App.tagNamespaces.Part;
+		private TagNamespace typeTagNamespace = App.tagNamespaces.Type;
+		private TagNamespace createdAtTagNamespace = App.tagNamespaces.CreatedAt;
+		private TagNamespace tweetIdTagNamespace = App.tagNamespaces.TweetId;
+		private TagNamespace TwitterUserIdTagNamespace = App.tagNamespaces.TwitterUserId;
+		private TagNamespace twitterUserHandleTagNamespace = App.tagNamespaces.TwitterUserHandle;
+		private TagNamespace seigaMemberNameTagNamespace = App.tagNamespaces.SeigaMemberName;
+		private TagNamespace seigaMemberIdTagNamespace = App.tagNamespaces.SeigaMemberId;
+		private TagNamespace danbooruIdTagNamespace = App.tagNamespaces.DanbooruId;
+		private TagNamespace gelbooruIdTagNamespace = App.tagNamespaces.GelbooruId;
+		private TagNamespace mangaUpdateIdTagNamespace = App.tagNamespaces.MangaUpdateId;
+		private TagNamespace seigaIdTagNamespace = App.tagNamespaces.SeigaId;
 
 		/*
 		============================================
@@ -318,8 +330,8 @@ namespace Hatate
 				string material = (string)data.GetValue("material");
 				string characters = (string)data.GetValue("characters");
 
-				if (!string.IsNullOrWhiteSpace(danbooruId)) resultTags.Add(new Tag(danbooruId, "danbooru-id") { Source = Enum.TagSource.SearchEngine });
-				if (!string.IsNullOrWhiteSpace(gelbooruId)) resultTags.Add(new Tag(gelbooruId, "gelbooru-id") { Source = Enum.TagSource.SearchEngine });
+				if (this.danbooruIdTagNamespace.Enabled && !string.IsNullOrWhiteSpace(danbooruId)) resultTags.Add(new Tag(danbooruId, this.danbooruIdTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.gelbooruIdTagNamespace.Enabled && !string.IsNullOrWhiteSpace(gelbooruId)) resultTags.Add(new Tag(gelbooruId, this.gelbooruIdTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 				if (this.creatorTagNamespace.Enabled && !string.IsNullOrWhiteSpace(creator)) resultTags.Add(new Tag(creator, this.creatorTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 				if (this.materialTagNamespace.Enabled && !string.IsNullOrWhiteSpace(material)) resultTags.Add(new Tag(material, this.materialTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 				if (this.characterTagNamespace.Enabled && !string.IsNullOrWhiteSpace(characters)) resultTags.Add(new Tag(characters, this.characterTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
@@ -329,9 +341,9 @@ namespace Hatate
 				string part = (string)data.GetValue("part");
 				string type = (string)data.GetValue("type");
 
-				if (!string.IsNullOrWhiteSpace(muId)) resultTags.Add(new Tag(muId, "manga-update-id") { Source = Enum.TagSource.SearchEngine });
-				if (!string.IsNullOrWhiteSpace(part)) resultTags.Add(new Tag(part, "part") { Source = Enum.TagSource.SearchEngine });
-				if (!string.IsNullOrWhiteSpace(type)) resultTags.Add(new Tag(type, "type") { Source = Enum.TagSource.SearchEngine });
+				if (this.mangaUpdateIdTagNamespace.Enabled && !string.IsNullOrWhiteSpace(muId)) resultTags.Add(new Tag(muId, this.mangaUpdateIdTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.partTagNamespace.Enabled && !string.IsNullOrWhiteSpace(part)) resultTags.Add(new Tag(part, this.partTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.typeTagNamespace.Enabled && !string.IsNullOrWhiteSpace(type)) resultTags.Add(new Tag(type, this.typeTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 
 				// Twitter
 				string createdAt = (string)data.GetValue("created_at");
@@ -339,19 +351,19 @@ namespace Hatate
 				string twitterUserId = (string)data.GetValue("twitter_user_id");
 				string twitterUserHandle = (string)data.GetValue("twitter_user_handle");
 
-				if (!string.IsNullOrWhiteSpace(createdAt)) resultTags.Add(new Tag(createdAt, "created-at") { Source = Enum.TagSource.SearchEngine });
-				if (!string.IsNullOrWhiteSpace(tweetId)) resultTags.Add(new Tag(tweetId, "tweet-id") { Source = Enum.TagSource.SearchEngine });
-				if (!string.IsNullOrWhiteSpace(twitterUserId)) resultTags.Add(new Tag(twitterUserId, "twitter-user-id") { Source = Enum.TagSource.SearchEngine });
-				if (!string.IsNullOrWhiteSpace(twitterUserHandle)) resultTags.Add(new Tag(twitterUserHandle, "twitter-user-handle") { Source = Enum.TagSource.SearchEngine });
+				if (this.createdAtTagNamespace.Enabled && !string.IsNullOrWhiteSpace(createdAt)) resultTags.Add(new Tag(createdAt, this.createdAtTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.tweetIdTagNamespace.Enabled && !string.IsNullOrWhiteSpace(tweetId)) resultTags.Add(new Tag(tweetId, this.tweetIdTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.TwitterUserIdTagNamespace.Enabled && !string.IsNullOrWhiteSpace(twitterUserId)) resultTags.Add(new Tag(twitterUserId, this.TwitterUserIdTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+				if (this.twitterUserHandleTagNamespace.Enabled && !string.IsNullOrWhiteSpace(twitterUserHandle)) resultTags.Add(new Tag(twitterUserHandle, this.twitterUserHandleTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
 
 				// Nico Nico Seiga
 				string seigaId = (string)data.GetValue("seiga_id");
 				bool hasSeigaId = !string.IsNullOrWhiteSpace(seigaId);
 
 				if (hasSeigaId) {
-					resultTags.Add(new Tag(seigaId, "seiga-id") { Source = Enum.TagSource.SearchEngine });
-					if (!string.IsNullOrWhiteSpace(memberName)) resultTags.Add(new Tag(memberName, "seiga-member-name") { Source = Enum.TagSource.SearchEngine });
-					if (!string.IsNullOrWhiteSpace(memberId)) resultTags.Add(new Tag(memberId, "seiga-member-id") { Source = Enum.TagSource.SearchEngine });
+					if (this.seigaIdTagNamespace.Enabled) resultTags.Add(new Tag(seigaId, this.seigaIdTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+					if (this.seigaMemberNameTagNamespace.Enabled && !string.IsNullOrWhiteSpace(memberName)) resultTags.Add(new Tag(memberName, this.seigaMemberNameTagNamespace.Namespace) { Source = Enum.TagSource.SearchEngine });
+					if (this.seigaMemberIdTagNamespace.Enabled && !string.IsNullOrWhiteSpace(memberId)) resultTags.Add(new Tag(memberId, this.seigaMemberIdTagNamespace.Enabled) { Source = Enum.TagSource.SearchEngine });
 				}
 
 				foreach (string extUrl in extUrls) {

@@ -8,11 +8,11 @@ namespace Hatate.View.Control
 	/// </summary>
 	public partial class TagNamespaceItem : UserControl
 	{
-		public TagNamespaceItem(TagNamespace tagNamespace)
+		public TagNamespaceItem(string keyName, TagNamespace tagNamespace)
 		{
 			InitializeComponent();
 
-			this.KeyName = tagNamespace.KeyName;
+			this.KeyName = keyName;
 			this.Enabled = tagNamespace.Enabled;
 			this.Namespace = tagNamespace.Namespace;
 		}
