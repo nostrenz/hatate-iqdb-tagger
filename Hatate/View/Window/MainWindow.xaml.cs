@@ -2076,7 +2076,17 @@ namespace Hatate
 					return;
 				}
 
-				Supremes.Nodes.Element changelog = doc.Select("div.release-main-section div.markdown-body").First;
+				Supremes.Nodes.Element releaseDiv = doc.Select("div.release-main-section").First;
+
+				if (releaseDiv == null) {
+					releaseDiv = doc.Select("div[data-test-selector=\"release-card\"]").First;	
+				}
+
+				Supremes.Nodes.Element changelog = null;
+
+				if (releaseDiv != null) {
+					changelog = releaseDiv.Select("div.markdown-body").First;
+				}
 
 				Application.Current.Dispatcher.Invoke(new Action(() =>
 				{
