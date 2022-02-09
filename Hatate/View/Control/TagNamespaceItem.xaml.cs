@@ -25,7 +25,8 @@ namespace Hatate.View.Control
 
 		public string KeyName
 		{
-			get; set;
+			get { return (string)this.Label_KeyName.Content; }
+			set { this.Label_KeyName.Content = value; }
 		}
 
 		public bool Enabled

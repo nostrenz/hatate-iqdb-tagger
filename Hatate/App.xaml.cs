@@ -34,6 +34,7 @@ namespace Hatate
 			#endif
 
 			App.sources.Init();
+			App.tagNamespaces.Init();
 		}
 
 		/*

@@ -18,7 +18,14 @@
 		<Button Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Save_Click"/>
 		<TextBlock Margin="10,128,6,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32"><Run Text="Some tags can be obtained directly from SauceNAO results. Here you can select which ones you want to get and optionally prefix them with a namespace."/></TextBlock>
 		<GroupBox Header="Tag namespaces" Margin="10,172,10,49">
-			<ListView x:Name="ListView_TagNamespaces" Margin="0,0,0,0" SelectionMode="Single"/>
+			<ListView x:Name="ListView_TagNamespaces" Margin="0,0,0,0" SelectionMode="Single">
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem">
+						<Setter Property="HorizontalAlignment" Value="Stretch"/>
+						<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+					</Style>
+				</ListView.ItemContainerStyle>
+			</ListView>
 		</GroupBox>
 		<Separator Height="25" Margin="6,97,10,0" VerticalAlignment="Top"/>
 	</Grid>

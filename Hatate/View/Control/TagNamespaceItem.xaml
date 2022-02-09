@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Hatate.View.Control"
-             mc:Ignorable="d"
-             Height="17.5" Width="219">
+             mc:Ignorable="d" Height="33">
 	<Grid>
-		<TextBox x:Name="TextBox_Namespace" Margin="18,-1,0,-1" Padding="5,0" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-		<CheckBox x:Name="Checkbox_Enabled" HorizontalAlignment="Left" Height="Auto" Width="18" VerticalContentAlignment="Center" VerticalAlignment="Center" Click="Checkbox_Enabled_Click"/>
+		<TextBox x:Name="TextBox_Namespace" Margin="159,5,10,5" Padding="5,0" VerticalContentAlignment="Center" Height="Auto"/>
+		<CheckBox x:Name="Checkbox_Enabled" HorizontalAlignment="Left" Height="Auto" Width="20" VerticalContentAlignment="Center" VerticalAlignment="Center" Click="Checkbox_Enabled_Click" Margin="10,5,0,5"/>
+		<Label x:Name="Label_KeyName" HorizontalAlignment="Left" Margin="35,5,0,5" Width="119"/>
 	</Grid>
 </UserControl>

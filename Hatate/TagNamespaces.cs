@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Hatate.Properties;
 using Options = Hatate.Properties.Settings;
 
 namespace Hatate

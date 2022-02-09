@@ -37,13 +37,8 @@ namespace Hatate
 				tagNamespaceItems.Add(tagNamespaceItem);
 			}
 
-			this.UpdateTagNamespaces(tagNamespaceItems);
-		}
-
-		private void UpdateTagNamespaces(List<TagNamespaceItem> tagNamespaceItems)
-		{
 			// Sort by name
-			tagNamespaceItems = tagNamespaceItems.OrderBy(tagNamespaceItem => tagNamespaceItem.Namespace).ToList();
+			tagNamespaceItems = tagNamespaceItems.OrderBy(tagNamespaceItem => tagNamespaceItem.KeyName).ToList();
 
 			foreach (TagNamespaceItem tagNamespaceItem in tagNamespaceItems) {
 				this.ListView_TagNamespaces.Items.Add(tagNamespaceItem);
