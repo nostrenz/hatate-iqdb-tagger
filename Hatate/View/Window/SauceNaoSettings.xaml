@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
         Title="SauceNAO settings"
-        Height="410.303" Width="606.225"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Height="410" Width="606" MinWidth="606" MinHeight="410"
+        WindowStartupLocation="CenterOwner">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Label Content="Without a registered account, SauceNAO will start refusing requests after reaching 100 in the last 24 hours." Margin="10,10,10,0" VerticalAlignment="Top" Padding="0"/>
 		<Label Content="By creating an account and providing the API key, this limit is increased to 200 or more if you're donating." Margin="10,26,10,0" VerticalAlignment="Top" Padding="0"/>
