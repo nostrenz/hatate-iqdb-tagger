@@ -40,7 +40,7 @@
 			if (Properties.Settings.Default.AddRating) {
 				Supremes.Nodes.Element rating = doc.Select("#rating" + imageId).First;
 
-				if (rating.Text != "N/A") {
+				if (rating != null && rating.Text != "N/A") {
 					this.AddTag(rating.Text, "rating");
 				}
 			}
