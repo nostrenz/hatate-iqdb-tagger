@@ -499,7 +499,12 @@ namespace Hatate
 			string str = "";
 
 			for (int i = 0; i < tags.Count; i++) {
-				str += "\"" + tags[i].Namespaced.Replace(@"\", @"\\") + "\"";
+				string tag = tags[i].Namespaced;
+
+				tag = tag.Replace(@"\", @"\\");
+				tag = tag.Replace("\"", "\\\"");
+
+				str += "\"" + tag + "\"";
 
 				if (i < tags.Count - 1) {
 					str += ", ";
