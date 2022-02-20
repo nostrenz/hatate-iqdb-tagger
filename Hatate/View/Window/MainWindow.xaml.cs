@@ -422,6 +422,11 @@ namespace Hatate
 
 				if (Options.Default.AddImagesToHydrusPage) {
 					hydrusPageKey = await App.hydrusApi.GetPageNamed(Options.Default.HydrusPageName);
+
+					// Don't go further if the API encountered an error
+					if (App.hydrusApi.Unreachable) {
+						return;
+					}
 				}
 
 				bool success = await this.SendTagsToHydrusForResult(result, hydrusPageKey);
@@ -1667,6 +1672,11 @@ namespace Hatate
 
 			if (Options.Default.AddImagesToHydrusPage) {
 				hydrusPageKey = await App.hydrusApi.GetPageNamed(Options.Default.HydrusPageName, true);
+
+				// Don't go further if the API encountered an error
+				if (App.hydrusApi.Unreachable) {
+					return;
+				}
 			}
 
 			// Process each selected file until no one remain or the API becomes unreachable
