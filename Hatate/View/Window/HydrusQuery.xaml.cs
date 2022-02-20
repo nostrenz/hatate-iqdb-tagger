@@ -125,13 +125,6 @@ namespace Hatate
 
 		private async void GetHydrusServices()
 		{
-			// Cannot contact the API
-			if (App.hydrusApi.Unreachable) {
-				this.Close();
-
-				return;
-			}
-
 			bool doesSearchFilesSupportsServiceArguments = await App.hydrusApi.DoesSearchFilesSupportsServiceArguments();
 
 			// Hydrus API allows specifying the file and tag service in queries starting from API version 19
@@ -142,6 +135,11 @@ namespace Hatate
 			}
 
 			JObject services = await App.hydrusApi.GetServices();
+
+			// Cannot obtain services
+			if (services == null) {
+				return;
+			}
 
 			foreach (var item in services) {
 				string key = (string)item.Key;
