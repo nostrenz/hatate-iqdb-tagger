@@ -426,8 +426,8 @@ namespace Hatate
 						response = reader.ReadToEnd();
 					}
 				}
-			} catch (WebException e) {
-				this.ShowApiUnreachableMessage(e.Message);
+			} catch (WebException webException) {
+				this.HandleWebException(webException);
 			}
 
 			return response;
@@ -455,11 +455,28 @@ namespace Hatate
 				}
 
 				response = new StreamReader(webResponse.GetResponseStream()).ReadToEnd();
-			} catch (WebException e) {
-				this.ShowApiUnreachableMessage(e.Message);
+			} catch (WebException webException) {
+				this.HandleWebException(webException);
 			}
 
 			return response;
+		}
+
+		private void HandleWebException(WebException webException)
+		{
+			HttpWebResponse webResponse = (HttpWebResponse)webException.Response;
+			string message = webException.Message;
+
+			// A 400 error code can be due to an invalid tag service
+			if ((int)webResponse.StatusCode == 400) {
+				message += "\n\nPossible cause:";
+				message += "\n- The selected tag service does not exists.";
+
+				message += "\n\nPossible fix:";
+				message += "\n- Go to \"Settings\" > \"Hydrus API\" and select a tag service";
+			}
+
+			this.ShowApiUnreachableMessage(message);
 		}
 
 		/// <summary>
