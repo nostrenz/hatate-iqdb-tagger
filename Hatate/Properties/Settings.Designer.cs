@@ -778,5 +778,17 @@ namespace Hatate.Properties {
                 this["TagNamespaces"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FocusHydrusPage {
+            get {
+                return ((bool)(this["FocusHydrusPage"]));
+            }
+            set {
+                this["FocusHydrusPage"] = value;
+            }
+        }
     }
 }

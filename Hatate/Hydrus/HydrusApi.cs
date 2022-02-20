@@ -296,7 +296,7 @@ namespace Hatate
 
 				string pageKey = page.GetValue("page_key").ToString();
 
-				if (focus && pageKey != null) {
+				if (Settings.Default.FocusHydrusPage && focus && pageKey != null) {
 					await this.FocusPage(pageKey);
 				}
 

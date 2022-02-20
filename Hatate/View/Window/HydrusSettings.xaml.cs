@@ -30,6 +30,7 @@ namespace Hatate
 			this.CheckBox_SendUrlWithTags.IsChecked = Settings.Default.SendUrlWithTags;
 			this.CheckBox_AddImagesToHydrusPage.IsChecked = Settings.Default.AddImagesToHydrusPage;
 			this.TextBox_HydrusPageName.Text = Settings.Default.HydrusPageName;
+			this.CheckBox_FocusHydrusPage.IsChecked = Settings.Default.FocusHydrusPage;
 
 			if (this.HasValidConnectionInfos()) {
 				this.RetrieveTagServices();
@@ -129,6 +130,7 @@ namespace Hatate
 			Settings.Default.SendUrlWithTags = (bool)this.CheckBox_SendUrlWithTags.IsChecked;
 			Settings.Default.AddImagesToHydrusPage = (bool)this.CheckBox_AddImagesToHydrusPage.IsChecked;
 			Settings.Default.HydrusPageName = this.TextBox_HydrusPageName.Text;
+			Settings.Default.FocusHydrusPage = (bool)this.CheckBox_FocusHydrusPage.IsChecked;
 
 			Settings.Default.Save();
 
