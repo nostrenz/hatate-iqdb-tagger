@@ -295,6 +295,11 @@ namespace Hatate
 				this.uploadedImageUrl = "https://saucenao.com/" + queryImageDisplay;
 			}
 
+			// No results, limit might be reached
+			if (results == null) {
+				return;
+			}
+
 			foreach (JObject result in results) {
 				List<Tag> resultTags = new List<Tag>();
 
