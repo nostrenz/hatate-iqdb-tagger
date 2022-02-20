@@ -346,7 +346,12 @@ namespace Hatate
 		{
 			this.unreachable = true;
 
-			MessageBox.Show("Unable to call the Hydrus API. Please verify that Hydrus is running with a configured local files API.\n\n" + exceptionMessage);
+			string message = "Unable to call the Hydrus API. ";
+			message += "\n- Verify Hydrus is running with a configured local files API.";
+			message += "\n- Verify the URL, access key and tag service in \"Settings\" > \"Hydrus API\".";
+			message += "\n\n" + exceptionMessage;
+
+			MessageBox.Show(message);
 		}
 
 		public void ResetUnreachableFlag()
