@@ -349,7 +349,10 @@ namespace Hatate
 			string message = "Unable to call the Hydrus API. ";
 			message += "\n- Verify Hydrus is running with a configured local files API.";
 			message += "\n- Verify the URL, access key and tag service in \"Settings\" > \"Hydrus API\".";
-			message += "\n\n" + exceptionMessage;
+			
+			if (exceptionMessage != null) {
+				message += "\n\n" + exceptionMessage;
+			}
 
 			MessageBox.Show(message);
 		}
@@ -470,15 +473,19 @@ namespace Hatate
 		private void HandleWebException(WebException webException)
 		{
 			HttpWebResponse webResponse = (HttpWebResponse)webException.Response;
-			string message = webException.Message;
+			string message = null;
 
-			// A 400 error code can be due to an invalid tag service
-			if ((int)webResponse.StatusCode == 400) {
-				message += "\n\nPossible cause:";
-				message += "\n- The selected tag service does not exists.";
+			if (webResponse != null) {
+				message = webException.Message;
 
-				message += "\n\nPossible fix:";
-				message += "\n- Go to \"Settings\" > \"Hydrus API\" and select a tag service";
+				// A 400 error code can be due to an invalid tag service
+				if ((int)webResponse.StatusCode == 400) {
+					message += "\n\nPossible cause:";
+					message += "\n- The selected tag service does not exists.";
+
+					message += "\n\nPossible fix:";
+					message += "\n- Go to \"Settings\" > \"Hydrus API\" and select a tag service";
+				}
 			}
 
 			this.ShowApiUnreachableMessage(message);
