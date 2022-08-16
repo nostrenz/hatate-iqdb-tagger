@@ -20,46 +20,34 @@ namespace Hatate.Parser
 
 			// Get tags
 			foreach (Supremes.Nodes.Element tagRow in tagRows) {
-				Supremes.Nodes.Elements link = tagRow.Select("a");
-
-				if (link == null) {
-					continue;
-				}
-
 				if (tagRow.Text.Length < 1) {
 					continue;
 				}
 
-				string value = link.Text.Replace(tagRow.Text, "").Trim();
+				string nameSpace = null;
 
-				if (value.Length < 1) {
-					continue;
-				}
-
-				string nameSpace = tagRow.Text.Replace(value, "").Trim();
-
-				switch (nameSpace) {
-					case "Artiste":
+				switch (tagRow.ClassName.ToLower()) {
+					case "artiste":
 						nameSpace = "creator";
 					break;
-					case "Studio":
+					case "studio":
 						nameSpace = "series";
 					break;
-					case "Game":
+					case "game":
 						nameSpace = "series";
 					break;
-					case "Character":
+					case "character":
 						nameSpace = "character";
 					break;
-					case "Source":
+					case "source":
 						nameSpace = "series";
 					break;
-					default:
-						nameSpace = null;
+					case "mangaka":
+						nameSpace = "creator";
 					break;
 				}
 
-				this.AddTag(value.ToLower(), nameSpace);
+				this.AddTag(tagRow.Text.ToLower(), nameSpace);
 			}
 
 			// Get informations
