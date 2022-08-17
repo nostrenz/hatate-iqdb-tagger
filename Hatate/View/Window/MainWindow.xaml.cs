@@ -351,8 +351,12 @@ namespace Hatate
 		private async Task SearchFile(int index, Enum.SearchEngine searchEngine)
 		{
 			Result result = this.GetResultAt(index);
-			bool isRetry = this.retrySearch;
 
+			if (result == null) {
+				return;
+			}
+
+			bool isRetry = this.retrySearch;
 			this.retrySearch = false;
 
 			// Some file format aren't supported by some search engines
