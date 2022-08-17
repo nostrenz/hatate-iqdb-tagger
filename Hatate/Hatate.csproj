@@ -117,7 +117,9 @@
     </ApplicationDefinition>
     <Compile Include="Enum\TagSource.cs" />
     <Compile Include="TagNamespace.cs" />
-    <Compile Include="TagNamespaces.cs" />
+    <Compile Include="TagNamespaces\AbstractTagNamespaces.cs" />
+    <Compile Include="TagNamespaces\SauceNao.cs" />
+    <Compile Include="TagNamespaces\Zerochan.cs" />
     <Compile Include="View\Control\TagNamespaceItem.xaml.cs">
       <DependentUpon>TagNamespaceItem.xaml</DependentUpon>
     </Compile>
@@ -176,6 +178,9 @@
     </Compile>
     <Compile Include="Sources.cs" />
     <Compile Include="Tag.cs" />
+    <Compile Include="View\Window\ZerochanSettings.xaml.cs">
+      <DependentUpon>ZerochanSettings.xaml</DependentUpon>
+    </Compile>
     <Page Include="View\Control\TagNamespaceItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -237,6 +242,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Control\SourceItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Window\ZerochanSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

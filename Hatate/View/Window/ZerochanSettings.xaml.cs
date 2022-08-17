@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Windows;
-using System.Diagnostics;
 using System.Collections.Generic;
 using Hatate.Properties;
 using Hatate.View.Control;
@@ -8,19 +7,18 @@ using Hatate.View.Control;
 namespace Hatate.View.Window
 {
 	/// <summary>
-	/// Interaction logic for SauceNaoSettings.xaml
+	/// Interaction logic for ZerochanSettings.xaml
 	/// </summary>
-	public partial class SauceNaoSettings : System.Windows.Window
+	public partial class ZerochanSettings : System.Windows.Window
 	{
-		public SauceNaoSettings()
+		private TagNamespaces.Zerochan tagNamespaces = new TagNamespaces.Zerochan();
+
+		public ZerochanSettings()
 		{
 			InitializeComponent();
 
 			this.Owner = App.Current.MainWindow;
 
-			this.TextBox_ApiKey.Text = Settings.Default.SauceNaoApiKey;
-
-			// Tag namespaces
 			this.LoadTagNamespaces();
 		}
 
@@ -32,7 +30,7 @@ namespace Hatate.View.Window
 		{
 			List<TagNamespaceItem> tagNamespaceItems = new List<TagNamespaceItem>();
 
-			foreach (KeyValuePair<string, TagNamespace> keyValuePair in App.tagNamespaces.TagNamespacesList) {
+			foreach (KeyValuePair<string, TagNamespace> keyValuePair in this.tagNamespaces.TagNamespacesList) {
 				TagNamespaceItem tagNamespaceItem = new TagNamespaceItem(keyValuePair.Key, keyValuePair.Value);
 				tagNamespaceItems.Add(tagNamespaceItem);
 			}
@@ -49,23 +47,15 @@ namespace Hatate.View.Window
 		Event
 		*/
 
-		private void TextBlock_Register_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			Process.Start(new ProcessStartInfo("https://saucenao.com/user.php"));
-		}
-
 		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
-			// Tag namespaces
-			App.tagNamespaces.Clear();
+			this.tagNamespaces.Clear();
 
 			foreach (TagNamespaceItem tagNamespaceItem in this.ListView_TagNamespaces.Items) {
-				App.tagNamespaces.Add(tagNamespaceItem.KeyName, new TagNamespace(tagNamespaceItem));
+				this.tagNamespaces.Add(tagNamespaceItem.KeyName, new TagNamespace(tagNamespaceItem));
 			}
-
-			Settings.Default.SauceNaoApiKey = this.TextBox_ApiKey.Text;
-			Settings.Default.TagNamespaces = App.tagNamespaces.Serialize();
-
+			
+			Settings.Default.ZerochanTagNamespaces = this.tagNamespaces.Serialize();
 			Settings.Default.Save();
 
 			this.Close();

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Options = Hatate.Properties.Settings;
+﻿using Options = Hatate.Properties.Settings;
 
-namespace Hatate
+namespace Hatate.TagNamespaces
 {
-	public class TagNamespaces
+	public class SauceNao : AbstractTagNamespaces
 	{
 		private const string TITLE = "Title";
 		private const string CREATOR = "Creator";
@@ -27,40 +24,18 @@ namespace Hatate
 		private const string MANGA_UPDATE_ID = "Manga update ID";
 		private const string SEIGA_ID = "Seiga ID";
 
-		private Dictionary<string, TagNamespace> tagNamespaces = new Dictionary<string, TagNamespace>() {};
+		public SauceNao()
+		{
+			this.Init(Options.Default.TagNamespaces);
+		}
 
 		/*
 		============================================
-		Public
+		Protected
 		============================================
 		*/
 
-		public void Init()
-		{
-			// Empty setting, create default
-			if (String.IsNullOrEmpty(Options.Default.TagNamespaces)) {
-				this.CreateJson();
-			} else {
-				this.LoadFromOptions();
-			}
-		}
-
-		public void Clear()
-		{
-			this.tagNamespaces.Clear();
-		}
-
-		public void Add(string keyName, TagNamespace tagNamespace)
-		{
-			this.tagNamespaces.Add(keyName, tagNamespace);
-		}
-
-		public string Serialize()
-		{
-			return JsonConvert.SerializeObject(this.tagNamespaces);
-		}
-
-		private void CreateJson()
+		protected override void CreateDefault()
 		{
 			this.tagNamespaces.Add(TITLE, new TagNamespace("title"));
 			this.tagNamespaces.Add(CREATOR, new TagNamespace("creator"));
@@ -81,16 +56,6 @@ namespace Hatate
 			this.tagNamespaces.Add(GELBOORU_ID, new TagNamespace("gelbooru-id"));
 			this.tagNamespaces.Add(MANGA_UPDATE_ID, new TagNamespace("manga-update-id"));
 			this.tagNamespaces.Add(SEIGA_ID, new TagNamespace("seiga-id"));
-		}
-
-		private void LoadFromOptions()
-		{
-			this.tagNamespaces = JsonConvert.DeserializeObject<Dictionary<string, TagNamespace>>(Options.Default.TagNamespaces);
-		}
-
-		public Dictionary<string, TagNamespace> TagNamespacesList
-		{
-			get { return this.tagNamespaces; }
 		}
 
 		/*

@@ -114,6 +114,9 @@
 				<MenuItem Header="Hatate" Height="18" Click="MenuItem_Options_Click" />
 				<MenuItem Header="Hydrus API" Height="18" Click="MenuItem_HydrusApi_Click" />
 				<MenuItem Header="SauceNAO" Height="18" Click="MenuItem_SauceNao_Click" />
+				<MenuItem Header="Boorus" Height="18">
+					<MenuItem Header="Zerochan" Height="18" Click="MenuItem_Zerochan_Click" />
+				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="Help" Height="18">
 				<MenuItem Header="Open GitHub repository" Height="18" Click="MenuItem_Github_Click" />

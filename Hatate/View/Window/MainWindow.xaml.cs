@@ -2449,7 +2449,17 @@ namespace Hatate
 		/// <param name="e"></param>
 		private void MenuItem_SauceNao_Click(object sender, RoutedEventArgs e)
 		{
-			new SauceNaoSettings().ShowDialog();
+			new View.Window.SauceNaoSettings().ShowDialog();
+		}
+
+		/// <summary>
+		/// Opens the Zerochan settings window.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MenuItem_Zerochan_Click(object sender, RoutedEventArgs e)
+		{
+			new View.Window.ZerochanSettings().ShowDialog();
 		}
 
 		/// <summary>

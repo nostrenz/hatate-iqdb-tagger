@@ -18,36 +18,44 @@ namespace Hatate.Parser
 				return false;
 			}
 
+			TagNamespaces.Zerochan tagNamespaces = new TagNamespaces.Zerochan();
+
 			// Get tags
 			foreach (Supremes.Nodes.Element tagRow in tagRows) {
 				if (tagRow.Text.Length < 1) {
 					continue;
 				}
 
-				string nameSpace = null;
+				string tag = tagRow.Text.Trim().ToLower();
+				string nameSpace = tagRow.ClassName.ToLower();
+				TagNamespace tagNamespace = null;
 
-				switch (tagRow.ClassName.ToLower()) {
+				switch (nameSpace) {
 					case "artiste":
-						nameSpace = "creator";
+						tagNamespace = tagNamespaces.Artiste;
 					break;
 					case "studio":
-						nameSpace = "series";
+						tagNamespace = tagNamespaces.Studio;
 					break;
 					case "game":
-						nameSpace = "series";
-					break;
-					case "character":
-						nameSpace = "character";
-					break;
-					case "source":
-						nameSpace = "series";
+						tagNamespace = tagNamespaces.Game;
 					break;
 					case "mangaka":
-						nameSpace = "creator";
+						tagNamespace = tagNamespaces.Mangaka;
 					break;
 				}
 
-				this.AddTag(tagRow.Text.ToLower(), nameSpace);
+				// Special case for the "source" namespace
+				if (nameSpace == "source") {
+					if (tag == "original") nameSpace = "series";
+					else tagNamespace = tagNamespaces.Source;
+				}
+
+				if (tagNamespace != null && tagNamespace.Enabled) {
+					nameSpace = tagNamespace.Namespace;
+				}
+
+				this.AddTag(tag, nameSpace);
 			}
 
 			// Get informations

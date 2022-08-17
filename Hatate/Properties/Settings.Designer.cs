@@ -790,5 +790,17 @@ namespace Hatate.Properties {
                 this["FocusHydrusPage"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ZerochanTagNamespaces {
+            get {
+                return ((string)(this["ZerochanTagNamespaces"]));
+            }
+            set {
+                this["ZerochanTagNamespaces"] = value;
+            }
+        }
     }
 }
