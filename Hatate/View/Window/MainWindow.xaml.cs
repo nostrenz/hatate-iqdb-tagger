@@ -530,19 +530,6 @@ namespace Hatate
 
 			this.lastSearchedInSeconds = 1;
 
-			///TEST
-			foreach (Match match in sauceNao.Matches) {
-				Console.WriteLine("-----------------------");
-				Console.WriteLine("Rating: " + match.Rating);
-				Console.WriteLine("PreviewUrl: " + match.PreviewUrl);
-				Console.WriteLine("Tags:");
-				foreach (Tag tag in match.Tags) {
-					Console.WriteLine("- " + tag.Namespaced);
-				}
-			}
-			//return;
-			///TEST
-
 			result.Matches = sauceNao.Matches;
 			result.UploadedImageUrl = sauceNao.UploadedImageUrl;
 			result.UsedSearchEngine = Enum.SearchEngine.SauceNAO;
