@@ -28,30 +28,20 @@ namespace Hatate.Parser
 
 				string tag = tagRow.Text.Trim().ToLower();
 				string nameSpace = tagRow.ClassName.ToLower();
-				TagNamespace tagNamespace = null;
+				TagNamespace tagNamespace = tagNamespaces.Find(nameSpace);
 
-				switch (nameSpace) {
-					case "artiste":
-						tagNamespace = tagNamespaces.Artiste;
-					break;
-					case "studio":
-						tagNamespace = tagNamespaces.Studio;
-					break;
-					case "game":
-						tagNamespace = tagNamespaces.Game;
-					break;
-					case "mangaka":
-						tagNamespace = tagNamespaces.Mangaka;
-					break;
+				// Special case for the "source:original" tag, mapping it to "series:original"
+				if (nameSpace == "source" && tag == "original") {
+					nameSpace = "series";
+					tagNamespace = null;
 				}
 
-				// Special case for the "source" namespace
-				if (nameSpace == "source") {
-					if (tag == "original") nameSpace = "series";
-					else tagNamespace = tagNamespaces.Source;
-				}
+				if (tagNamespace != null) {
+					// We don't want tags from that namespace
+					if (!tagNamespace.Enabled) {
+						continue;
+					}
 
-				if (tagNamespace != null && tagNamespace.Enabled) {
 					nameSpace = tagNamespace.Namespace;
 				}
 
