@@ -65,10 +65,10 @@ namespace Hatate.Parser
 				JArray postTagsArtist = postTags.GetValue("artist").ToObject<JArray>();
 				JArray postTagsMeta = postTags.GetValue("meta").ToObject<JArray>();
 
-				this.AddTagFromArray(postTagsGeneral);
-				this.AddTagFromArray(postTagsCopyright, "series");
-				this.AddTagFromArray(postTagsArtist, "creator");
-				this.AddTagFromArray(postTagsMeta, "meta");
+				this.AddTagsFromArray(postTagsGeneral);
+				this.AddTagsFromArray(postTagsCopyright, "series");
+				this.AddTagsFromArray(postTagsArtist, "creator");
+				this.AddTagsFromArray(postTagsMeta, "meta");
 
 				long.TryParse(size, out this.size);
 				int.TryParse(width, out this.width);
@@ -104,7 +104,7 @@ namespace Hatate.Parser
 		============================================
 		*/
 
-		private void AddTagFromArray(JArray tags, string nameSpace = null)
+		private void AddTagsFromArray(JArray tags, string nameSpace = null)
 		{
 			foreach (JToken jToken in tags) {
 				string tag = jToken.Value<string>();
