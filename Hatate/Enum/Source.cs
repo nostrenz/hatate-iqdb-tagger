@@ -24,6 +24,7 @@ namespace Hatate.Enum
         DeviantArt,
         ArtStation,
         Pawoo,
-        MangaDex
+        MangaDex,
+        e621
     }
 }

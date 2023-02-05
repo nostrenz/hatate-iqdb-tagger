@@ -703,6 +703,7 @@ namespace Hatate
 				case Enum.Source.Pixiv: booru = new Parser.Pixiv(); break;
 				case Enum.Source.NicoNicoSeiga: booru = new Parser.NicoNicoSeiga(); break;
 				case Enum.Source.DeviantArt: booru = new Parser.DeviantArt(); break;
+				case Enum.Source.e621: booru = new Parser.e621(); break;
 				default: return false;
 			}
 

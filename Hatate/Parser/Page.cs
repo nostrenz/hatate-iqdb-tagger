@@ -46,20 +46,6 @@ namespace Hatate.Parser
 			return this.Parse(doc);
 		}
 
-		public bool FromFile(string uri)
-		{
-			Supremes.Nodes.Document doc = null;
-
-			// Search for the anime
-			try {
-				doc = Supremes.Dcsoup.ParseFile(uri, "utf-8");
-			} catch {
-				return false;
-			}
-
-			return this.Parse(doc);
-		}
-
 		/*
 		============================================
 		Protected

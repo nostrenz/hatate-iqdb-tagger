@@ -66,6 +66,8 @@ namespace Hatate
 				this.Source = Enum.Source.Pawoo;
 			} else if (url.Contains("mangadex.org")) {
 				this.Source = Enum.Source.MangaDex;
+			} else if (url.Contains("e621.net")) {
+				this.Source = Enum.Source.e621;
 			}
 		}
 

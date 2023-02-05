@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Hatate.Parser
 {
 	interface IParser
 	{
 		bool FromUrl(string url);
-		bool FromFile(string uri);
 
 		List<Tag> Tags { get; }
 		string Full { get; }

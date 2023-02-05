@@ -116,6 +116,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Enum\TagSource.cs" />
+    <Compile Include="Parser\e621.cs" />
     <Compile Include="TagNamespace.cs" />
     <Compile Include="TagNamespaces\AbstractTagNamespaces.cs" />
     <Compile Include="TagNamespaces\SauceNao.cs" />
