@@ -25,7 +25,7 @@ namespace Hatate.Parser
 			}
 
 			using (WebClient webClient = new WebClient()) {
-				webClient.Headers.Add("User-Agent", USER_AGENT);
+				webClient.Headers.Add("User-Agent", this.UserAgent);
 
 				string json = null;
 
