@@ -72,6 +72,7 @@ namespace Hatate.Parser
             JToken height = parsed.GetValue("image_height");
             JToken size = parsed.GetValue("file_size");
             JToken deleted = parsed.GetValue("is_deleted");
+			JToken banned = parsed.GetValue("is_banned");
             JToken full = parsed.GetValue("file_url");
             JToken source = parsed.GetValue("source");
 
@@ -107,7 +108,8 @@ namespace Hatate.Parser
                 }
             }
 
-            if (deleted != null && deleted.ToString() == "true") {
+            if ((deleted != null && deleted.ToObject<bool>())
+			||  (banned != null && banned.ToObject<bool>())) {
                 this.unavailable = true;
             }
 
