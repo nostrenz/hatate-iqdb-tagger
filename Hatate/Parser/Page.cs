@@ -7,6 +7,9 @@ namespace Hatate.Parser
 	// Base class for the booru parsers.
 	abstract class Page
 	{
+		// Value for the User-Agent header used with some APIs
+		protected const string USER_AGENT = "Hatate/1.0";
+
 		private const string KB = "KB";
 		private const string MB = "MB";
 

@@ -21,7 +21,7 @@ namespace Hatate.Parser
 			string jsonUrl = "https://danbooru.donmai.us/posts/" + postId + ".json";
 
 			using (WebClient webClient = new WebClient()) {
-				webClient.Headers.Add("User-Agent", "Hatate/1.0");
+				webClient.Headers.Add("User-Agent", USER_AGENT);
 
 				string json = null;
 
