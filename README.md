@@ -1,5 +1,5 @@
 # Hatate
-Search and tag images using IQDB.
+Search and tag images using IQDB and SauceNAO.
 
 Tagged images can then be imported into [Hydrus](https://github.com/hydrusnetwork/hydrus).
 
@@ -32,7 +32,7 @@ You can manually add files or a whole folder using those entries from the "**Fil
 
 ### By executing a Hydrus query
 
-[**This requires Hydrus to be running and the API to be configured.**](#Settings->-Hydrus-API)
+[**Requires Hydrus to be running and the API to be configured.**](#Settings->-Hydrus-API)
 
 The "**Files > Query Hydrus**" menu opens a window allowing you to enter tags and matching files from Hydrus will be added.
 
@@ -55,7 +55,7 @@ This will write a text file next to the image with all the tags in it. You can t
 
 ### Send tags to Hydrus
 
-[**This requires Hydrus to be running and the API to be configured.**](#Settings->-Hydrus-API)
+[**Requires Hydrus to be running and the API to be configured.**](#Settings->-Hydrus-API)
 
 Files will be directly imported into Hydrus with tags through the API.
 
@@ -63,7 +63,7 @@ If an error happens during the process the row will be colored in **orange** and
 
 ### Send URLs to Hydrus
 
-[**This requires Hydrus to be running and the API to be configured.**](#Settings->-Hydrus-API)
+[**Requires Hydrus to be running and the API to be configured.**](#Settings->-Hydrus-API)
 
 The local file won't be sent to Hydrus, instead the matched booru URL will be sent making Hydrus download it.
 By default tags will also be sent alongside the URL but you can [disable that if you want](#Send-tags-alonside-a-URL).
