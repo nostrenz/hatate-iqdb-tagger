@@ -91,11 +91,13 @@ namespace Hatate.Parser
             JToken postTagsCopyright = postTags.GetValue("copyright");
             JToken postTagsArtist = postTags.GetValue("artist");
             JToken postTagsMeta = postTags.GetValue("meta");
+			JToken postTagsSpecies = postTags.GetValue("species");
 
             this.AddTagsFromArray(postTagsGeneral);
             this.AddTagsFromArray(postTagsCopyright, "series");
             this.AddTagsFromArray(postTagsArtist, "creator");
             this.AddTagsFromArray(postTagsMeta, "meta");
+			this.AddTagsFromArray(postTagsSpecies, "species");
 
             if (size != null) {
                 long.TryParse(size.ToString(), out this.size);
