@@ -18,15 +18,13 @@ namespace Hatate.Parser
 				return false;
 			}
 
-			string jsonUrl = "https://danbooru.donmai.us/posts/" + postId + ".json";
-
 			using (WebClient webClient = new WebClient()) {
 				webClient.Headers.Add("User-Agent", USER_AGENT);
 
 				string json = null;
 
 				try {
-					json = webClient.DownloadString(jsonUrl);
+					json = webClient.DownloadString("https://danbooru.donmai.us/posts/" + postId + ".json");
 				} catch (WebException webException) {
 					HttpWebResponse response = (HttpWebResponse)webException.Response;
 
@@ -39,51 +37,8 @@ namespace Hatate.Parser
 					return false;
 				}
 
-				if (string.IsNullOrWhiteSpace(json)) {
-					return false;
-				}
-
-				dynamic parsed = JObject.Parse(json);
-
-				string rating = parsed.GetValue("rating").ToString();
-				string width = parsed.GetValue("image_width").ToString();
-				string height = parsed.GetValue("image_height").ToString();
-				string size = parsed.GetValue("file_size").ToString();
-				string deleted = parsed.GetValue("is_deleted").ToString(); // "true" / "false"
-				string banned = parsed.GetValue("is_banned").ToString(); // "true" / "false"
-
-				string tagStringGeneral = parsed.GetValue("tag_string_general").ToString();
-				string tagStringCharacter = parsed.GetValue("tag_string_character").ToString();
-				string tagStringCopyright = parsed.GetValue("tag_string_copyright").ToString();
-				string tagStringArtist = parsed.GetValue("tag_string_artist").ToString();
-				string tagStringMeta = parsed.GetValue("tag_string_meta").ToString();
-
-				long.TryParse(size, out this.size);
-				int.TryParse(width, out this.width);
-				int.TryParse(height, out this.height);
-
-				this.full = parsed.GetValue("file_url").ToString();
-				this.source = parsed.GetValue("source").ToString();
-
-				switch (rating) {
-					case "g": this.rating = "General"; break;
-					case "s": this.rating = "Safe"; break;
-					case "q": this.rating = "Questionable"; break;
-					case "e": this.rating = "Explicit"; break;
-				}
-
-				if (deleted == "true" || banned == "true") {
-					this.unavailable = true;
-				}
-
-				this.AddTagsFromString(tagStringGeneral);
-				this.AddTagsFromString(tagStringCharacter, "character");
-				this.AddTagsFromString(tagStringCopyright, "series");
-				this.AddTagsFromString(tagStringArtist, "creator");
-				this.AddTagsFromString(tagStringMeta, "meta");
+				return this.ParseJson(json);
 			}
-
-			return true;
 		}
 
 		/*
@@ -104,8 +59,75 @@ namespace Hatate.Parser
 		============================================
 		*/
 
-		private void AddTagsFromString(string tagsString, string nameSpace = null)
+		private bool ParseJson(string json)
 		{
+            if (string.IsNullOrWhiteSpace(json)) {
+                return false;
+            }
+
+            JObject parsed = JObject.Parse(json);
+
+            JToken rating = parsed.GetValue("rating");
+            JToken width = parsed.GetValue("image_width");
+            JToken height = parsed.GetValue("image_height");
+            JToken size = parsed.GetValue("file_size");
+            JToken deleted = parsed.GetValue("is_deleted");
+            JToken full = parsed.GetValue("file_url");
+            JToken source = parsed.GetValue("source");
+
+            JToken tagStringGeneral = parsed.GetValue("tag_string_general");
+            JToken tagStringCharacter = parsed.GetValue("tag_string_character");
+            JToken tagStringCopyright = parsed.GetValue("tag_string_copyright");
+            JToken tagStringArtist = parsed.GetValue("tag_string_artist");
+            JToken tagStringMeta = parsed.GetValue("tag_string_meta");
+
+            if (size != null) {
+                long.TryParse(size.ToString(), out this.size);
+            }
+
+            if (width != null && height != null) {
+                int.TryParse(width.ToString(), out this.width);
+                int.TryParse(height.ToString(), out this.height);
+            }
+
+            if (full != null) {
+                this.full = full.ToString();
+            }
+
+            if (source != null) {
+                this.source = source.ToString();
+            }
+
+            if (rating != null) {
+                switch (rating.ToString()) {
+                    case "g": this.rating = "General"; break;
+                    case "s": this.rating = "Safe"; break;
+                    case "q": this.rating = "Questionable"; break;
+                    case "e": this.rating = "Explicit"; break;
+                }
+            }
+
+            if (deleted != null && deleted.ToString() == "true") {
+                this.unavailable = true;
+            }
+
+            this.AddTagsFromString(tagStringGeneral);
+            this.AddTagsFromString(tagStringCharacter, "character");
+            this.AddTagsFromString(tagStringCopyright, "series");
+            this.AddTagsFromString(tagStringArtist, "creator");
+            this.AddTagsFromString(tagStringMeta, "meta");
+
+			return true;
+        }
+
+        private void AddTagsFromString(JToken tagsToken, string nameSpace = null)
+		{
+			if (tagsToken == null) {
+				return;
+			}
+
+			string tagsString = tagsToken.ToString();
+
 			if (string.IsNullOrWhiteSpace(tagsString)) {
 				return;
 			}

@@ -24,15 +24,13 @@ namespace Hatate.Parser
 				return false;
 			}
 
-			string jsonUrl = "https://e621.net/posts/" + postId + ".json";
-
 			using (WebClient webClient = new WebClient()) {
 				webClient.Headers.Add("User-Agent", USER_AGENT);
 
 				string json = null;
 
 				try {
-					json = webClient.DownloadString(jsonUrl);
+					json = webClient.DownloadString("https://e621.net/posts/" + postId + ".json");
 				} catch (WebException webException) {
 					HttpWebResponse response = (HttpWebResponse)webException.Response;
 
@@ -44,46 +42,9 @@ namespace Hatate.Parser
 				} catch {
 					return false;
 				}
-				
-				if (string.IsNullOrWhiteSpace(json)) {
-					return false;
-				}
 
-				dynamic parsed = JObject.Parse(json);
-
-				JObject post = parsed.post;
-				JObject postFile = post.GetValue("file").ToObject<JObject>();
-				JObject postTags = post.GetValue("tags").ToObject<JObject>();
-			
-				string rating = post.GetValue("rating").ToString();
-				string width = postFile.GetValue("width").ToString();
-				string height = postFile.GetValue("height").ToString();
-				string size = postFile.GetValue("size").ToString();
-
-				JArray postTagsGeneral = postTags.GetValue("general").ToObject<JArray>();
-				JArray postTagsCopyright = postTags.GetValue("copyright").ToObject<JArray>();
-				JArray postTagsArtist = postTags.GetValue("artist").ToObject<JArray>();
-				JArray postTagsMeta = postTags.GetValue("meta").ToObject<JArray>();
-
-				this.AddTagsFromArray(postTagsGeneral);
-				this.AddTagsFromArray(postTagsCopyright, "series");
-				this.AddTagsFromArray(postTagsArtist, "creator");
-				this.AddTagsFromArray(postTagsMeta, "meta");
-
-				long.TryParse(size, out this.size);
-				int.TryParse(width, out this.width);
-				int.TryParse(height, out this.height);
-
-				this.full = postFile.GetValue("url").ToString();
-
-				switch (rating) {
-					case "s": this.rating = "Safe"; break;
-					case "q": this.rating = "Questionable"; break;
-					case "e": this.rating = "Explicit"; break;
-				}
+				return this.ParseJson(json);
 			}
-
-			return true;
 		}
 
 		/*
@@ -104,9 +65,72 @@ namespace Hatate.Parser
 		============================================
 		*/
 
-		private void AddTagsFromArray(JArray tags, string nameSpace = null)
+		private bool ParseJson(string json)
 		{
-			foreach (JToken jToken in tags) {
+            if (string.IsNullOrWhiteSpace(json)) {
+                return false;
+            }
+
+            dynamic parsed = JObject.Parse(json);
+            JObject post = parsed.post;
+
+            if (post == null) {
+                return false;
+            }
+
+            JObject postFile = post.GetValue("file").ToObject<JObject>();
+            JObject postTags = post.GetValue("tags").ToObject<JObject>();
+
+            JToken rating = post.GetValue("rating");
+            JToken width = postFile.GetValue("width");
+            JToken height = postFile.GetValue("height");
+            JToken size = postFile.GetValue("size");
+            JToken full = postFile.GetValue("url");
+
+            JToken postTagsGeneral = postTags.GetValue("general");
+            JToken postTagsCopyright = postTags.GetValue("copyright");
+            JToken postTagsArtist = postTags.GetValue("artist");
+            JToken postTagsMeta = postTags.GetValue("meta");
+
+            this.AddTagsFromArray(postTagsGeneral);
+            this.AddTagsFromArray(postTagsCopyright, "series");
+            this.AddTagsFromArray(postTagsArtist, "creator");
+            this.AddTagsFromArray(postTagsMeta, "meta");
+
+            if (size != null) {
+                long.TryParse(size.ToString(), out this.size);
+            }
+
+            if (width != null && height != null) {
+                int.TryParse(width.ToString(), out this.width);
+                int.TryParse(height.ToString(), out this.height);
+            }
+
+            if (full != null) {
+                this.full = full.ToString();
+            }
+
+            if (rating != null) {
+                switch (rating.ToString())
+                {
+                    case "s": this.rating = "Safe"; break;
+                    case "q": this.rating = "Questionable"; break;
+                    case "e": this.rating = "Explicit"; break;
+                }
+            }
+
+			return true;
+        }
+
+		private void AddTagsFromArray(JToken tagsToken, string nameSpace = null)
+		{
+            if (tagsToken == null) {
+                return;
+            }
+
+            JArray tags = tagsToken.ToObject<JArray>();
+
+            foreach (JToken jToken in tags) {
 				string tag = jToken.Value<string>();
 
 				if (string.IsNullOrEmpty(tag)) {
