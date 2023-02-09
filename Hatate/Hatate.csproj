@@ -127,6 +127,9 @@
     <Compile Include="View\Window\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Window\BetterImageRules.xaml.cs">
+      <DependentUpon>BetterImageRules.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Window\Capture.xaml.cs">
       <DependentUpon>Capture.xaml</DependentUpon>
     </Compile>
@@ -179,6 +182,9 @@
     </Compile>
     <Compile Include="Sources.cs" />
     <Compile Include="Tag.cs" />
+    <Compile Include="View\Window\ValidMatchRules.xaml.cs">
+      <DependentUpon>ValidMatchRules.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Window\ZerochanSettings.xaml.cs">
       <DependentUpon>ZerochanSettings.xaml</DependentUpon>
     </Compile>
@@ -187,6 +193,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Window\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Window\BetterImageRules.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -243,6 +253,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Control\SourceItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Window\ValidMatchRules.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

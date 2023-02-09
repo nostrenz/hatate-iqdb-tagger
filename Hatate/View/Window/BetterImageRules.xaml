@@ -1,0 +1,14 @@
+﻿<Window x:Class="Hatate.View.Window.BetterImageRules"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hatate.View.Window"
+        mc:Ignorable="d"
+        Title="Edit conditions under which a valid match is considered better than the local image file"
+        Height="315" Width="660"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid Background="{DynamicResource WindowBackground}">
+        
+    </Grid>
+</Window>

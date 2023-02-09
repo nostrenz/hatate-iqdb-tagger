@@ -5,23 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hydrus API settings" Width="550" MinWidth="550" Height="324" MinHeight="305" MaxHeight="324" WindowStartupLocation="CenterOwner">
-	<Grid Background="{DynamicResource WindowBackground}">
-		<Label Content="API URL" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
-		<Label Content="API access key" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
-		<TextBox x:Name="TextBox_ApiAccessKey" Height="26" Margin="101,41,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-		<Button x:Name="Button_Apply" Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Apply_Click" IsEnabled="False"/>
-		<TextBox x:Name="TextBox_ApiHost" Height="26" Margin="101,10,10,0" TextWrapping="Wrap" Text="http://127.0.0.1:45869" VerticalAlignment="Top"/>
-		<Button Content="Test connection" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Width="86" Click="Button_Test_Click"/>
-		<ComboBox x:Name="ComboBox_TagServices" Margin="101,72,10,0" VerticalAlignment="Top" Height="26" IsEnabled="False"/>
-		<Label x:Name="Label_TagService" Content="Tag service" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="86" IsEnabled="False"/>
-		<CheckBox x:Name="CheckBox_DeleteImported" Content="Send files to recycle bin once imported into Hydrus" HorizontalAlignment="Left" Margin="10,152,0,0" VerticalAlignment="Top" Height="12"/>
-		<CheckBox x:Name="CheckBox_AutoSend" Content="Automatically send searched files to Hydrus" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Height="14"/>
-		<Separator Height="25" Margin="101,103,10,0" VerticalAlignment="Top"/>
-		<CheckBox x:Name="CheckBox_AssociateUrl" Content="Associate found URL with file when sending tags" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top"/>
-		<CheckBox x:Name="CheckBox_SendUrlWithTags" Content="Send tags alongside a URL" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top"/>
-		<CheckBox x:Name="CheckBox_AddImagesToHydrusPage" Content="Display imported images in a Hydrus page named" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top" ToolTip="If enabled, images imported into Hydrus using the 'Import file with tags' context menu option will be displayed in an Hydrus page" Height="20"/>
-		<TextBox x:Name="TextBox_HydrusPageName" Height="20" Margin="281,202,10,0" TextWrapping="Wrap" Text="files" VerticalAlignment="Top"/>
-		<CheckBox x:Name="CheckBox_FocusHydrusPage" Content="Focus that page when an image is imported" Margin="281,227,10,0" VerticalAlignment="Top" Height="20"/>
-	</Grid>
+        Title="Hydrus API settings" Width="585" MinWidth="585" Height="345" MinHeight="345" WindowStartupLocation="CenterOwner">
+    <Grid Background="{DynamicResource WindowBackground}">
+        <Label Content="API URL" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
+        <Label Content="API access key" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBox_ApiAccessKey" Height="26" Margin="101,41,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Button x:Name="Button_Apply" Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Apply_Click" IsEnabled="False"/>
+        <TextBox x:Name="TextBox_ApiHost" Height="26" Margin="101,10,10,0" TextWrapping="Wrap" Text="http://127.0.0.1:45869" VerticalAlignment="Top"/>
+        <Button Content="Test connection" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Width="86" Click="Button_Test_Click"/>
+        <ComboBox x:Name="ComboBox_TagServices" Margin="101,72,10,0" VerticalAlignment="Top" Height="26" IsEnabled="False"/>
+        <Label x:Name="Label_TagService" Content="Tag service" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="86" IsEnabled="False"/>
+        <CheckBox x:Name="CheckBox_DeleteImported" Content="Send local image file to recycle bin once imported into Hydrus" Margin="10,164,10,0" VerticalAlignment="Top" Height="12"/>
+        <Separator Height="25" Margin="101,103,10,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox_AssociateUrl" Content="Associate found URL with file when sending tags" Margin="10,181,10,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox_SendUrlWithTags" Content="Send tags alongside a URL" Margin="10,199,10,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox_AddImagesToHydrusPage" Content="Display imported images in a Hydrus page named" HorizontalAlignment="Left" Margin="10,217,0,0" VerticalAlignment="Top" ToolTip="If enabled, images imported into Hydrus using the 'Import file with tags' context menu option will be displayed in an Hydrus page" Height="20" Width="276"/>
+        <TextBox x:Name="TextBox_HydrusPageName" Height="20" Margin="291,217,10,0" TextWrapping="Wrap" Text="files" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox_FocusHydrusPage" Content="Focus that page when an image is imported" Margin="291,242,10,0" VerticalAlignment="Top" Height="20"/>
+        <Label Content="Automatically send to Hydrus" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Width="168"/>
+        <ComboBox Margin="183,133,10,0" VerticalAlignment="Top" Height="26">
+            <ComboBoxItem Content="Never"/>
+            <ComboBoxItem Content="Import local image file (and its tags)"/>
+            <ComboBoxItem Content="Import URL (let Hydrus download the image and its tags)"/>
+            <ComboBoxItem Content="Import URL if remote image is better, otherwise do nothing"/>
+            <ComboBoxItem Content="Import URL if remote image is better, otherwise import local image file"/>
+        </ComboBox>
+    </Grid>
 </Window>

@@ -24,7 +24,6 @@ namespace Hatate
 
 			this.TextBox_ApiHost.Text = Settings.Default.HydrusApiHost;
 			this.TextBox_ApiAccessKey.Text = Settings.Default.HydrusApiAccessKey;
-			this.CheckBox_AutoSend.IsChecked = Settings.Default.AutoSend;
 			this.CheckBox_DeleteImported.IsChecked = Settings.Default.DeleteImported;
 			this.CheckBox_AssociateUrl.IsChecked = Settings.Default.AssociateUrl;
 			this.CheckBox_SendUrlWithTags.IsChecked = Settings.Default.SendUrlWithTags;
@@ -124,7 +123,6 @@ namespace Hatate
 
 			this.SetConnectionSettings();
 
-			Settings.Default.AutoSend = (bool)this.CheckBox_AutoSend.IsChecked;
 			Settings.Default.DeleteImported = (bool)this.CheckBox_DeleteImported.IsChecked;
 			Settings.Default.AssociateUrl = (bool)this.CheckBox_AssociateUrl.IsChecked;
 			Settings.Default.SendUrlWithTags = (bool)this.CheckBox_SendUrlWithTags.IsChecked;
@@ -181,5 +179,5 @@ namespace Hatate
 			this.RetrieveTagServices();
 			this.Button_Apply.IsEnabled = true;
 		}
-	}
+    }
 }
