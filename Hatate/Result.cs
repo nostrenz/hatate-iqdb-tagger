@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Options = Hatate.Properties.Settings;
 using Hatate.Properties;
 
 namespace Hatate
@@ -445,15 +446,24 @@ namespace Hatate
 					return false;
 				}
 
-				if (this.remote.Format != null && this.remote.Format.ToLower() == "png" && this.local.Format.ToLower() != "png") {
+				if (this.remote.Format != null
+				&&  this.remote.Format.ToLower() == Options.Default.BetterImageRules_PreferedFileFormat.ToLower()
+				&&  this.local.Format.ToLower() != Options.Default.BetterImageRules_PreferedFileFormat.ToLower()) {
 					return true;
 				}
 
-				if (this.remote.Width > this.local.Width || this.remote.Height > this.local.Height) {
+				if (Options.Default.BetterImageRules_RemoteImageWidthShouldBeGreater
+				&&  this.remote.Width > this.local.Width) {
 					return true;
 				}
 
-				if (this.remote.Size > this.local.Size) {
+				if (Options.Default.BetterImageRules_RemoteImageHeightShouldBeGreater
+				&& this.remote.Height > this.local.Height) {
+					return true;
+				}
+
+				if (Options.Default.BetterImageRules_RemoteImageSizeShouldBeGreater
+				&&  this.remote.Size > this.local.Size) {
 					return true;
 				}
 

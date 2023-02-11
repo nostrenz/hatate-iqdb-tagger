@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using IqdbApi.Enums;
 
 /// <summary>

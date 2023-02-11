@@ -11,11 +11,11 @@ namespace Hatate.View.Window
 {
     public partial class ValidMatchRules : System.Windows.Window
     {
-        public ValidMatchRules()
+        public ValidMatchRules(System.Windows.Window owner)
         {
             InitializeComponent();
 
-            this.Owner = App.Current.MainWindow;
+            this.Owner = owner;
 
             // Add match types
             foreach (var value in System.Enum.GetValues(typeof(IqdbApi.Enums.MatchType))) {
@@ -30,12 +30,6 @@ namespace Hatate.View.Window
             this.Slider_SimilarityThreshold.ToolTip = this.Label_SimilarityThreshold.ToolTip;
 
             this.LoadSources();
-
-            bool iqdbIsSelected = ((Enum.SearchEngine)Options.Default.SearchEngine == Enum.SearchEngine.IQDB);
-
-            this.TextBox_MinimumTagsCount.IsEnabled = iqdbIsSelected;
-            this.Combo_MatchType.IsEnabled = iqdbIsSelected;
-            this.CheckBox_MatchType.IsEnabled = iqdbIsSelected;
 
             // Create sources list context menu
             ContextMenu context = new ContextMenu();
@@ -53,6 +47,8 @@ namespace Hatate.View.Window
             context.Items.Add(item);
 
             this.ListView_Sources.ContextMenu = context;
+
+            this.UpdateLabels();
         }
 
         /*
@@ -128,6 +124,11 @@ namespace Hatate.View.Window
             this.UpdateSources(sourceItems);
         }
 
+        private void UpdateLabels()
+        {
+            this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
+		}
+
         /*
 		============================================
 		Event
@@ -172,6 +173,15 @@ namespace Hatate.View.Window
         private void Slider_SimilarityThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             this.Label_SimilarityThreshold.Content = "Similarity threshold (" + (byte)this.Slider_SimilarityThreshold.Value + "%)";
+
+            string toolTipText = "Sources positioned higher in the list will be prefered to those with a ";
+            toolTipText += "\nhigher match similarity as long as the difference is within this threshold.";
+            toolTipText += "\n\nExample: Even if Danbooru is positioned first and Gelbooru second in the";
+            toolTipText += "\nlist above, a value of " + (byte)this.Slider_SimilarityThreshold.Value + "% means that a Gelbooru result with 100% similarity";
+            toolTipText += "\nwill still be prefered over a Danbooru one with " + (100 - (byte)this.Slider_SimilarityThreshold.Value) + "% similarity.";
+
+            this.Label_SimilarityThreshold.ToolTip = toolTipText;
+            this.Slider_SimilarityThreshold.ToolTip = toolTipText;
         }
 
         private void ContextMenu_MenuItem_MoveSourceUpOrDown(object sender, RoutedEventArgs e)
@@ -214,7 +224,7 @@ namespace Hatate.View.Window
         private void Sliders_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (this.IsLoaded) {
-                this.Label_Similarity.Content = "Minimum similarity (" + (int)this.Slider_Similarity.Value + "%)";
+                this.UpdateLabels();
             }
         }
 

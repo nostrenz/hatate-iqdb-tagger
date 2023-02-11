@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
-        Title="Hydrus API settings" Width="585" MinWidth="585" Height="345" MinHeight="345" WindowStartupLocation="CenterOwner">
+        Title="Hydrus API settings"
+        WindowStartupLocation="CenterOwner"
+        Width="585" MinWidth="585" Height="345" MinHeight="345" MaxHeight="345">
     <Grid Background="{DynamicResource WindowBackground}">
         <Label Content="API URL" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="86"/>
         <Label Content="API access key" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
@@ -23,12 +25,6 @@
         <TextBox x:Name="TextBox_HydrusPageName" Height="20" Margin="291,217,10,0" TextWrapping="Wrap" Text="files" VerticalAlignment="Top"/>
         <CheckBox x:Name="CheckBox_FocusHydrusPage" Content="Focus that page when an image is imported" Margin="291,242,10,0" VerticalAlignment="Top" Height="20"/>
         <Label Content="Automatically send to Hydrus" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Width="168"/>
-        <ComboBox Margin="183,133,10,0" VerticalAlignment="Top" Height="26">
-            <ComboBoxItem Content="Never"/>
-            <ComboBoxItem Content="Import local image file (and its tags)"/>
-            <ComboBoxItem Content="Import URL (let Hydrus download the image and its tags)"/>
-            <ComboBoxItem Content="Import URL if remote image is better, otherwise do nothing"/>
-            <ComboBoxItem Content="Import URL if remote image is better, otherwise import local image file"/>
-        </ComboBox>
-    </Grid>
+		<ComboBox x:Name="ComboBox_AutoSendBehaviour" Margin="183,133,10,0" VerticalAlignment="Top" Height="26"/>
+	</Grid>
 </Window>

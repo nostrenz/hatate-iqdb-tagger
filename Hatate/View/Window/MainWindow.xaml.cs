@@ -67,6 +67,12 @@ namespace Hatate
 			this.AddParenthesisValueRadioToViewMenu("Highest similarity", ParenthesisValue.HighestSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match similarity", ParenthesisValue.MatchSimilarity);
 			this.AddParenthesisValueRadioToViewMenu("Match source", ParenthesisValue.MatchSource);
+
+			// Set the new "AutoSendBehaviour" setting according to the old "AutoSend" setting
+			if (Options.Default.Hydrus_AutoSendBehaviour == (byte)Enum.HydrusAutoSendBehaviour.Never && Options.Default.AutoSend) {
+				Options.Default.Hydrus_AutoSendBehaviour = (byte)Enum.HydrusAutoSendBehaviour.ImportLocal;
+				Options.Default.Save();
+			}
 		}
 
 		/*
@@ -420,26 +426,12 @@ namespace Hatate
 
 			result.Searched = true;
 
-			// Send to Hydrus
-			if (result.HasTags && Options.Default.AutoSend) {
-				string hydrusPageKey = null;
+			bool success = await this.HandleAutoSendToHydrus(result, (Enum.HydrusAutoSendBehaviour)Options.Default.Hydrus_AutoSendBehaviour);
 
-				if (Options.Default.AddImagesToHydrusPage) {
-					hydrusPageKey = await App.hydrusApi.GetPageNamed(Options.Default.HydrusPageName);
-
-					// Don't go further if the API encountered an error
-					if (App.hydrusApi.Unreachable) {
-						return;
-					}
-				}
-
-				bool success = await this.SendTagsToHydrusForResult(result, hydrusPageKey);
-
-				if (success) {
-					this.RemoveResultFromFilesListbox(result);
-				} else {
-					this.ListBox_Files.SelectedItems.Remove(result);
-				}
+			if (success) {
+				this.RemoveResultFromFilesListbox(result);
+			} else {
+				this.ListBox_Files.SelectedItems.Remove(result);
 			}
 
 			// Update informations on the right if the image is selected in the list
@@ -449,6 +441,57 @@ namespace Hatate
 
 			// Update counters (remaining, found, not found)
 			this.UpdateLabels();
+		}
+
+		/// <summary>
+		/// Handles how a local image file or URL can be automatically sent to Hydrus under certain conditions.
+		/// </summary>
+		private async Task<bool> HandleAutoSendToHydrus(Result result, Enum.HydrusAutoSendBehaviour behaviour)
+		{
+			if (behaviour == Enum.HydrusAutoSendBehaviour.Never) {
+				return true;
+			}
+
+			bool importLocalImageFile = false;
+			bool importBooruPageUrl = false;
+
+			if (behaviour == Enum.HydrusAutoSendBehaviour.ImportLocal) {
+				// Send the local image file along with its tags
+				importLocalImageFile = true;
+			} else if (behaviour == Enum.HydrusAutoSendBehaviour.ImportUrl) {
+				// Send the matched URL
+				importBooruPageUrl = true;
+			} else if (behaviour == Enum.HydrusAutoSendBehaviour.ImportUrlIfBetter) {
+				// Send the matched URL, but only if the remote image is better than the local one
+				importBooruPageUrl = result.IsMatchBetterThanLocal;
+			} else if (behaviour == Enum.HydrusAutoSendBehaviour.ImportUrlOrLocal) {
+				// Send the matched URL if the remote image is better than the local one, otherwise import the local image file along with its tags
+				importBooruPageUrl = result.IsMatchBetterThanLocal;
+				importLocalImageFile = !importBooruPageUrl;
+			}
+
+			bool success = false;
+
+			if (importLocalImageFile) {
+				string hydrusPageKey = null;
+
+				if (Options.Default.AddImagesToHydrusPage) {
+					hydrusPageKey = await App.hydrusApi.GetPageNamed(Options.Default.HydrusPageName);
+
+					// The API encountered an error
+					if (App.hydrusApi.Unreachable) {
+						hydrusPageKey = null;
+					}
+				}
+
+				success &= await this.SendTagsToHydrusForResult(result, hydrusPageKey);
+			}
+
+			if (importBooruPageUrl) {
+				success &= await App.hydrusApi.SendUrl(result, result.Url);
+			}
+
+			return success;
 		}
 
 		/// <summary>

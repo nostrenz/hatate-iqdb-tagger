@@ -82,7 +82,7 @@ namespace Hatate
 			int min = delay - half;
 			int max = delay + half;
 
-			this.Label_Delay.Content = "Delay (" + delay + "secs / " + (delay / 60) + "mins)";
+			this.Label_Delay.Content = "Delay between searches (" + delay + "secs / " + (delay / 60) + "mins)";
 			this.CheckBox_Randomize.Content = "Randomize the delay (" + min + "~" + max + " secs / " + (min / 60) + "~" + (max / 60) + " mins)";
 		}
 
@@ -178,12 +178,12 @@ namespace Hatate
 
         private void Button_ValidMatchRules_Click(object sender, RoutedEventArgs e)
         {
-			new View.Window.ValidMatchRules().ShowDialog();
+			new View.Window.ValidMatchRules(this).ShowDialog();
         }
 
         private void Button_BetterImageRules_Click(object sender, RoutedEventArgs e)
         {
-			new View.Window.BetterImageRules().ShowDialog();
+			new View.Window.BetterImageRules(this).ShowDialog();
         }
     }
 }

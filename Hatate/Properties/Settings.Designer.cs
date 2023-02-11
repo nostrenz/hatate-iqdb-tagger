@@ -802,5 +802,65 @@ namespace Hatate.Properties {
                 this["ZerochanTagNamespaces"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PNG")]
+        public string BetterImageRules_PreferedFileFormat {
+            get {
+                return ((string)(this["BetterImageRules_PreferedFileFormat"]));
+            }
+            set {
+                this["BetterImageRules_PreferedFileFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool BetterImageRules_RemoteImageWidthShouldBeGreater {
+            get {
+                return ((bool)(this["BetterImageRules_RemoteImageWidthShouldBeGreater"]));
+            }
+            set {
+                this["BetterImageRules_RemoteImageWidthShouldBeGreater"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool BetterImageRules_RemoteImageHeightShouldBeGreater {
+            get {
+                return ((bool)(this["BetterImageRules_RemoteImageHeightShouldBeGreater"]));
+            }
+            set {
+                this["BetterImageRules_RemoteImageHeightShouldBeGreater"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool BetterImageRules_RemoteImageSizeShouldBeGreater {
+            get {
+                return ((bool)(this["BetterImageRules_RemoteImageSizeShouldBeGreater"]));
+            }
+            set {
+                this["BetterImageRules_RemoteImageSizeShouldBeGreater"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte Hydrus_AutoSendBehaviour {
+            get {
+                return ((byte)(this["Hydrus_AutoSendBehaviour"]));
+            }
+            set {
+                this["Hydrus_AutoSendBehaviour"] = value;
+            }
+        }
     }
 }

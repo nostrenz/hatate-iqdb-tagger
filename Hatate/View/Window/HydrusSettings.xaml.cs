@@ -34,6 +34,26 @@ namespace Hatate
 			if (this.HasValidConnectionInfos()) {
 				this.RetrieveTagServices();
 			}
+
+			this.AddAutoSendBehaviourComboBoxItem(Enum.HydrusAutoSendBehaviour.Never, "Never");
+			this.AddAutoSendBehaviourComboBoxItem(Enum.HydrusAutoSendBehaviour.ImportLocal, "Import local image file (and its tags)");
+			this.AddAutoSendBehaviourComboBoxItem(Enum.HydrusAutoSendBehaviour.ImportUrl, "Import URL (let Hydrus download the image and its tags)");
+			this.AddAutoSendBehaviourComboBoxItem(Enum.HydrusAutoSendBehaviour.ImportUrlIfBetter, "Import URL if remote image is better, otherwise do nothing");
+			this.AddAutoSendBehaviourComboBoxItem(Enum.HydrusAutoSendBehaviour.ImportUrlOrLocal, "Import URL if remote image is better, otherwise import local image file");
+		}
+
+		private void AddAutoSendBehaviourComboBoxItem(Enum.HydrusAutoSendBehaviour tag, string label)
+		{
+			ComboBoxItem item = new ComboBoxItem();
+
+			item.Tag = tag;
+			item.Content = label;
+
+			this.ComboBox_AutoSendBehaviour.Items.Add(item);
+
+			if (Settings.Default.Hydrus_AutoSendBehaviour == (byte)tag) {
+				this.ComboBox_AutoSendBehaviour.SelectedItem = item;
+			}
 		}
 
 		private async void RetrieveTagServices()
@@ -129,6 +149,7 @@ namespace Hatate
 			Settings.Default.AddImagesToHydrusPage = (bool)this.CheckBox_AddImagesToHydrusPage.IsChecked;
 			Settings.Default.HydrusPageName = this.TextBox_HydrusPageName.Text;
 			Settings.Default.FocusHydrusPage = (bool)this.CheckBox_FocusHydrusPage.IsChecked;
+			Settings.Default.Hydrus_AutoSendBehaviour = (byte)((ComboBoxItem)this.ComboBox_AutoSendBehaviour.SelectedItem).Tag;
 
 			Settings.Default.Save();
 

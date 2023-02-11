@@ -6,44 +6,44 @@
         xmlns:local="clr-namespace:Hatate"
         mc:Ignorable="d"
         Title="Hatate settings"
-        Width="608" MinWidth="608" Height="625" MinHeight="625"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
-    <Grid Background="{DynamicResource WindowBackground}">
-        <GroupBox Header="Search settings" Margin="10,77,10,0" Height="173" VerticalAlignment="Top">
-            <Grid>
-                <Label Content="Use this search engine" VerticalAlignment="Top" HorizontalAlignment="Left" Width="277" Height="20" Padding="0" VerticalContentAlignment="Center" Margin="10,10,0,0"/>
-                <ComboBox x:Name="Combo_SearchEngines" VerticalAlignment="Top" SelectionChanged="Combo_SearchEngines_SelectionChanged" Margin="292,10,10,0"/>
-                <Label x:Name="Label_Delay" Content="Delay between each search (600secs / 10mins):" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" ToolTip="Time between each search, please don't lower it too much to prevent from abusing the search engines" Width="277" Padding="0,0,0,0" VerticalContentAlignment="Center" Height="18"/>
-                <Slider x:Name="Slider_Delay" Margin="292,35,10,0" VerticalAlignment="Top" ValueChanged="Sliders_ValueChanged" SmallChange="1" Minimum="1" Maximum="600" Value="60"/>
-                <CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" Margin="10,62,297,0" VerticalAlignment="Top" Height="14"/>
-                <CheckBox x:Name="CheckBox_ResizeImage" Content="Resized local image width for uploading" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top" Width="228" Height="14" ToolTip="If enabled, images will be resized to this width before being uploaded to a search engine"/>
-                <TextBox x:Name="TextBox_ThumbWidth" Height="23" Margin="292,72,10,0" TextWrapping="Wrap" Text="150" VerticalAlignment="Top"/>
-                <Label x:Name="Label_Retry" Content="When a search with IQDB gives no result:" Margin="10,102,11,0" VerticalAlignment="Top"/>
-                <RadioButton x:Name="RadioButton_DontRetry" GroupName="RetryMethod" Content="Do nothing" HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top" Width="104"/>
-                <RadioButton x:Name="RadioButton_RetrySameEngine" GroupName="RetryMethod" Content="Retry one time with the same search engine" HorizontalAlignment="Left" Margin="142,124,0,0" VerticalAlignment="Top" Width="241"/>
-                <RadioButton x:Name="RadioButton_RetryOtherEngine" GroupName="RetryMethod" Content="Retry with SauceNAO" HorizontalAlignment="Left" Margin="440,124,0,0" VerticalAlignment="Top" Width="134"/>
-            </Grid>
-        </GroupBox>
+		WindowStartupLocation="CenterOwner"
+        Width="608" MinWidth="608" Height="635" MinHeight="635" MaxHeight="635">
+	<Grid Background="{DynamicResource WindowBackground}">
+		<GroupBox Header="Search settings" Margin="10,77,10,0" Height="187" VerticalAlignment="Top">
+			<Grid>
+				<Label Content="Use this search engine" VerticalAlignment="Top" HorizontalAlignment="Left" Width="277" Height="20" Padding="0" VerticalContentAlignment="Center" Margin="10,10,0,0"/>
+				<ComboBox x:Name="Combo_SearchEngines" VerticalAlignment="Top" SelectionChanged="Combo_SearchEngines_SelectionChanged" Margin="292,10,10,0"/>
+				<Label x:Name="Label_Delay" Content="Delay between searches (600secs / 10mins)" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" ToolTip="Time between each search, please don't lower it too much to prevent from abusing the search engines" Width="276" Padding="0,0,0,0" VerticalContentAlignment="Center" Height="18"/>
+				<Slider x:Name="Slider_Delay" Margin="292,35,10,0" VerticalAlignment="Top" ValueChanged="Sliders_ValueChanged" SmallChange="1" Minimum="1" Maximum="600" Value="60"/>
+				<CheckBox x:Name="CheckBox_Randomize" Content="Randomize the delay (30~90 secs / 0.5~1.5 mins)" Margin="10,58,10,0" VerticalAlignment="Top" Height="14"/>
+				<CheckBox x:Name="CheckBox_ResizeImage" Content="Resized local image width for uploading" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top" Width="228" Height="14" ToolTip="If enabled, images will be resized to this width before being uploaded to a search engine"/>
+				<TextBox x:Name="TextBox_ThumbWidth" Height="23" Margin="292,77,10,0" TextWrapping="Wrap" Text="150" VerticalAlignment="Top"/>
+				<Label x:Name="Label_Retry" Content="When a search with IQDB gives no result:" Margin="10,105,10,0" VerticalAlignment="Top"/>
+				<RadioButton x:Name="RadioButton_DontRetry" GroupName="RetryMethod" Content="Do nothing" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Width="104"/>
+				<RadioButton x:Name="RadioButton_RetrySameEngine" GroupName="RetryMethod" Content="Retry one time with the same search engine" HorizontalAlignment="Left" Margin="155,133,0,0" VerticalAlignment="Top" Width="241"/>
+				<RadioButton x:Name="RadioButton_RetryOtherEngine" GroupName="RetryMethod" Content="Retry with SauceNAO" Margin="0,133,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="140"/>
+			</Grid>
+		</GroupBox>
 
-        <GroupBox Header="Search results handling" Margin="10,269,10,0" Height="260" VerticalAlignment="Top">
-            <Grid>
-                <CheckBox x:Name="CheckBox_ParseTags" Content="Parse booru page to retrive tags" Margin="10,10,10,0" VerticalAlignment="Top" Height="14" xml:space="preserve" ToolTip="If enabled, will try to parse the booru page found by the search engine,&#xA;allowing to retrieve tags and other infos about the image"/>
+		<GroupBox Header="Search results handling" Margin="10,282,10,0" Height="256" VerticalAlignment="Top">
+			<Grid>
+				<CheckBox x:Name="CheckBox_ParseTags" Content="Parse booru page to retrive tags" Margin="10,10,10,0" VerticalAlignment="Top" Height="14" xml:space="preserve" ToolTip="If enabled, will try to parse the booru page found by the search engine,&#xA;allowing to retrieve tags and other infos about the image"/>
                 <CheckBox x:Name="CheckBox_AddRating" Content="Add rating as a tag" Margin="10,29,10,0" VerticalAlignment="Top" Height="14"/>
-                <CheckBox x:Name="CheckBox_AddFoundTag" Content="Add this tag to files successfully found" HorizontalAlignment="Left" Margin="10,58,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
-                <CheckBox x:Name="CheckBox_AddNotfoundTag" Content="Add this tag to files not found" HorizontalAlignment="Left" Margin="10,86,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
-                <CheckBox x:Name="CheckBox_AddTaggedTag" Content="Add this tag to files tagged from a booru" HorizontalAlignment="Left" Margin="10,114,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
-                <TextBox x:Name="TextBox_FoundTag" Height="23" Margin="243,53,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
-                <TextBox x:Name="TextBox_NotfoundTag" Height="23" Margin="243,81,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
-                <TextBox x:Name="TextBox_TaggedTag" Height="23" Margin="243,109,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
+                <CheckBox x:Name="CheckBox_AddFoundTag" Content="Add this tag to files successfully found" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
+                <CheckBox x:Name="CheckBox_AddNotfoundTag" Content="Add this tag to files not found" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
+                <CheckBox x:Name="CheckBox_AddTaggedTag" Content="Add this tag to files tagged from a booru" HorizontalAlignment="Left" Margin="10,129,0,0" VerticalAlignment="Top" Height="14" Width="228" Click="CheckBox_AddTag_Click"/>
+                <TextBox x:Name="TextBox_FoundTag" Height="23" Margin="243,67,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
+                <TextBox x:Name="TextBox_NotfoundTag" Height="23" Margin="243,95,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
+                <TextBox x:Name="TextBox_TaggedTag" Height="23" Margin="243,123,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="False"/>
                 <Button Content="Edit conditions under which a valid match is considered better than the local image file" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_BetterImageRules_Click"/>
-        <CheckBox x:Name="CheckBox_LogMatchedUrls" Content="Log matched URLs into a text file" Margin="10,137,10,0" VerticalAlignment="Top" Height="14"/>
+        <CheckBox x:Name="CheckBox_LogMatchedUrls" Content="Log matched URLs into a text file" Margin="10,48,10,0" VerticalAlignment="Top" Height="14"/>
                 <Button Content="Edit conditions under which a search result is considered a valid match for the local image file" Margin="11,0,9,40" Height="25" VerticalAlignment="Bottom" Click="Button_ValidMatchRules_Click"/>
             </Grid>
-        </GroupBox>
+		</GroupBox>
 
-        <Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
-        <CheckBox x:Name="CheckBox_AskTags" Content="Ask for tags when adding files to the list" Margin="10,28,10,0" VerticalAlignment="Top" Height="14"/>
-        <CheckBox x:Name="CheckBox_RemoveResultAfter" Content="Remove file from list after writing tags or sending to Hydrus" Margin="10,47,10,0" VerticalAlignment="Top" Height="14"/>
-        <CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,10,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
-    </Grid>
+		<Button Content="Save" Click="Button_Save_Click" Height="29" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
+		<CheckBox x:Name="CheckBox_AskTags" Content="Ask for tags when adding files to the list" Margin="10,28,10,0" VerticalAlignment="Top" Height="14"/>
+		<CheckBox x:Name="CheckBox_RemoveResultAfter" Content="Remove file from list after writing tags or sending to Hydrus" Margin="10,47,10,0" VerticalAlignment="Top" Height="14"/>
+		<CheckBox x:Name="CheckBox_StartupReleaseCheck" Content="Check for new release on startup" Margin="10,10,10,0" VerticalAlignment="Top" ToolTip="If enabled, Hatate will check if a new release is available to download on GitHub after starting the program"/>
+	</Grid>
 </Window>
