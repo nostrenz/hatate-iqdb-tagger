@@ -21,6 +21,14 @@ namespace Hatate.View.Window
             this.ComboBox_LocalImageFormat.SelectedIndex = 0;
             this.ComboBox_RemoteImageFormat.SelectedIndex = 0;
 
+            this.TextBox_LocalImageWidth.Text = this.localImage.Width.ToString();
+            this.TextBox_LocalImageHeight.Text = this.localImage.Height.ToString();
+            this.TextBox_LocalImageSize.Text = System.Math.Round((decimal)this.localImage.SizeInBytes / 1000).ToString();
+
+            this.TextBox_RemoteImageWidth.Text = this.remoteImage.Width.ToString();
+            this.TextBox_RemoteImageHeight.Text = this.remoteImage.Height.ToString();
+            this.TextBox_RemoteImageSize.Text = System.Math.Round((decimal)this.remoteImage.SizeInBytes / 1000).ToString();
+
             this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.LessThan, "less than");
             this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.GreaterThan, "greater than");
             this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.Equal, "equal to");
@@ -32,6 +40,10 @@ namespace Hatate.View.Window
 		Private
 		*/
 
+        /// <summary>
+        /// Adds a new item for the given ImageFileFormat in all the format comboboxes,
+        /// and selects it if it corresponds to the one save in settings.
+        /// </summary>
         private void AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat format, string label)
         {
             ComboBoxItem preferedItem = new ComboBoxItem();
@@ -50,13 +62,19 @@ namespace Hatate.View.Window
             this.ComboBox_LocalImageFormat.Items.Add(localItem);
             this.ComboBox_RemoteImageFormat.Items.Add(remoteItem);
 
-            if (Options.Default.BetterImageRules_PreferedFileFormat == (byte)format) {
+            if (format == (Enum.ImageFileFormat)Options.Default.BetterImageRules_PreferedFileFormat) {
                 this.ComboBox_PreferedFileFormat.SelectedItem = preferedItem;
 			} else if (this.ComboBox_PreferedFileFormat.SelectedItem == null) {
                 this.ComboBox_PreferedFileFormat.SelectedIndex = 0;
 			}
 		}
 
+        /// <summary>
+        /// Adds a new item for the given ComparisonOperator in all the operator comboboxes,
+        /// and selects it if it corresponds to the one save in settings.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <param name="label"></param>
         private void AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator op, string label)
         {
             ComboBoxItem widthItem = new ComboBoxItem();
@@ -94,6 +112,9 @@ namespace Hatate.View.Window
 			}
 		}
 
+        /// <summary>
+        /// Use the values provided in the fields to test if a remote image would be determined as being better than a local one.
+        /// </summary>
         private void TestLocalImageAgainstRemoteImage()
         {
             // UI not fully loaded yet
@@ -120,12 +141,12 @@ namespace Hatate.View.Window
             this.localImage.Format = (Enum.ImageFileFormat)((ComboBoxItem)this.ComboBox_LocalImageFormat.SelectedItem).Tag;
             this.localImage.Width = localImageWidth;
             this.localImage.Height = localImageHeight;
-            this.localImage.SizeInBytes = localImageSize;
+            this.localImage.SizeInBytes = localImageSize * 1000;
 
             this.remoteImage.Format = (Enum.ImageFileFormat)((ComboBoxItem)this.ComboBox_RemoteImageFormat.SelectedItem).Tag;
             this.remoteImage.Width = remoteImageWidth;
             this.remoteImage.Height = remoteImageHeight;
-            this.remoteImage.SizeInBytes = remoteImageSize;
+            this.remoteImage.SizeInBytes = remoteImageSize * 1000;
 
             bool remoteIsBetter = this.remoteImage.IsBetterThan(
                 this.localImage,
@@ -153,7 +174,7 @@ namespace Hatate.View.Window
         /// </summary>
 		private void Button_Save_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
-            Options.Default.BetterImageRules_PreferedFileFormat = (byte)((ComboBoxItem)this.ComboBox_WidthOperator.SelectedItem).Tag;
+            Options.Default.BetterImageRules_PreferedFileFormat = (byte)((ComboBoxItem)this.ComboBox_PreferedFileFormat.SelectedItem).Tag;
             Options.Default.BetterImageRules_WidthComparisonOperator = (byte)((ComboBoxItem)this.ComboBox_WidthOperator.SelectedItem).Tag;
             Options.Default.BetterImageRules_HeightComparisonOperator = (byte)((ComboBoxItem)this.ComboBox_HeightOperator.SelectedItem).Tag;
             Options.Default.BetterImageRules_SizeComparisonOperator = (byte)((ComboBoxItem)this.ComboBox_SizeOperator.SelectedItem).Tag;
@@ -179,21 +200,27 @@ namespace Hatate.View.Window
             this.Close();
 		}
 
-		private void ComboBox_TestImageFormat_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        /// <summary>
+        /// Called when changing the selected item of one of the comboboxes.
+        /// Triggers the check to see if the remote image is better than the local one.
+        /// </summary>
+		private void ComboBox_TestImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
             this.TestLocalImageAgainstRemoteImage();
 		}
 
-		private void TextBox_TestImage_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        /// <summary>
+        /// Called when changing the text of one of the textboxes.
+        /// Triggers the check to see if the remote image is better than the local one.
+        /// </summary>
+		private void TextBox_TestImage_TextChanged(object sender, TextChangedEventArgs e)
 		{
              this.TestLocalImageAgainstRemoteImage();
 		}
 
-		private void CheckBox_Test_Click(object sender, System.Windows.RoutedEventArgs e)
-		{
-            this.TestLocalImageAgainstRemoteImage();
-		}
-
+        /// <summary>
+        /// Called when the changing the state of the checkbox used to toggle the "format" condition.
+        /// </summary>
 		private void CheckBox_Format_StateChanged(object sender, System.Windows.RoutedEventArgs e)
 		{
             this.ComboBox_LocalImageFormat.IsEnabled = (bool)this.CheckBox_Format.IsChecked;
@@ -203,6 +230,9 @@ namespace Hatate.View.Window
             this.TestLocalImageAgainstRemoteImage();
 		}
 
+        /// <summary>
+        /// Called when the changing the state of the checkbox used to toggle the "width" condition.
+        /// </summary>
 		private void CheckBox_Width_StateChanged(object sender, System.Windows.RoutedEventArgs e)
 		{
             this.TextBox_LocalImageWidth.IsEnabled = (bool)this.CheckBox_Width.IsChecked;
@@ -212,6 +242,9 @@ namespace Hatate.View.Window
             this.TestLocalImageAgainstRemoteImage();
 		}
 
+        /// <summary>
+        /// Called when the changing the state of the checkbox used to toggle the "height" condition.
+        /// </summary>
         private void CheckBox_Height_StateChanged(object sender, System.Windows.RoutedEventArgs e)
 		{
             this.TextBox_LocalImageHeight.IsEnabled = (bool)this.CheckBox_Height.IsChecked;
@@ -221,6 +254,9 @@ namespace Hatate.View.Window
             this.TestLocalImageAgainstRemoteImage();
 		}
 
+        /// <summary>
+        /// Called when the changing the state of the checkbox used to toggle the "size" condition.
+        /// </summary>
 		private void CheckBox_Size_StateChanged(object sender, System.Windows.RoutedEventArgs e)
 		{
             this.TextBox_LocalImageSize.IsEnabled = (bool)this.CheckBox_Size.IsChecked;
@@ -230,14 +266,17 @@ namespace Hatate.View.Window
             this.TestLocalImageAgainstRemoteImage();
 		}
 
+        /// <summary>
+        /// Called once the window is fully loaded.
+        /// </summary>
 		private void Window_Loaded(object sender, System.Windows.RoutedEventArgs e)
 		{
             this.ComboBox_PreferedFileFormat.SelectedItem = Options.Default.BetterImageRules_PreferedFileFormat;
 
-            this.CheckBox_Format.IsChecked = (Options.Default.BetterImageRules_PreferedFileFormat != (byte)Enum.ImageFileFormat.Unknown);
-            this.CheckBox_Width.IsChecked = (Options.Default.BetterImageRules_WidthComparisonOperator != (byte)Enum.ComparisonOperator.None);
-            this.CheckBox_Height.IsChecked = (Options.Default.BetterImageRules_HeightComparisonOperator != (byte)Enum.ComparisonOperator.None);
-            this.CheckBox_Size.IsChecked = (Options.Default.BetterImageRules_SizeComparisonOperator != (byte)Enum.ComparisonOperator.None);
+            this.CheckBox_Format.IsChecked = Options.Default.BetterImageRules_PreferedFileFormat != (byte)Enum.ImageFileFormat.Unknown;
+            this.CheckBox_Width.IsChecked = Options.Default.BetterImageRules_WidthComparisonOperator != (byte)Enum.ComparisonOperator.None;
+            this.CheckBox_Height.IsChecked = Options.Default.BetterImageRules_HeightComparisonOperator != (byte)Enum.ComparisonOperator.None;
+            this.CheckBox_Size.IsChecked = Options.Default.BetterImageRules_SizeComparisonOperator != (byte)Enum.ComparisonOperator.None;
 
             this.ComboBox_LocalImageFormat.IsEnabled = (bool)this.CheckBox_Format.IsChecked;
             this.ComboBox_PreferedFileFormat.IsEnabled = (bool)this.CheckBox_Format.IsChecked;

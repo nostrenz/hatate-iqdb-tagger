@@ -829,7 +829,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public byte BetterImageRules_WidthComparisonOperator {
             get {
                 return ((byte)(this["BetterImageRules_WidthComparisonOperator"]));
@@ -841,7 +841,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public byte BetterImageRules_HeightComparisonOperator {
             get {
                 return ((byte)(this["BetterImageRules_HeightComparisonOperator"]));
@@ -853,7 +853,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public byte BetterImageRules_SizeComparisonOperator {
             get {
                 return ((byte)(this["BetterImageRules_SizeComparisonOperator"]));
