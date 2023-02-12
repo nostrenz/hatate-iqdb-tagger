@@ -24,9 +24,9 @@ namespace Hatate
 		private bool unavailable = false;
 		private ushort pages = 0;
 
-		public Result(string imagePath)
+		public Result(string localImageFilePath)
 		{
-			this.ImagePath = imagePath;
+			this.LocalImageFilePath = localImageFilePath;
 
 			this.Tags = new List<Tag>();
 			this.Ignoreds = new List<Tag>();
@@ -46,13 +46,13 @@ namespace Hatate
 		*/
 
 		/// <summary>
-		/// Two Result objects are considered equals if thay have the same ImagePath.
+		/// Two Result objects are considered equals if thay have the same LocalImageFilePath.
 		/// </summary>
 		/// <param name="other"></param>
 		/// <returns></returns>
 		public bool Equals(Result other)
 		{
-			return this.ImagePath == other.ImagePath;
+			return this.LocalImageFilePath == other.LocalImageFilePath;
 		}
 
 		/// <summary>
@@ -61,7 +61,7 @@ namespace Hatate
 		/// <returns></returns>
 		public override int GetHashCode()
 		{
-			return this.ImagePath.GetHashCode();
+			return this.LocalImageFilePath.GetHashCode();
 		}
 
 		public void SetHydrusMetadata(HydrusMetadata hydrusMetadata)
@@ -88,7 +88,7 @@ namespace Hatate
 		public void CalculateLocalHash()
 		{
 			using (var md5 = MD5.Create()) {
-				using (var stream = System.IO.File.OpenRead(this.ImagePath)) {
+				using (var stream = System.IO.File.OpenRead(this.LocalImageFilePath)) {
 					var hash = md5.ComputeHash(stream);
 
 					this.local.Hash = System.BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
@@ -187,6 +187,15 @@ namespace Hatate
 			}
 		}
 
+		/// <summary>
+		/// Checks if the local image file still exists on disk.
+		/// </summary>
+		/// <returns></returns>
+		public bool LocalImageFileExists()
+		{
+			return System.IO.File.Exists(this.LocalImageFilePath);
+		}
+
 		/*
 		============================================
 		Private
@@ -222,7 +231,7 @@ namespace Hatate
 
 		#region Accessor
 
-		public string ImagePath { get; set; }
+		public string LocalImageFilePath { get; set; }
 		public bool Searched { get; set; }
 		public List<Tag> Tags { get; set; }
 		public List<Tag> Ignoreds { get; set; }
@@ -456,7 +465,7 @@ namespace Hatate
 			get
 			{
 				if (!this.Searched) {
-					return this.ImagePath;
+					return this.LocalImageFilePath;
 				}
 
 				string parenthesisText = null;
@@ -480,10 +489,10 @@ namespace Hatate
 				}
 
 				if (parenthesisText == null) {
-					return this.ImagePath;
+					return this.LocalImageFilePath;
 				}
 
-				return "(" + parenthesisText + ") " + this.ImagePath;
+				return "(" + parenthesisText + ") " + this.LocalImageFilePath;
 			}
 		}
 

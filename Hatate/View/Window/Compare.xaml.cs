@@ -47,7 +47,7 @@ namespace Hatate
 		public void LoadResultImages(Result result)
 		{
 			// Already loaded
-			if (this.result != null && result.ImagePath == this.result.ImagePath && result.Full == this.result.Full) {
+			if (this.result != null && result.LocalImageFilePath == this.result.LocalImageFilePath && result.Full == this.result.Full) {
 				this.Status(result.Full);
 
 				return;
@@ -58,7 +58,7 @@ namespace Hatate
 			this.Image_Remote.Source = null;
 
 			try {
-				this.Image_Local.Source = App.CreateBitmapImage(result.ImagePath);
+				this.Image_Local.Source = App.CreateBitmapImage(result.LocalImageFilePath);
 				this.Image_Remote.Source = new BitmapImage(new Uri(result.PreviewUrl));
 			} catch (Exception) {
 				this.Status("Image loading failed.");

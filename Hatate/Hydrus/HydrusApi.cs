@@ -194,7 +194,7 @@ namespace Hatate
 		/// </summary>
 		public async Task<string> ImportFile(Result result)
 		{
-			string postData = @"{""path"" : """ + result.ImagePath.Replace('\\', '/') + @"""}";
+			string postData = @"{""path"" : """ + result.LocalImageFilePath.Replace('\\', '/') + @"""}";
 			string response = await this.PostRequestAsync("/add_files/add_file", postData);
 
 			if (string.IsNullOrEmpty(response)) {

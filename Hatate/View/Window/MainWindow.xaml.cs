@@ -177,7 +177,7 @@ namespace Hatate
 
 			// Don't read the local image as it's already a thumbnail and we already have informations about it from Hydrus metadata
 			if (result.HydrusFileId != null) {
-				result.ThumbPath = result.ImagePath;
+				result.ThumbPath = result.LocalImageFilePath;
 
 				return true;
 			}
@@ -186,7 +186,7 @@ namespace Hatate
 			if (File.Exists(result.ThumbPath)) {
 				if (result.Local.Width == 0 || result.Local.Height == 0) {
 					try {
-						System.Drawing.Image img = System.Drawing.Image.FromFile(result.ImagePath);
+						System.Drawing.Image img = System.Drawing.Image.FromFile(result.LocalImageFilePath);
 
 						result.Local.Width = img.Width;
 						result.Local.Height = img.Height;
@@ -196,7 +196,7 @@ namespace Hatate
 				}
 
 				if (result.Local.SizeInBytes == 0) {
-					result.Local.SizeInBytes = new FileInfo(result.ImagePath).Length;
+					result.Local.SizeInBytes = new FileInfo(result.LocalImageFilePath).Length;
 				}
 
 				return true;
@@ -204,7 +204,7 @@ namespace Hatate
 
 			string thumbsDir = App.ThumbsDirPath;
 
-			result.Local.FormatFromFileExtension = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.') + 1);
+			result.Local.FormatFromFileExtension = result.LocalImageFilePath.Substring(result.LocalImageFilePath.LastIndexOf('.') + 1);
 			result.ThumbPath = thumbsDir + Guid.NewGuid().ToString() + '.' + result.Local.Format;
 
 			Directory.CreateDirectory(thumbsDir);
@@ -213,9 +213,9 @@ namespace Hatate
 			System.Drawing.Image image = null;
 
 			try {
-				image = System.Drawing.Image.FromFile(result.ImagePath);
+				image = System.Drawing.Image.FromFile(result.LocalImageFilePath);
 			} catch (OutOfMemoryException) { // Cannot open file, we'll upload the original file
-				result.ThumbPath = result.ImagePath;
+				result.ThumbPath = result.LocalImageFilePath;
 
 				return true;
 			} catch (FileNotFoundException) { // Missing file, remove it from the list
@@ -224,13 +224,13 @@ namespace Hatate
 
 			result.Local.Width = image.Width;
 			result.Local.Height = image.Height;
-			result.Local.SizeInBytes = new FileInfo(result.ImagePath).Length;
+			result.Local.SizeInBytes = new FileInfo(result.LocalImageFilePath).Length;
 
 			// We don't want to generate a thumbnail or image width is lower than the resized width, we'll upload the original image
 			if (!Options.Default.ResizeImage || image.Width <= Options.Default.ThumbWidth) {
 				image.Dispose();
 
-				result.ThumbPath = result.ImagePath;
+				result.ThumbPath = result.LocalImageFilePath;
 
 				return true;
 			}
@@ -253,7 +253,7 @@ namespace Hatate
 				bmp.Dispose();
 				image.Dispose();
 
-				result.ThumbPath = result.ImagePath;
+				result.ThumbPath = result.LocalImageFilePath;
 
 				return true;
 			}
@@ -261,7 +261,7 @@ namespace Hatate
 			try {
 				bmp.Save(result.ThumbPath, ImageFormat.Jpeg);
 			} catch (IOException) { // Cannot save thumbnail, we'll upload the original file
-				result.ThumbPath = result.ImagePath;
+				result.ThumbPath = result.LocalImageFilePath;
 			}
 
 			// Liberate resources
@@ -398,11 +398,10 @@ namespace Hatate
 				break;
 			}
 
-			// Image found
 			if (result.Found) {
 				this.SetStatus("File found.");
 				this.found++;
-			} else { // Not found on IQDB
+			} else { 
 				if (!isRetry) {
 					if (Options.Default.RetryMethod == (byte)RetryMethod.SameEngine) {
 						// Retry with the same search engine
@@ -428,10 +427,8 @@ namespace Hatate
 
 			bool success = await this.HandleAutoSendToHydrus(result, (Enum.HydrusAutoSendBehaviour)Options.Default.Hydrus_AutoSendBehaviour);
 
-			if (success) {
+			if (success && Options.Default.RemoveResultAfter) {
 				this.RemoveResultFromFilesListbox(result);
-			} else {
-				this.ListBox_Files.SelectedItems.Remove(result);
 			}
 
 			// Update informations on the right if the image is selected in the list
@@ -484,7 +481,7 @@ namespace Hatate
 					}
 				}
 
-				success &= await this.SendTagsToHydrusForResult(result, hydrusPageKey);
+				success &= await this.ImportLocalImageInHydrus(result, hydrusPageKey);
 			}
 
 			if (importBooruPageUrl) {
@@ -962,13 +959,13 @@ namespace Hatate
 				return false;
 			}
 
-			if (File.Exists(result.ImagePath)) {
+			if (File.Exists(result.LocalImageFilePath)) {
 				// Warn a user trying to write a txt file into the Hydrus' "client_files" folder
-				if (this.IsHydrusOwnedFolder(result.ImagePath) && !App.AskUser("This image is located inside the Hydrus' \"client_files\" folder. Writing a txt files there might not be a good idea, do you really want to do that?")) {
+				if (this.IsHydrusOwnedFolder(result.LocalImageFilePath) && !App.AskUser("This image is located inside the Hydrus' \"client_files\" folder. Writing a txt files there might not be a good idea, do you really want to do that?")) {
 					return false;
 				}
 
-				this.WriteTagsToTxt(result.ImagePath + ".txt", result.NonHiddenTags.ToList());
+				this.WriteTagsToTxt(result.LocalImageFilePath + ".txt", result.NonHiddenTags.ToList());
 			}
 
 			// Write the ignored tags to txt
@@ -980,19 +977,25 @@ namespace Hatate
 		}
 
 		/// <summary>
-		/// Send tags to Hydrus for a given file and remove the row.
+		/// Imports the local image file in Hydrus along with its tags.
 		/// </summary>
 		/// <param name="item"></param>
-		private async Task<bool> SendTagsToHydrusForResult(Result result, string hydrusPageKey=null)
+		private async Task<bool> ImportLocalImageInHydrus(Result result, string hydrusPageKey=null)
 		{
 			if (result == null) {
+				return false;
+			}
+
+			if (!result.LocalImageFileExists()) {
+				result.AddWarning("The local file no longer exists at " + result.LocalImageFilePath);
+
 				return false;
 			}
 
 			bool imported = false;
 
 			// Not a Hydrus file, we need to import it first
-			if (String.IsNullOrEmpty(result.Local.Hash) && File.Exists(result.ImagePath)) {
+			if (String.IsNullOrEmpty(result.Local.Hash) && File.Exists(result.LocalImageFilePath)) {
 				result.Local.Hash = await App.hydrusApi.ImportFile(result);
 
 				// Still no hash, abort
@@ -1092,7 +1095,7 @@ namespace Hatate
 			this.ListBox_Ignoreds.Items.Refresh();
 
 			// Delete thumbnail
-			if (result.ThumbPath != null && result.ThumbPath != result.ImagePath) {
+			if (result.ThumbPath != null && result.ThumbPath != result.LocalImageFilePath) {
 				try {
 					using (new FileStream(result.ThumbPath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Delete, 1, FileOptions.DeleteOnClose | FileOptions.Asynchronous));
 				} catch (IOException) { }
@@ -1184,7 +1187,7 @@ namespace Hatate
 			for (int i = 0; i < this.ListBox_Files.SelectedItems.Count; i++) {
 				Result result = this.ListBox_Files.SelectedItems[i] as Result;
 
-				text += result.ImagePath;
+				text += result.LocalImageFilePath;
 
 				if (i < this.ListBox_Files.SelectedItems.Count - 1) {
 					text += "\n";
@@ -1421,7 +1424,7 @@ namespace Hatate
 			Result result = new Result(filepath);
 
 			if (//this.ListBox_Files.Items.Contains(result)
-			this.ListBox_Files.Items.Cast<Result>().Any(r => r.ImagePath == filepath)) {
+			this.ListBox_Files.Items.Cast<Result>().Any(r => r.LocalImageFilePath == filepath)) {
 				return;
 			}
 
@@ -1717,7 +1720,7 @@ namespace Hatate
 			// Process each selected file until no one remain or the API becomes unreachable
 			while (this.ListBox_Files.SelectedItems.Count > 0 && !App.hydrusApi.Unreachable) {
 				Result result = this.GetSelectedResultAt(0);
-				bool success = await this.SendTagsToHydrusForResult(result, hydrusPageKey);
+				bool success = await this.ImportLocalImageInHydrus(result, hydrusPageKey);
 				counts = this.HandleProcessedResult(result, success, ref successes, ref failures);
 
 				this.SetStatus("Sending tags to Hydrus... " + counts);
@@ -1851,17 +1854,17 @@ namespace Hatate
 		/// <param name="result"></param>
 		private void SendFileToRecycleBin(Result result)
 		{
-			if (!File.Exists(result.ImagePath)) {
+			if (!File.Exists(result.LocalImageFilePath)) {
 				return;
 			}
 
 			// Don't delete file if it's one of Hydrus client files
-			if (this.IsHydrusOwnedFolder(result.ImagePath)) {
+			if (this.IsHydrusOwnedFolder(result.LocalImageFilePath)) {
 				return;
 			}
 
 			try {
-				FileIO.FileSystem.DeleteFile(result.ImagePath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin);
+				FileIO.FileSystem.DeleteFile(result.LocalImageFilePath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin);
 			} catch (Exception) { }
 		}
 
@@ -2167,7 +2170,7 @@ namespace Hatate
 			}
 
 			// Missing images to be displayed in the window
-			if (result.ImagePath == null || result.PreviewUrl == null) {
+			if (result.LocalImageFilePath == null || result.PreviewUrl == null) {
 				return;
 			}
 
@@ -2267,7 +2270,7 @@ namespace Hatate
 			}
 
 			foreach (Result result in this.ListBox_Files.Items) {
-				if (filePath == (string)result.ImagePath) {
+				if (filePath == (string)result.LocalImageFilePath) {
 					return true;
 				}
 			}
@@ -2592,7 +2595,7 @@ namespace Hatate
 				break;
 				case "openFolder":
 					if (this.ListBox_Files.SelectedItem != null) {
-						this.StartProcess(Directory.GetParent(this.SelectedResult.ImagePath).FullName);
+						this.StartProcess(Directory.GetParent(this.SelectedResult.LocalImageFilePath).FullName);
 					}
 				break;
 				case "deleteFiles":
@@ -2685,6 +2688,7 @@ namespace Hatate
 			bool hasMatchUrls = false;
 			bool hasHydrusFiles = false;
 			bool areHydrusFiles = true;
+			bool localFileExists = false;
 
 			foreach (Result result in this.ListBox_Files.SelectedItems) {
 				if (result.HasTags) {
@@ -2714,6 +2718,10 @@ namespace Hatate
 						}
 					}
 				}
+
+				if (result.LocalImageFileExists()) {
+					localFileExists = true;
+				}
 			}
 
 			ContextMenu context = new ContextMenu();
@@ -2725,8 +2733,12 @@ namespace Hatate
 				sub.Header = "Import file with tags";
 				sub.ToolTip = "Imports the local file and its tags into Hydrus";
 				sub.Tag = "sendTagsToHydrus";
-				sub.IsEnabled = hasTags;
+				sub.IsEnabled = localFileExists;
 				sub.Click += this.ContextMenu_MenuItem_Click;
+
+				if (!localFileExists) {
+					sub.ToolTip = "Local file no longer exists";
+				}
 
 				// All the selected files are from a Hydrus query
 				if (areHydrusFiles) {
@@ -2892,7 +2904,7 @@ namespace Hatate
 
 				sub = new MenuItem();
 				sub.Header = "File path";
-				sub.ToolTip = this.SelectedResult.ImagePath;
+				sub.ToolTip = this.SelectedResult.LocalImageFilePath;
 				sub.Tag = "copyFilePaths";
 				sub.Click += this.ContextMenu_MenuItem_Click;
 				item.Items.Add(sub);
@@ -2976,6 +2988,11 @@ namespace Hatate
 			item.Tag = "writeTagsToFiles";
 			item.IsEnabled = hasTags;
 			item.Click += this.ContextMenu_MenuItem_Click;
+
+			if (!hasTags) {
+				item.ToolTip = "This image doesn't have any tags";
+			}
+
 			context.Items.Add(item);
 
 			item = new MenuItem();
@@ -3000,7 +3017,7 @@ namespace Hatate
 			if (singleSelected) {
 				Result result = this.SelectedResult;
 
-				if (result != null && this.IsHydrusOwnedFolder(result.ImagePath)) {
+				if (result != null && this.IsHydrusOwnedFolder(result.LocalImageFilePath)) {
 					item.IsEnabled = false;
 					item.ToolTip = "Can't delete this file as it's one of the Hydrus client files.";
 				}
@@ -3346,7 +3363,7 @@ namespace Hatate
 				return;
 			}
 
-			string filepath = this.SelectedResult.ImagePath;
+			string filepath = this.SelectedResult.LocalImageFilePath;
 
 			if (File.Exists(filepath)) {
 				Process.Start(filepath);
