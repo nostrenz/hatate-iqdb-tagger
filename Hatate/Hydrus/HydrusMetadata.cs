@@ -23,15 +23,15 @@ namespace Hatate
 
 			int width;
 			int height;
-			long size;
+			long sizeInBytes;
 
 			int.TryParse(inner.GetValue("width").ToString(), out width);
 			int.TryParse(inner.GetValue("height").ToString(), out height);
-			long.TryParse(inner.GetValue("size").ToString(), out size);
+			long.TryParse(inner.GetValue("size").ToString(), out sizeInBytes);
 
 			this.Width = width;
 			this.Height = height;
-			this.Size = size;
+			this.SizeInBytes = sizeInBytes;
 		}
 
 		/*
@@ -47,7 +47,7 @@ namespace Hatate
 		public string Mime { get; set; }
 		public int Width { get; set; }
 		public int Height { get; set; }
-		public long Size { get; set; }
+		public long SizeInBytes { get; set; }
 
 		public bool IsImage
 		{

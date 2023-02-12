@@ -197,19 +197,19 @@
     <Setting Name="ZerochanTagNamespaces" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="BetterImageRules_PreferedFileFormat" Type="System.String" Scope="User">
-      <Value Profile="(Default)">PNG</Value>
-    </Setting>
-    <Setting Name="BetterImageRules_RemoteImageWidthShouldBeGreater" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="BetterImageRules_RemoteImageHeightShouldBeGreater" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="BetterImageRules_RemoteImageSizeShouldBeGreater" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="BetterImageRules_PreferedFileFormat" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="Hydrus_AutoSendBehaviour" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="BetterImageRules_WidthComparisonOperator" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="BetterImageRules_HeightComparisonOperator" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="BetterImageRules_SizeComparisonOperator" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

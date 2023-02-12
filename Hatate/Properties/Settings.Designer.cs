@@ -805,49 +805,13 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PNG")]
-        public string BetterImageRules_PreferedFileFormat {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public byte BetterImageRules_PreferedFileFormat {
             get {
-                return ((string)(this["BetterImageRules_PreferedFileFormat"]));
+                return ((byte)(this["BetterImageRules_PreferedFileFormat"]));
             }
             set {
                 this["BetterImageRules_PreferedFileFormat"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool BetterImageRules_RemoteImageWidthShouldBeGreater {
-            get {
-                return ((bool)(this["BetterImageRules_RemoteImageWidthShouldBeGreater"]));
-            }
-            set {
-                this["BetterImageRules_RemoteImageWidthShouldBeGreater"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool BetterImageRules_RemoteImageHeightShouldBeGreater {
-            get {
-                return ((bool)(this["BetterImageRules_RemoteImageHeightShouldBeGreater"]));
-            }
-            set {
-                this["BetterImageRules_RemoteImageHeightShouldBeGreater"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool BetterImageRules_RemoteImageSizeShouldBeGreater {
-            get {
-                return ((bool)(this["BetterImageRules_RemoteImageSizeShouldBeGreater"]));
-            }
-            set {
-                this["BetterImageRules_RemoteImageSizeShouldBeGreater"] = value;
             }
         }
         
@@ -860,6 +824,42 @@ namespace Hatate.Properties {
             }
             set {
                 this["Hydrus_AutoSendBehaviour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte BetterImageRules_WidthComparisonOperator {
+            get {
+                return ((byte)(this["BetterImageRules_WidthComparisonOperator"]));
+            }
+            set {
+                this["BetterImageRules_WidthComparisonOperator"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte BetterImageRules_HeightComparisonOperator {
+            get {
+                return ((byte)(this["BetterImageRules_HeightComparisonOperator"]));
+            }
+            set {
+                this["BetterImageRules_HeightComparisonOperator"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte BetterImageRules_SizeComparisonOperator {
+            get {
+                return ((byte)(this["BetterImageRules_SizeComparisonOperator"]));
+            }
+            set {
+                this["BetterImageRules_SizeComparisonOperator"] = value;
             }
         }
     }

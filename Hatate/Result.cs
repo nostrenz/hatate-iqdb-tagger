@@ -70,17 +70,9 @@ namespace Hatate
 
 			this.local.Width = hydrusMetadata.Width;
 			this.local.Height = hydrusMetadata.Height;
-			this.local.Size = hydrusMetadata.Size;
+			this.local.SizeInBytes = hydrusMetadata.SizeInBytes;
 			this.local.Hash = hydrusMetadata.Hash;
-
-			switch (hydrusMetadata.Mime) {
-				case "image/jpg": this.local.Format = "jpg"; break;
-				case "image/jpeg": this.local.Format = "jpg"; break;
-				case "image/png": this.local.Format = "png"; break;
-				case "image/bmp": this.local.Format = "bmp"; break;
-				case "image/webp": this.local.Format = "webp"; break;
-				case "image/tiff": this.local.Format = "tiff"; break;
-			}
+			this.local.FormatFromMimeType = hydrusMetadata.Mime;
 		}
 
 		public void AddWarning(string message)
@@ -316,7 +308,7 @@ namespace Hatate
 		public Image Local
 		{
 			get { return this.local; }
-			set { this.Local = value; }
+			set { this.local = value; }
 		}
 
 		/// <summary>
@@ -446,28 +438,13 @@ namespace Hatate
 					return false;
 				}
 
-				if (this.remote.Format != null
-				&&  this.remote.Format.ToLower() == Options.Default.BetterImageRules_PreferedFileFormat.ToLower()
-				&&  this.local.Format.ToLower() != Options.Default.BetterImageRules_PreferedFileFormat.ToLower()) {
-					return true;
-				}
-
-				if (Options.Default.BetterImageRules_RemoteImageWidthShouldBeGreater
-				&&  this.remote.Width > this.local.Width) {
-					return true;
-				}
-
-				if (Options.Default.BetterImageRules_RemoteImageHeightShouldBeGreater
-				&& this.remote.Height > this.local.Height) {
-					return true;
-				}
-
-				if (Options.Default.BetterImageRules_RemoteImageSizeShouldBeGreater
-				&&  this.remote.Size > this.local.Size) {
-					return true;
-				}
-
-				return false;
+				return this.remote.IsBetterThan(
+					local,
+					(Enum.ImageFileFormat)Options.Default.BetterImageRules_PreferedFileFormat,
+					(Enum.ComparisonOperator)Options.Default.BetterImageRules_WidthComparisonOperator,
+					(Enum.ComparisonOperator)Options.Default.BetterImageRules_WidthComparisonOperator,
+					(Enum.ComparisonOperator)Options.Default.BetterImageRules_WidthComparisonOperator
+				);
 			}
 		}
 

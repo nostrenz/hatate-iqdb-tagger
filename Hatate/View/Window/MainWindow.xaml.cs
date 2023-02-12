@@ -195,8 +195,8 @@ namespace Hatate
 					} catch (OutOfMemoryException) { }
 				}
 
-				if (result.Local.Size == 0) {
-					result.Local.Size = new FileInfo(result.ImagePath).Length;
+				if (result.Local.SizeInBytes == 0) {
+					result.Local.SizeInBytes = new FileInfo(result.ImagePath).Length;
 				}
 
 				return true;
@@ -204,7 +204,7 @@ namespace Hatate
 
 			string thumbsDir = App.ThumbsDirPath;
 
-			result.Local.Format = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.') + 1);
+			result.Local.FormatFromFileExtension = result.ImagePath.Substring(result.ImagePath.LastIndexOf('.') + 1);
 			result.ThumbPath = thumbsDir + Guid.NewGuid().ToString() + '.' + result.Local.Format;
 
 			Directory.CreateDirectory(thumbsDir);
@@ -224,7 +224,7 @@ namespace Hatate
 
 			result.Local.Width = image.Width;
 			result.Local.Height = image.Height;
-			result.Local.Size = new FileInfo(result.ImagePath).Length;
+			result.Local.SizeInBytes = new FileInfo(result.ImagePath).Length;
 
 			// We don't want to generate a thumbnail or image width is lower than the resized width, we'll upload the original image
 			if (!Options.Default.ResizeImage || image.Width <= Options.Default.ThumbWidth) {
@@ -774,12 +774,12 @@ namespace Hatate
 			result.Full = booru.Full;
 			result.Pages = booru.Pages;
 			result.Remote = new Image();
-			result.Remote.Size = booru.Size;
+			result.Remote.SizeInBytes = booru.Size;
 			result.Remote.Width = booru.Width;
 			result.Remote.Height = booru.Height;
 
 			if (booru.Full != null) {
-				result.Remote.Format = booru.Full.Substring(booru.Full.LastIndexOf('.') + 1);
+				result.Remote.FormatFromFileExtension = booru.Full.Substring(booru.Full.LastIndexOf('.') + 1);
 			}
 
 			switch (booru.Rating) {
@@ -1915,12 +1915,12 @@ namespace Hatate
 			this.Label_Match.Content = result.Source.ToString();
 			this.Label_MatchInfos.Content = "";
 
-			if (result.Remote.Format != null) {
-				this.Label_Match.Content += " " + result.Remote.Format.ToUpper();
+			if (result.Remote.Format != Enum.ImageFileFormat.Unknown) {
+				this.Label_Match.Content += " " + result.Remote.Format.ToString().ToUpper();
 			}
 
-			if (result.Remote.Size > 0) {
-				this.Label_MatchInfos.Content += this.HumanReadableFileSize(result.Remote.Size) + " ";
+			if (result.Remote.SizeInBytes > 0) {
+				this.Label_MatchInfos.Content += this.HumanReadableFileSize(result.Remote.SizeInBytes) + " ";
 			}
 
 			if (result.Remote.Width > 0 && result.Remote.Height > 0) {
@@ -2038,12 +2038,12 @@ namespace Hatate
 		private bool ImageFormatIsSupported(Image image, Enum.SearchEngine searchEngine)
 		{
 			// webp not supported by IQDB
-			if (searchEngine == Enum.SearchEngine.IQDB && image.Format == "webp") {
+			if (searchEngine == Enum.SearchEngine.IQDB && image.Format == Enum.ImageFileFormat.WEBP) {
 				return false;
 			}
 
 			// tiff not supported by SauceNao
-			if (searchEngine == Enum.SearchEngine.SauceNAO && image.Format == "tiff") {
+			if (searchEngine == Enum.SearchEngine.SauceNAO && image.Format == Enum.ImageFileFormat.TIFF) {
 				return false;
 			}
 
@@ -2537,10 +2537,10 @@ namespace Hatate
 			}
 
 			this.Image_Local.Source = App.CreateBitmapImage(result.ThumbPath);
-			this.Label_SourceInfos.Content = this.HumanReadableFileSize(result.Local.Size) + " (" + result.Local.Width + "x" + result.Local.Height + ")";
+			this.Label_SourceInfos.Content = this.HumanReadableFileSize(result.Local.SizeInBytes) + " (" + result.Local.Width + "x" + result.Local.Height + ")";
 
-			if (result.Local.Format != null) {
-				this.Label_Local.Content = "Local " + result.Local.Format.ToUpper();
+			if (result.Local.Format != Enum.ImageFileFormat.Unknown) {
+				this.Label_Local.Content = "Local " + result.Local.Format.ToString().ToUpper();
 			}
 
 			this.UpdateRightView(result);

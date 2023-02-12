@@ -115,7 +115,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Enum\ComparisonOperator.cs" />
     <Compile Include="Enum\HydrusAutoSendBehaviour.cs" />
+    <Compile Include="Enum\ImageFileFormat.cs" />
     <Compile Include="Enum\TagSource.cs" />
     <Compile Include="Parser\e621.cs" />
     <Compile Include="TagNamespace.cs" />
