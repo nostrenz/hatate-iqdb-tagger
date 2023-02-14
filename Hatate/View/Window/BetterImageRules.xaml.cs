@@ -115,12 +115,15 @@ namespace Hatate.View.Window
         /// <summary>
         /// Use the values provided in the fields to test if a remote image would be determined as being better than a local one.
         /// </summary>
-        private void TestLocalImageAgainstRemoteImage()
+        private void TestRemoteImageAgainstLocalImage()
         {
             // UI not fully loaded yet
             if (!this.IsLoaded) {
                 return;
 			}
+
+            this.localImage.Format = Enum.ImageFileFormat.Unknown;
+            this.remoteImage.Format = Enum.ImageFileFormat.Unknown;
 
             int localImageWidth = 0;
             int localImageHeight = 0;
@@ -130,20 +133,30 @@ namespace Hatate.View.Window
             int remoteImageHeight = 0;
             long remoteImageSize = 0;
 
-            int.TryParse(this.TextBox_LocalImageWidth.Text, out localImageWidth);
-            int.TryParse(this.TextBox_LocalImageHeight.Text, out localImageHeight);
-            long.TryParse(this.TextBox_LocalImageSize.Text, out localImageSize);
+            if ((bool)this.CheckBox_Format.IsChecked) {
+                this.localImage.Format = (Enum.ImageFileFormat)((ComboBoxItem)this.ComboBox_LocalImageFormat.SelectedItem).Tag;
+                this.remoteImage.Format = (Enum.ImageFileFormat)((ComboBoxItem)this.ComboBox_RemoteImageFormat.SelectedItem).Tag;
+			}
 
-            int.TryParse(this.TextBox_RemoteImageWidth.Text, out remoteImageWidth);
-            int.TryParse(this.TextBox_RemoteImageHeight.Text, out remoteImageHeight);
-            long.TryParse(this.TextBox_RemoteImageSize.Text, out remoteImageSize);
+            if ((bool)this.CheckBox_Width.IsChecked) {
+                int.TryParse(this.TextBox_LocalImageWidth.Text, out localImageWidth);
+                int.TryParse(this.TextBox_RemoteImageWidth.Text, out remoteImageWidth);
+			}
 
-            this.localImage.Format = (Enum.ImageFileFormat)((ComboBoxItem)this.ComboBox_LocalImageFormat.SelectedItem).Tag;
+            if ((bool)this.CheckBox_Height.IsChecked) {
+                int.TryParse(this.TextBox_LocalImageHeight.Text, out localImageHeight);
+                int.TryParse(this.TextBox_RemoteImageHeight.Text, out remoteImageHeight);
+			}
+
+            if ((bool)this.CheckBox_Size.IsChecked) {
+                long.TryParse(this.TextBox_LocalImageSize.Text, out localImageSize);
+                long.TryParse(this.TextBox_RemoteImageSize.Text, out remoteImageSize);
+			}
+
             this.localImage.Width = localImageWidth;
             this.localImage.Height = localImageHeight;
             this.localImage.SizeInBytes = localImageSize * 1000;
 
-            this.remoteImage.Format = (Enum.ImageFileFormat)((ComboBoxItem)this.ComboBox_RemoteImageFormat.SelectedItem).Tag;
             this.remoteImage.Width = remoteImageWidth;
             this.remoteImage.Height = remoteImageHeight;
             this.remoteImage.SizeInBytes = remoteImageSize * 1000;
@@ -206,7 +219,7 @@ namespace Hatate.View.Window
         /// </summary>
 		private void ComboBox_TestImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-            this.TestLocalImageAgainstRemoteImage();
+            this.TestRemoteImageAgainstLocalImage();
 		}
 
         /// <summary>
@@ -215,7 +228,7 @@ namespace Hatate.View.Window
         /// </summary>
 		private void TextBox_TestImage_TextChanged(object sender, TextChangedEventArgs e)
 		{
-             this.TestLocalImageAgainstRemoteImage();
+             this.TestRemoteImageAgainstLocalImage();
 		}
 
         /// <summary>
@@ -227,7 +240,7 @@ namespace Hatate.View.Window
             this.ComboBox_PreferedFileFormat.IsEnabled = (bool)this.CheckBox_Format.IsChecked;
             this.ComboBox_RemoteImageFormat.IsEnabled = (bool)this.CheckBox_Format.IsChecked;
 
-            this.TestLocalImageAgainstRemoteImage();
+            this.TestRemoteImageAgainstLocalImage();
 		}
 
         /// <summary>
@@ -239,7 +252,7 @@ namespace Hatate.View.Window
             this.ComboBox_WidthOperator.IsEnabled = (bool)this.CheckBox_Width.IsChecked;
             this.TextBox_RemoteImageWidth.IsEnabled = (bool)this.CheckBox_Width.IsChecked;
 
-            this.TestLocalImageAgainstRemoteImage();
+            this.TestRemoteImageAgainstLocalImage();
 		}
 
         /// <summary>
@@ -251,7 +264,7 @@ namespace Hatate.View.Window
             this.ComboBox_HeightOperator.IsEnabled = (bool)this.CheckBox_Height.IsChecked;
             this.TextBox_RemoteImageHeight.IsEnabled = (bool)this.CheckBox_Height.IsChecked;
 
-            this.TestLocalImageAgainstRemoteImage();
+            this.TestRemoteImageAgainstLocalImage();
 		}
 
         /// <summary>
@@ -263,7 +276,7 @@ namespace Hatate.View.Window
             this.ComboBox_SizeOperator.IsEnabled = (bool)this.CheckBox_Size.IsChecked;
             this.TextBox_RemoteImageSize.IsEnabled = (bool)this.CheckBox_Size.IsChecked;
 
-            this.TestLocalImageAgainstRemoteImage();
+            this.TestRemoteImageAgainstLocalImage();
 		}
 
         /// <summary>
@@ -294,7 +307,7 @@ namespace Hatate.View.Window
             this.ComboBox_SizeOperator.IsEnabled = (bool)this.CheckBox_Size.IsChecked;
             this.TextBox_RemoteImageSize.IsEnabled = (bool)this.CheckBox_Size.IsChecked;
 
-            this.TestLocalImageAgainstRemoteImage();
+            this.TestRemoteImageAgainstLocalImage();
 		}
 	}
 }
