@@ -7,7 +7,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="Hatate.View.Window.BetterImageRules"
         mc:Ignorable="d"
         Title="Edit conditions under which a valid match is considered better than the local image file"
-        Width="555" Height="425"
+        Width="560" Height="425"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
 	<Grid Background="{DynamicResource WindowBackground}">
 		<Button Content="Save" Margin="10,0,10,10" Height="25" VerticalAlignment="Bottom" Click="Button_Save_Click"/>
@@ -19,29 +19,30 @@
 		<GroupBox Header="Conditions" Margin="10,0,10,50" Height="221" VerticalAlignment="Bottom">
 			<Grid Margin="0,0,0,0">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="30*"/>
-					<ColumnDefinition Width="40*"/>
-					<ColumnDefinition Width="55*"/>
-					<ColumnDefinition Width="40*"/>
+					<ColumnDefinition Width="100"/>
+					<ColumnDefinition Width="50*"/>
+					<ColumnDefinition Width="200"/>
+					<ColumnDefinition Width="50*"/>
 				</Grid.ColumnDefinitions>
 
-				<Label Content="Local image" Grid.Column="1" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Height="23"/>
+				<Label Content="Local image" Grid.Column="1" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Height="23" Padding="0,5"/>
 				<ComboBox x:Name="ComboBox_LocalImageFormat" Grid.Column="1" Margin="10,41,10,0" VerticalAlignment="Top" SelectionChanged="ComboBox_TestImage_SelectionChanged" ToolTip="Select a value to test this condition"/>
 				<TextBox x:Name="TextBox_LocalImageWidth" Grid.Column="1" Height="23" Margin="10,66,10,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" TextChanged="TextBox_TestImage_TextChanged" ToolTip="Enter a value to test this condition"/>
 				<TextBox x:Name="TextBox_LocalImageHeight" Grid.Column="1" Height="23" Margin="10,94,10,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" TextChanged="TextBox_TestImage_TextChanged" ToolTip="Enter a value to test this condition"/>
 				<TextBox x:Name="TextBox_LocalImageSize" Grid.Column="1" Height="23" Margin="10,122,10,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" TextChanged="TextBox_TestImage_TextChanged" ToolTip="Enter a value to test this condition"/>
 
-				<Label Grid.Column="3" Content="Remote image" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Height="23"/>
+				<Label Grid.Column="3" Content="Remote image" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" FontWeight="Bold" Height="23" Padding="0,5"/>
 				<ComboBox Grid.Column="3" x:Name="ComboBox_RemoteImageFormat" Margin="10,41,10,0" VerticalAlignment="Top" SelectionChanged="ComboBox_TestImage_SelectionChanged" ToolTip="Select a value to test this condition"/>
 				<TextBox Grid.Column="3" x:Name="TextBox_RemoteImageWidth" Height="23" Margin="10,66,10,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" TextChanged="TextBox_TestImage_TextChanged" ToolTip="Enter a value to test this condition"/>
 				<TextBox Grid.Column="3" x:Name="TextBox_RemoteImageHeight" Height="23" Margin="10,94,10,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" TextChanged="TextBox_TestImage_TextChanged" ToolTip="Enter a value to test this condition"/>
 				<TextBox Grid.Column="3" x:Name="TextBox_RemoteImageSize" Height="23" Margin="10,122,10,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" TextChanged="TextBox_TestImage_TextChanged" ToolTip="Enter a value to test this condition"/>
 
+				<Label Content="for the remote image, it should be..." Grid.Column="2" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="23" Padding="0,5"/>
+				<ComboBox x:Name="ComboBox_PreferedFileFormat" Margin="10,41,10,0" VerticalAlignment="Top" Height="20" SelectionChanged="ComboBox_TestImage_SelectionChanged" Grid.Column="2"/>
 				<ComboBox x:Name="ComboBox_WidthOperator" Grid.Column="2" Margin="10,66,10,0" VerticalAlignment="Top" SelectionChanged="ComboBox_TestImage_SelectionChanged"/>
 				<ComboBox x:Name="ComboBox_HeightOperator" Grid.Column="2" Margin="10,94,10,0" VerticalAlignment="Top" SelectionChanged="ComboBox_TestImage_SelectionChanged"/>
 				<ComboBox x:Name="ComboBox_SizeOperator" Grid.Column="2" Margin="10,122,10,0" VerticalAlignment="Top" SelectionChanged="ComboBox_TestImage_SelectionChanged"/>
-				<Label Content="should be" Grid.Column="2" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="23"/>
-				<ComboBox x:Name="ComboBox_PreferedFileFormat" Margin="10,41,10,0" VerticalAlignment="Top" Height="20" SelectionChanged="ComboBox_TestImage_SelectionChanged" Grid.Column="2" ToolTip="Uncheck to ignore this condition"/>
+				
 				<CheckBox x:Name="CheckBox_Format" Content="Format" Margin="10,45,10,0" VerticalAlignment="Top" Checked="CheckBox_Format_StateChanged" Unchecked="CheckBox_Format_StateChanged" ToolTip="Uncheck to ignore this condition"/>
 				<CheckBox x:Name="CheckBox_Width" Content="Width" Margin="10,71,10,0" VerticalAlignment="Top" Checked="CheckBox_Width_StateChanged" Unchecked="CheckBox_Width_StateChanged" ToolTip="Uncheck to ignore this condition"/>
 				<CheckBox x:Name="CheckBox_Height" Content="Height" Margin="10,99,10,0" VerticalAlignment="Top" Checked="CheckBox_Height_StateChanged" Unchecked="CheckBox_Height_StateChanged" ToolTip="Uncheck to ignore this condition"/>

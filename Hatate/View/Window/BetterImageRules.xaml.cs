@@ -29,11 +29,11 @@ namespace Hatate.View.Window
             this.TextBox_RemoteImageHeight.Text = this.remoteImage.Height.ToString();
             this.TextBox_RemoteImageSize.Text = System.Math.Round((decimal)this.remoteImage.SizeInBytes / 1000).ToString();
 
-            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.LessThan, "less than");
-            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.GreaterThan, "greater than");
-            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.Equal, "equal to");
-            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.LessOrEqualThan, "less than or equal to");
-            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.GreaterOrEqualThan, "greater than or equal to");
+            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.LessThan, "lesser");
+            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.GreaterThan, "greater");
+            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.Equal, "equal");
+            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.LessOrEqualThan, "lesser or equal");
+            this.AddComparisonOperatorComboBoxItem(Enum.ComparisonOperator.GreaterOrEqualThan, "greater or equal");
         }
 
         /*
