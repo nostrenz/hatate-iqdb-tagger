@@ -425,9 +425,9 @@ namespace Hatate
 
 			result.Searched = true;
 
-			bool success = await this.HandleAutoSendToHydrus(result, (Enum.HydrusAutoSendBehaviour)Options.Default.Hydrus_AutoSendBehaviour);
+			bool sentToHydrus = await this.HandleAutoSendToHydrus(result, (Enum.HydrusAutoSendBehaviour)Options.Default.Hydrus_AutoSendBehaviour);
 
-			if (success && Options.Default.RemoveResultAfter) {
+			if (sentToHydrus && Options.Default.RemoveResultAfter) {
 				this.RemoveResultFromFilesListbox(result);
 			}
 
@@ -442,11 +442,12 @@ namespace Hatate
 
 		/// <summary>
 		/// Handles how a local image file or URL can be automatically sent to Hydrus under certain conditions.
+		/// Returns true if the local image file o the URL was sent to Hydrus, false otherwise.
 		/// </summary>
 		private async Task<bool> HandleAutoSendToHydrus(Result result, Enum.HydrusAutoSendBehaviour behaviour)
 		{
 			if (behaviour == Enum.HydrusAutoSendBehaviour.Never) {
-				return true;
+				return false;
 			}
 
 			bool importLocalImageFile = false;
@@ -467,7 +468,7 @@ namespace Hatate
 				importLocalImageFile = !importBooruPageUrl;
 			}
 
-			bool success = false;
+			bool sentToHydrus = false;
 
 			if (importLocalImageFile) {
 				string hydrusPageKey = null;
@@ -481,14 +482,14 @@ namespace Hatate
 					}
 				}
 
-				success &= await this.ImportLocalImageInHydrus(result, hydrusPageKey);
+				sentToHydrus |= await this.ImportLocalImageInHydrus(result, hydrusPageKey);
 			}
 
 			if (importBooruPageUrl) {
-				success &= await App.hydrusApi.SendUrl(result, result.Url);
+				sentToHydrus |= await App.hydrusApi.SendUrl(result, result.Url);
 			}
 
-			return success;
+			return sentToHydrus;
 		}
 
 		/// <summary>
