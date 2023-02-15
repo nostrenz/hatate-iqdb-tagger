@@ -19,9 +19,9 @@
 				<CheckBox x:Name="CheckBox_ResizeImage" Content="Resized local image width for uploading" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top" Width="228" Height="14" ToolTip="If enabled, images will be resized to this width before being uploaded to a search engine"/>
 				<TextBox x:Name="TextBox_ThumbWidth" Height="23" Margin="292,77,10,0" TextWrapping="Wrap" Text="150" VerticalAlignment="Top"/>
 				<Label x:Name="Label_Retry" Content="When a search with IQDB gives no result:" Margin="10,105,10,0" VerticalAlignment="Top"/>
-				<RadioButton x:Name="RadioButton_DontRetry" GroupName="RetryMethod" Content="Do nothing" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Width="104"/>
-				<RadioButton x:Name="RadioButton_RetrySameEngine" GroupName="RetryMethod" Content="Retry one time with the same search engine" Margin="143,133,183,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="250"/>
-				<RadioButton x:Name="RadioButton_RetryOtherEngine" GroupName="RetryMethod" Content="Retry with SauceNAO" Margin="0,133,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="140"/>
+				<RadioButton x:Name="RadioButton_DontRetry" GroupName="RetryMethod" Content="Do nothing" HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top"/>
+				<RadioButton x:Name="RadioButton_RetrySameEngine" GroupName="RetryMethod" Content="Retry one time with the same search engine" Margin="143,133,183,0" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+				<RadioButton x:Name="RadioButton_RetryOtherEngine" GroupName="RetryMethod" Content="Retry with SauceNAO" Margin="0,133,10,0" VerticalAlignment="Top" HorizontalAlignment="Right"/>
 			</Grid>
 		</GroupBox>
 

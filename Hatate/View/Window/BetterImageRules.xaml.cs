@@ -17,6 +17,9 @@ namespace Hatate.View.Window
 
             this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.PNG, "PNG");
             this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.JPEG, "JPEG");
+            this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.BMP, "BMP");
+            this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.TIFF, "TIFF");
+            this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.WEBP, "WEBP");
 
             this.ComboBox_LocalImageFormat.SelectedIndex = 0;
             this.ComboBox_RemoteImageFormat.SelectedIndex = 0;
