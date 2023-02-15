@@ -74,7 +74,6 @@ namespace Hatate.Parser
             JToken deleted = parsed.GetValue("is_deleted");
 			JToken banned = parsed.GetValue("is_banned");
             JToken full = parsed.GetValue("file_url");
-            JToken source = parsed.GetValue("source");
 
             JToken tagStringGeneral = parsed.GetValue("tag_string_general");
             JToken tagStringCharacter = parsed.GetValue("tag_string_character");
@@ -93,10 +92,6 @@ namespace Hatate.Parser
 
             if (full != null) {
                 this.full = full.ToString();
-            }
-
-            if (source != null) {
-                this.source = source.ToString();
             }
 
             if (rating != null) {

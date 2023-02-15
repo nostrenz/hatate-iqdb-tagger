@@ -64,6 +64,11 @@ namespace Hatate.Parser
 					return false;
 				}
 
+				if (data.body.width != null && data.body.height != null) {
+					int.TryParse((string)data.body.width, out this.width);
+					int.TryParse((string)data.body.height, out this.height);
+				}
+
 				// Get tags
 				if (data.body.tags != null && data.body.tags.tags != null) {
 					foreach (dynamic tag in data.body.tags.tags) {
@@ -84,6 +89,10 @@ namespace Hatate.Parser
 				// If it's an album, get the number of images in it
 				if (data.body.pageCount != null) {
 					ushort.TryParse(data.body.pageCount.ToString(), out this.pages);
+				}
+
+				if (data.body.urls != null && data.body.urls.original != null) {
+					this.full = (string)data.body.urls.original;
 				}
 			}
 

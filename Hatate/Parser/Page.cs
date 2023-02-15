@@ -21,7 +21,6 @@ namespace Hatate.Parser
 		protected int width = 0;
 		protected int height = 0;
 		protected string rating = null;
-		protected string source = null;
 		protected bool unavailable = false;
 		protected ushort pages = 0;
 
@@ -191,11 +190,6 @@ namespace Hatate.Parser
 		protected string Url
 		{
 			get { return this.url; }
-		}
-
-		protected string Source
-		{
-			get { return this.source; }
 		}
 
         // Value for the User-Agent header used with some APIs
