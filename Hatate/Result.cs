@@ -386,7 +386,7 @@ namespace Hatate
 				}
 
 				// Booru image seems better than the local one, we should review this file
-				if (this.IsMatchBetterThanLocal) {
+				if (this.IsRemoteBetterThanLocal) {
 					return Brushes.Yellow;
 				}
 
@@ -413,7 +413,7 @@ namespace Hatate
 				string text = "Found on IQDB, ";
 
 				// Booru image seems better than the local one, we should review this file
-				if (this.IsMatchBetterThanLocal) {
+				if (this.IsRemoteBetterThanLocal) {
 					return text + "booru image seems better";
 				}
 
@@ -427,7 +427,7 @@ namespace Hatate
 		/// <returns>
 		/// True for the found file, False for the local file.
 		/// </returns>
-		public bool IsMatchBetterThanLocal
+		public bool IsRemoteBetterThanLocal
 		{
 			get
 			{

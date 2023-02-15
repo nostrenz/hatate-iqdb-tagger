@@ -461,10 +461,10 @@ namespace Hatate
 				importBooruPageUrl = true;
 			} else if (behaviour == Enum.HydrusAutoSendBehaviour.ImportUrlIfBetter) {
 				// Send the matched URL, but only if the remote image is better than the local one
-				importBooruPageUrl = result.IsMatchBetterThanLocal;
+				importBooruPageUrl = result.IsRemoteBetterThanLocal;
 			} else if (behaviour == Enum.HydrusAutoSendBehaviour.ImportUrlOrLocal) {
 				// Send the matched URL if the remote image is better than the local one, otherwise import the local image file along with its tags
-				importBooruPageUrl = result.IsMatchBetterThanLocal;
+				importBooruPageUrl = result.IsRemoteBetterThanLocal;
 				importLocalImageFile = !importBooruPageUrl;
 			}
 
@@ -1939,7 +1939,7 @@ namespace Hatate
 			}
 
 			// Set borders
-			if (result.IsMatchBetterThanLocal) {
+			if (result.IsRemoteBetterThanLocal) {
 				this.Border_Local.BorderBrush = this.GetBrushFromString("#CC0");
 				this.Border_Match.BorderBrush = this.GetBrushFromString("#0F0");
 			} else {

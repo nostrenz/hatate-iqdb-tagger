@@ -9,11 +9,16 @@ namespace Hatate.View.Window
         private Image localImage = new Image();
         private Image remoteImage = new Image();
 
-        public BetterImageRules(System.Windows.Window owner)
+        public BetterImageRules(System.Windows.Window owner, Result result = null)
         {
             InitializeComponent();
 
             this.Owner = owner;
+
+            if (result != null) {
+                this.localImage = result.Local;
+                this.remoteImage = result.Remote;
+			}
 
             this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.PNG, "PNG");
             this.AddPreferedImageFileFormatComboBoxItem(Enum.ImageFileFormat.JPEG, "JPEG");

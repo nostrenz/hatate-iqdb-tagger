@@ -16,7 +16,7 @@
 		{
 			sbyte score = 0;
 
-			if (preferedFormat != Enum.ImageFileFormat.Unknown) {
+			if (preferedFormat != Enum.ImageFileFormat.Unknown && this.Format != Enum.ImageFileFormat.Unknown) {
 				if (this.Format == preferedFormat && other.Format != preferedFormat) {
 					score++;
 				} else if (this.Format != preferedFormat && other.Format == preferedFormat) {
@@ -24,15 +24,15 @@
 				}
 			}
 
-			if (widthOperator != Enum.ComparisonOperator.None) {
+			if (widthOperator != Enum.ComparisonOperator.None && this.Width > 0) {
 				score += this.Compare(this.Width, other.Width, widthOperator);
 			}
 
-			if (heightOperator != Enum.ComparisonOperator.None) {
+			if (heightOperator != Enum.ComparisonOperator.None && this.Height > 0) {
 				score += this.Compare(this.Height, other.Height, heightOperator);
 			}
 
-			if (sizeOperator != Enum.ComparisonOperator.None) {
+			if (sizeOperator != Enum.ComparisonOperator.None && this.SizeInBytes > 0) {
 				score += this.Compare(this.SizeInBytes, other.SizeInBytes, sizeOperator);
 			}
 
