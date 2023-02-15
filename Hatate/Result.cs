@@ -14,8 +14,6 @@ namespace Hatate
 	/// </summary>
 	public class Result : System.IEquatable<Result>
 	{
-		const byte FEW = 9;
-
 		private Image local = new Image();
 		private Image remote = new Image();
 		private List<string> warnings = new List<string>();
@@ -387,11 +385,6 @@ namespace Hatate
 					return Brushes.Red;
 				}
 
-				// Few tags were retrived, we should review this file
-				if (this.Tags.Count <= FEW) {
-					return Brushes.Yellow;
-				}
-
 				// Booru image seems better than the local one, we should review this file
 				if (this.IsMatchBetterThanLocal) {
 					return Brushes.Yellow;
@@ -418,11 +411,6 @@ namespace Hatate
 				}
 
 				string text = "Found on IQDB, ";
-
-				// Few tags were retrived, we should review this file
-				if (this.Tags.Count <= FEW) {
-					return text + "but few tags were retrieved";
-				}
 
 				// Booru image seems better than the local one, we should review this file
 				if (this.IsMatchBetterThanLocal) {
