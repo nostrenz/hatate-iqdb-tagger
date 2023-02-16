@@ -322,8 +322,10 @@ namespace Hatate
 			// Refresh the items to update the foreground color from the Result objets
 			this.ListBox_Files.Items.Refresh();
 
-			// This is the last search, end here
-			if (progress >= this.ListBox_Files.Items.Count - 1 && !this.retrySearch) {
+			progress = this.GetNextIndex();
+
+			// No more files in the list, end here
+			if (progress < 0) {
 				this.EndSearch();
 
 				return;
