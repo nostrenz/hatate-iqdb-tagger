@@ -406,11 +406,17 @@ namespace Hatate
 					return "- " + string.Join("\n- ", this.warnings);
 				}
 
-				if (!this.Found) {
-					return "Not found on IQDB";
+				string usedSearchEngineName = "IQDB";
+
+				if (this.UsedSearchEngine == Enum.SearchEngine.SauceNAO) {
+					usedSearchEngineName = "SauceNAO";
 				}
 
-				string text = "Found on IQDB, ";
+				if (!this.Found) {
+					return "Not found on " + usedSearchEngineName;
+				}
+
+				string text = "Found on " + usedSearchEngineName + ", ";
 
 				// Booru image seems better than the local one, we should review this file
 				if (this.IsRemoteBetterThanLocal) {
