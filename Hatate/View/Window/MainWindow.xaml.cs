@@ -488,7 +488,7 @@ namespace Hatate
 			}
 
 			if (importBooruPageUrl) {
-				sentToHydrus |= await App.hydrusApi.SendUrl(result, result.Url);
+				sentToHydrus |= await this.SendUrlToHydrus(result, result.Url);
 			}
 
 			return sentToHydrus;
@@ -1783,14 +1783,10 @@ namespace Hatate
 		/// </summary>
 		/// <param name="result"></param>
 		/// <param name="url"></param>
-		private async void SendUrlToHydrus(Result result, string url)
+		private async Task<bool> SendUrlToHydrus(Result result, string url)
 		{
 			App.hydrusApi.ResetUnreachableFlag();
 			this.ListBox_Files.IsEnabled = false;
-
-			if (result == null) {
-				return;
-			}
 
 			int successes = 0;
 			int failures = 0;
@@ -1806,6 +1802,8 @@ namespace Hatate
 			this.ListBox_Files.Items.Refresh();
 			this.ListBox_Files.IsEnabled = true;
 			this.SetStatus("URL sent to Hydrus.");
+
+			return success;
 		}
 
 		/// <summary>
@@ -2641,7 +2639,9 @@ namespace Hatate
 					this.CopySelectedSourceUrls();
 				break;
 				case "sendThisUrlToHydrus":
-					this.SendUrlToHydrus(this.SelectedResult, mi.Header.ToString());
+					if (this.ListBox_Files.SelectedItem != null) {
+						this.SendUrlToHydrus(this.SelectedResult, mi.Header.ToString());
+					}
 				break;
 				case "copyThisUrl":
 					Clipboard.SetText(mi.Header.ToString());
