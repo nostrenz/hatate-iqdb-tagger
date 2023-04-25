@@ -403,7 +403,7 @@ namespace Hatate
 			if (result.Found) {
 				this.SetStatus("File found.");
 				this.found++;
-			} else { 
+			} else {
 				if (!isRetry) {
 					if (Options.Default.RetryMethod == (byte)RetryMethod.SameEngine) {
 						// Retry with the same search engine
@@ -752,15 +752,15 @@ namespace Hatate
 
 			// Add tags from the parsed booru page
 			result.ClearTagsOfSource(Enum.TagSource.Booru);
+			bool parsingSucceeded = false;
 
-			// Parse booru page
-			bool success = booru.FromUrl(result.Url);
-
-			// For some booru we might know if the image is available on the page even if the parsing fails
-			result.Unavailable = booru.Unavailable;
+			if (result.Url != null) {
+				parsingSucceeded = booru.FromUrl(result.Url);
+				result.Unavailable = booru.Unavailable;
+			}
 
 			// Don't go further if we can't retrieve tags from the URL
-			if (!success) {
+			if (!parsingSucceeded) {
 				this.ListBox_Tags.Items.Refresh();
 
 				return false;
@@ -2128,7 +2128,7 @@ namespace Hatate
 				Supremes.Nodes.Element releaseDiv = doc.Select("div.release-main-section").First;
 
 				if (releaseDiv == null) {
-					releaseDiv = doc.Select("div[data-test-selector=\"release-card\"]").First;	
+					releaseDiv = doc.Select("div[data-test-selector=\"release-card\"]").First;
 				}
 
 				Supremes.Nodes.Element changelog = null;
