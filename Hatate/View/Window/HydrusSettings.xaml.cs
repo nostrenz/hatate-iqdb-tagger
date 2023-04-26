@@ -173,7 +173,11 @@ namespace Hatate
 				MessageBox.Show("Connection failed");
 				this.Button_Apply.IsEnabled = false;
 				return;
-			}
+			} catch (System.NotSupportedException) {
+                MessageBox.Show("Connection failed");
+                this.Button_Apply.IsEnabled = false;
+                return;
+            }
 
 			request.Headers.Add("Hydrus-Client-API-Access-Key: " + this.TextBox_ApiAccessKey.Text);
 			request.AutomaticDecompression = DecompressionMethods.GZip;
