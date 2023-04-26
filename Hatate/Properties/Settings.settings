@@ -57,7 +57,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="HydrusApiPort" Type="System.String" Scope="User">
-      <Value Profile="(Default)">45869</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HydrusApiAccessKey" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

@@ -241,7 +241,7 @@ namespace Hatate.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("45869")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string HydrusApiPort {
             get {
                 return ((string)(this["HydrusApiPort"]));

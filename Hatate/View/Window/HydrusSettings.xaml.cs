@@ -15,12 +15,7 @@ namespace Hatate
 
 			this.Owner = App.Current.MainWindow;
 
-			// Ensure compatibility with previous versions
-			if (!string.IsNullOrEmpty(Settings.Default.HydrusApiPort)) {
-				Settings.Default.HydrusApiHost += ':' + Settings.Default.HydrusApiPort;
-				Settings.Default.HydrusApiPort = null;
-				Settings.Default.Save();
-			}
+			App.hydrusApi.UpdateApiHostString();
 
 			this.TextBox_ApiHost.Text = Settings.Default.HydrusApiHost;
 			this.TextBox_ApiAccessKey.Text = Settings.Default.HydrusApiAccessKey;

@@ -349,7 +349,7 @@ namespace Hatate
 			string message = "Unable to call the Hydrus API. ";
 			message += "\n- Verify Hydrus is running with a configured local files API.";
 			message += "\n- Verify the URL, access key and tag service in \"Settings\" > \"Hydrus API\".";
-			
+
 			if (exceptionMessage != null) {
 				message += "\n\n" + exceptionMessage;
 			}
@@ -361,6 +361,38 @@ namespace Hatate
 		{
 			this.unreachable = false;
 		}
+
+		/**
+		 * Updates the format of the API host string stored in settings.
+		 */
+		public void UpdateApiHostString()
+		{
+            // Deduplicate port in host string
+            if (!string.IsNullOrEmpty(Settings.Default.HydrusApiHost)) {
+                string host = Settings.Default.HydrusApiHost;
+                int pos = host.LastIndexOf(":");
+
+                if (pos > 0) {
+                    string port = Settings.Default.HydrusApiHost.Substring(pos);
+
+                    host = host.Substring(0, pos);
+                    pos = host.LastIndexOf(port);
+
+                    if (pos > 0) {
+                        Settings.Default.HydrusApiHost = host.Trim();
+                        Settings.Default.HydrusApiPort = null;
+                        Settings.Default.Save();
+                    }
+                }
+            }
+
+            // Ensure compatibility with previous versions
+            if (!string.IsNullOrEmpty(Settings.Default.HydrusApiPort)) {
+                Settings.Default.HydrusApiHost += ':' + Settings.Default.HydrusApiPort;
+                Settings.Default.HydrusApiPort = null;
+                Settings.Default.Save();
+            }
+        }
 
 		#endregion Public
 
@@ -396,15 +428,9 @@ namespace Hatate
 
 		private HttpWebRequest CreateRequest(string route)
 		{
-			// Ensure compatibility with previous versions
-			if (!string.IsNullOrEmpty(Settings.Default.HydrusApiPort)) {
-				Settings.Default.HydrusApiHost += ':' + Settings.Default.HydrusApiPort;
-				Settings.Default.HydrusApiPort = null;
-				Settings.Default.Save();
-			}
+            this.UpdateApiHostString();
 
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Settings.Default.HydrusApiHost + route);
-
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Settings.Default.HydrusApiHost + route);
 			request.Headers.Add("Hydrus-Client-API-Access-Key: " + Settings.Default.HydrusApiAccessKey);
 
 			return request;
