@@ -143,7 +143,11 @@ namespace Hatate
 
 			foreach (var item in services) {
 				string key = (string)item.Key;
-				JArray jArray = (JArray)item.Value;
+				dynamic jArray = item.Value;
+
+				if (!(jArray is JArray)) {
+					jArray = item.Value.Children<JObject>();
+				}
 
 				// File services
 				if (key == "local_files" || key == "file_repositories" || key == "all_local_files" || key == "all_known_files") {
